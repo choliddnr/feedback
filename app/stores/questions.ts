@@ -1,5 +1,6 @@
 import { defineStore, acceptHMRUpdate, skipHydrate } from "pinia";
 import type { Question } from "~/types";
+import { isEmptyObject } from "~/utils";
 
 export const useQuestionsStore = defineStore("questions", () => {
   const { selectedProducts } = storeToRefs(useProductsStore());
@@ -26,6 +27,15 @@ export const useQuestionsStore = defineStore("questions", () => {
     }
     return data;
   });
+  const totalQuestions = computed<number>(() => {
+    let count = 0;
+    if (!isEmptyObject(productsQuestions.value)) {
+      for (let key in productsQuestions.value) {
+        count = count + (productsQuestions.value[key]?.length || 0);
+      }
+    }
+    return count;
+  });
 
   const productQuestions = computed<Question[]>(
     () => productsQuestions.value[currentProductId.value] || []
@@ -49,6 +59,7 @@ export const useQuestionsStore = defineStore("questions", () => {
     currentQuestionIndex,
     currentQuestionId,
     lastQuestionsIndex,
+    totalQuestions,
   };
 });
 

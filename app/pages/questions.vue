@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { watchDebounced } from "@vueuse/core";
+import { isEmptyObject } from "~/utils";
 const { productsMap, selectedProducts } = storeToRefs(useProductsStore());
 const {
   productQuestions,
@@ -8,6 +10,7 @@ const {
   lastQuestionsIndex,
   currentQuestionId,
   currentQuestionIndex,
+  totalQuestions,
 } = storeToRefs(useQuestionsStore());
 
 const product = computed(() => productsMap.value.get(currentProductId.value));
@@ -26,23 +29,11 @@ const loadAnsweredQuestions = () => {
       for (let j = 0, len = questions?.length || 0; j < len; j++) {
         const QId = questions![j]?.id;
         if (QId) {
-          console.log("question", pid, productsQuestions.value, questions, QId);
           answers.value[pid][QId] = savedAnswers[QId] || undefined;
         }
       }
     }
   }
-};
-
-const isObjEmpty = (obj: Object) => {
-  let isEmpty = true;
-  for (let key in obj) {
-    if (obj.hasOwnProperty(key)) {
-      isEmpty = false;
-      break;
-    }
-  }
-  return isEmpty;
 };
 
 const answeredProduct = ref<{ [key: string]: boolean }>({});
@@ -52,14 +43,20 @@ const setAnsweredProductDefaultValue = () => {
     answeredProduct.value[selectedProducts.value[i]!] = false;
   }
 };
+// console.log();
 
-const unwatch = watch(productsQuestions, () => {
-  console.log(productsQuestions.value, isObjEmpty(productsQuestions.value));
-  if (!isObjEmpty(productsQuestions.value)) {
-    setAnsweredProductDefaultValue();
-    unwatch();
-  }
-});
+if (!isEmptyObject(productsQuestions.value)) {
+  console.log("watch productsQuestions", false);
+  setAnsweredProductDefaultValue();
+} else {
+  console.log("watch productsQuestions", true);
+  const unwatch = watch(productsQuestions, () => {
+    if (!isEmptyObject(productsQuestions.value)) {
+      setAnsweredProductDefaultValue();
+      unwatch();
+    }
+  });
+}
 
 const allCurrentProductQuestionsAnswered = computed(() => {
   for (let key in answers.value[currentProductId.value]) {
@@ -109,47 +106,43 @@ const nextQuestion = () => {
   saveToLocalStorage(currentProductId.value);
   currentQuestionIndex.value++;
 };
+/**
+ * Allow user to submit
+ */
 
 const allowToSubmit = computed(() => {
-  if (!answeredProduct.value) return false;
-  for (let key in answeredProduct.value) {
-    if (answeredProduct.value[key] === false) {
-      return false;
-    }
-  }
+  console.log("cek", totalQuestions.value, totalAnsweredQuestions.value);
+  if (
+    totalAnsweredQuestions.value === undefined ||
+    totalAnsweredQuestions.value === 0
+  )
+    return false;
+  if (totalQuestions.value !== totalAnsweredQuestions.value) return false;
+
   return true;
 });
 
-// if (import.meta.client) {
-//   if (selectedProducts.value) {
-//     for (let i = 0, len = selectedProducts.value.length; i < len; i++) {
-//       const key = selectedProducts.value[i];
-//       if (key) {
-//         answers.value[key] = JSON.parse(localStorage.getItem(key) || "{}");
-//       }
-//     }
-//   }
-// }
-
-// watchEffect(() => {
-//   if (answers.value && selectedProducts.value) {
-//     for (let i = 0, len = selectedProducts.value.length; i < len; i++) {
-//       const key = selectedProducts.value[i];
-//       if (key) {
-//         const data = JSON.parse(localStorage.getItem(key) || "{}");
-//         for (let QId in data) {
-//           console.log("answers", QId);
-//           // answers.value[key]![QId] = data[QId];
-//         }
-//       }
-//     }
-//   }
-// });
+const totalAnsweredQuestions = computed<number>(() => {
+  let count = 0;
+  for (let key in answers.value) {
+    count = count + countObjectAttribute(answers.value[key]);
+  }
+  return count;
+});
+watchDebounced(
+  answers,
+  () => {
+    saveToLocalStorage(currentProductId.value);
+  },
+  { debounce: 1000, maxWait: 2000, deep: true }
+);
+const readyToMount = ref<boolean>(true);
 </script>
 <template>
   <UCard
     :ui="{ background: 'backdrop-blur-sm bg-white/60' }"
     class="w-full md:w-2/3"
+    v-show="readyToMount"
   >
     <template #header>
       <ClientOnly>
@@ -159,7 +152,6 @@ const allowToSubmit = computed(() => {
             {{ allCurrentProductQuestionsAnswered }}</span
           >
           <div class="flex flex-row gap-1">
-            <!-- <UButton label="jkka" @click="loadAnsweredQuestions" /> -->
             <UButton
               icon="i-heroicons-chevron-left-solid"
               @click="prevProduct"
@@ -256,6 +248,11 @@ const allowToSubmit = computed(() => {
         >{{ index }}</UButton
       >
     </div>
-    <!--<pre>{{ answers }}</pre>-->
+    <!--<pre>{{ totalQuestions }}/{{ totalAnsweredQuestions }}</pre>
+    <pre
+      >{{ answers }}/{{ currentProductId }}/{{ productQuestions }}/{{
+        currentQuestionIndex
+      }}</pre
+    >-->
   </UCard>
 </template>

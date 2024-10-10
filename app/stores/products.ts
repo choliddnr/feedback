@@ -19,11 +19,6 @@ export const useProductsStore = defineStore("products", () => {
       selectedProducts.value = JSON.parse(
         localStorage.getItem("selectedProducts")!
       );
-      console.log(
-        "selectedProducts client",
-        selectedProducts.value,
-        localStorage.getItem("selectedProducts")!
-      );
     }
   }
 
