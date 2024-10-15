@@ -2,31 +2,25 @@ import { defineStore, acceptHMRUpdate, skipHydrate } from "pinia";
 import type { Product } from "~/types";
 
 export const useProductsStore = defineStore("products", () => {
-  const products = ref<Product[]>([]);
-  const productsMap = computed(
-    () => new Map(products.value.map((p) => [p.id, p]))
-  );
-  const selectedProducts = ref<string[]>([]);
-  useFetch("/api/products", {
-    method: "GET",
-    onResponse: ({ response }) => {
-      products.value = response._data;
+  const { $pb } = useNuxtApp();
+  const { merchant } = storeToRefs(useMerchantStore());
+  const products = ref<Product[]>();
+  useAsyncData(
+    async () => {
+      if (!merchant.value?.id) return;
+      const records = await $pb
+        .collection("products")
+        .getFullList({ filter: `merchant='${merchant.value?.id}'` });
+      console.log("fetch product", structuredClone(records));
+      products.value = structuredClone(records) as unknown as Product[];
     },
-  });
-
-  if (import.meta.client) {
-    if (localStorage.getItem("selectedProducts")) {
-      selectedProducts.value = JSON.parse(
-        localStorage.getItem("selectedProducts")!
-      );
+    {
+      watch: [merchant],
     }
-  }
+  );
+  const productToDelete = ref<Product | undefined>();
 
-  return {
-    products,
-    selectedProducts: skipHydrate(selectedProducts),
-    productsMap: skipHydrate(productsMap),
-  };
+  return { productToDelete, products };
 });
 
 if ((import.meta as any).hot) {

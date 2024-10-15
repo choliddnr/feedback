@@ -1,5 +1,14 @@
+<script setup lang="ts">
+const { $pb } = useNuxtApp();
+const { merchant } = storeToRefs(useFeedbackStore());
+const bgUrl = computed(() => {
+  if (!merchant.value) return "";
+  return $pb.files.getUrl(merchant.value, merchant.value.image_background);
+});
+</script>
+
 <template>
-  <div class="bg-[url('/assets/img/1.jpg')] bg-cover bg-center">
+  <div class="bg-cover bg-center" :style="{ backgroundImage: `url(${bgUrl})` }">
     <UContainer
       :ui="{
         constrained: 'max-w-4xl',
@@ -11,4 +20,7 @@
       </div>
     </UContainer>
   </div>
+  <UNotifications />
+  <UModals />
+  <USlideovers />
 </template>

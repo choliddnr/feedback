@@ -2,6 +2,7 @@
 import { z } from "zod";
 import { useStorage } from "@vueuse/core";
 import type { Respondent } from "~/types";
+const { merchant } = storeToRefs(useFeedbackStore());
 const state = reactive<Partial<Respondent>>({
   name: undefined,
   gender: undefined,
@@ -17,16 +18,31 @@ const schema = z.object({
     .min(8000000000, "minimal 10 angka dan diawali dengan angka 8."),
 });
 
-const { respondent } = storeToRefs(useRespondentStore());
-console.log("client", respondent.value);
+const { respondent } = storeToRefs(useFeedbackStore());
 
 const onsubmit = () => {
   console.log(state);
   // useStorage("respondent", state);
-  localStorage.setItem("respondent", JSON.stringify(state));
-  useRouter().push("/products");
+  localStorage.setItem(
+    `${merchant.value?.id}_respondent`,
+    JSON.stringify(state)
+  );
+  respondent.value = {
+    name: state.name || "",
+    age: state.age || 0,
+    gender: state.gender || "",
+    whatsapp: state.whatsapp || 0,
+  };
+  useRouter().push(`/${merchant.value?.id}/products`);
 };
 onMounted(() => {
+  if (import.meta.client) {
+    if (localStorage.getItem(`${merchant.value?.id}_respondent`)) {
+      respondent.value = JSON.parse(
+        localStorage.getItem(`${merchant.value?.id}_respondent`)!
+      );
+    }
+  }
   if (respondent.value) {
     state.name = respondent.value.name;
     state.gender = respondent.value.gender;

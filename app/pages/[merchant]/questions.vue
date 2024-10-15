@@ -1,19 +1,24 @@
 <script setup lang="ts">
 import { watchDebounced } from "@vueuse/core";
 import { isEmptyObject } from "~/utils";
-const { productsMap, selectedProducts } = storeToRefs(useProductsStore());
+
+const { $pb } = useNuxtApp();
+const toast = useToast();
+
+const { productsMap, selectedProducts } = storeToRefs(useFeedbackStore());
 const {
   productQuestions,
   productsQuestions,
   currentProductId,
   currentProductIndex,
   lastQuestionsIndex,
-  currentQuestionId,
   currentQuestionIndex,
   totalQuestions,
-} = storeToRefs(useQuestionsStore());
+} = storeToRefs(useFeedbackStore());
 
-const product = computed(() => productsMap.value.get(currentProductId.value));
+const { respondent } = storeToRefs(useFeedbackStore());
+
+const product = computed(() => productsMap.value!.get(currentProductId.value));
 
 const answers = ref<{
   [key: string]: { [key: string]: any };
@@ -43,35 +48,35 @@ const setAnsweredProductDefaultValue = () => {
     answeredProduct.value[selectedProducts.value[i]!] = false;
   }
 };
-// console.log();
+const checkProductsQuestions = (): boolean => {
+  if (!isEmptyObject(productsQuestions.value)) {
+    for (let key in productsQuestions.value) {
+      if (productsQuestions.value[key]?.length === 0) {
+        return false;
+      }
+    }
+    return true;
+  }
+  return false;
+};
 
-if (!isEmptyObject(productsQuestions.value)) {
-  console.log("watch productsQuestions", false);
+if (checkProductsQuestions()) {
   setAnsweredProductDefaultValue();
 } else {
-  console.log("watch productsQuestions", true);
-  const unwatch = watch(productsQuestions, () => {
-    if (!isEmptyObject(productsQuestions.value)) {
-      setAnsweredProductDefaultValue();
-      unwatch();
+  const unwatch = watch(
+    productsQuestions,
+    () => {
+      if (checkProductsQuestions()) {
+        setAnsweredProductDefaultValue();
+        unwatch();
+      }
+    },
+    {
+      deep: true,
     }
-  });
+  );
 }
 
-const allCurrentProductQuestionsAnswered = computed(() => {
-  for (let key in answers.value[currentProductId.value]) {
-    if (
-      answers.value[currentProductId.value]![key] === undefined ||
-      answers.value[currentProductId.value]![key] === ""
-    ) {
-      answeredProduct.value[currentProductId.value] = false;
-      return false;
-    }
-  }
-
-  answeredProduct.value[currentProductId.value] = true;
-  return true;
-});
 const saveToLocalStorage = (key: string) => {
   localStorage.setItem(key, JSON.stringify(answers.value[key]));
 };
@@ -106,12 +111,12 @@ const nextQuestion = () => {
   saveToLocalStorage(currentProductId.value);
   currentQuestionIndex.value++;
 };
+
 /**
  * Allow user to submit
  */
 
 const allowToSubmit = computed(() => {
-  console.log("cek", totalQuestions.value, totalAnsweredQuestions.value);
   if (
     totalAnsweredQuestions.value === undefined ||
     totalAnsweredQuestions.value === 0
@@ -129,6 +134,7 @@ const totalAnsweredQuestions = computed<number>(() => {
   }
   return count;
 });
+
 watchDebounced(
   answers,
   () => {
@@ -136,21 +142,54 @@ watchDebounced(
   },
   { debounce: 1000, maxWait: 2000, deep: true }
 );
-const readyToMount = ref<boolean>(true);
+
+const submitFeedback = async () => {
+  const { data: ids } = await useAsyncData(async () => {
+    const promiseData = [];
+
+    for (let pKey in answers.value) {
+      for (let qKey in answers.value[pKey]) {
+        const promiseFunc = await $pb
+          .collection("answers")
+          .create({
+            question: qKey,
+            answer: answers.value[pKey]![qKey],
+          })
+          .then((res) => res.id);
+        promiseData.push(promiseFunc);
+      }
+    }
+    promiseData.push(
+      await $pb
+        .collection("respondent")
+        .create(respondent.value)
+        .then((res) => res.id)
+    );
+
+    return await Promise.all(promiseData);
+  });
+
+  const respondentId = ids.value!.pop();
+  await $pb.collection("feedback").create({
+    respondent: respondentId,
+    products: selectedProducts.value,
+    answers: ids.value,
+  });
+  toast.add({
+    title: "Thanks",
+    description: "Feedback anda berhasil kami terima!.",
+  });
+};
 </script>
 <template>
   <UCard
     :ui="{ background: 'backdrop-blur-sm bg-white/60' }"
     class="w-full md:w-2/3"
-    v-show="readyToMount"
   >
     <template #header>
       <ClientOnly>
         <div class="flex text-xl justify-between">
-          <span class="font-bold"
-            >{{ product ? product.title : "" }} -
-            {{ allCurrentProductQuestionsAnswered }}</span
-          >
+          <span class="font-bold">{{ product ? product.title : "" }} </span>
           <div class="flex flex-row gap-1">
             <UButton
               icon="i-heroicons-chevron-left-solid"
@@ -168,21 +207,23 @@ const readyToMount = ref<boolean>(true);
               icon="i-heroicons-chevron-right-solid"
               @click="nextProduct"
               :color="
-                currentProductIndex === productQuestions.length - 1
+                currentProductIndex === selectedProducts.length - 1
                   ? 'gray'
                   : 'primary'
               "
               :variant="
-                currentProductIndex === productQuestions.length - 1
+                currentProductIndex === selectedProducts.length - 1
                   ? 'soft'
                   : 'solid'
               "
-              :disabled="
-                currentProductIndex === productQuestions.length - 1 ||
-                !answeredProduct[currentProductId]
-              "
+              :disabled="currentProductIndex === selectedProducts.length - 1"
             />
-            <UButton label="submit" :disabled="!allowToSubmit" />
+            <UButton
+              label="submit"
+              :disabled="!allowToSubmit"
+              :color="allowToSubmit ? 'primary' : 'gray'"
+              @click="submitFeedback"
+            />
           </div>
         </div>
       </ClientOnly>
@@ -192,7 +233,7 @@ const readyToMount = ref<boolean>(true);
         <span>{{ productQuestions[currentQuestionIndex]?.q }}</span>
       </template>
       <UTextarea
-        v-if="productQuestions[currentQuestionIndex]?.type === 'textarea'"
+        v-if="productQuestions[currentQuestionIndex]?.type === 'text'"
         size="xl"
         variant="outline"
         placeholder="Search..."
@@ -204,7 +245,8 @@ const readyToMount = ref<boolean>(true);
     </UFormGroup>
     <div class="flex flex-row gap-1 my-2">
       <UButton
-        v-for="(opt, index) in productQuestions[currentQuestionIndex]?.options"
+        v-for="(opt, index) in productQuestions[currentQuestionIndex]
+          ?.answer_options"
         :label="opt"
         color="white"
         :ui="{ rounded: 'rounded-full' }"
@@ -248,11 +290,7 @@ const readyToMount = ref<boolean>(true);
         >{{ index }}</UButton
       >
     </div>
-    <!--<pre>{{ totalQuestions }}/{{ totalAnsweredQuestions }}</pre>
-    <pre
-      >{{ answers }}/{{ currentProductId }}/{{ productQuestions }}/{{
-        currentQuestionIndex
-      }}</pre
-    >-->
+
+    <!--<pre>{{ answers }}</pre>-->
   </UCard>
 </template>

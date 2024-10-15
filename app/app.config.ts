@@ -8,5 +8,21 @@ export default defineAppConfig({
     //     openDelay: 500,
     //   },
     // },
+    notifications: {
+      // Show toasts at the top right of the screen
+      position: "top-0 bottom-[unset]",
+    },
   },
+  primary_color: [
+    "great-blue",
+    "fuel-yellow",
+    "astra",
+    "pale-sky",
+    "flamingo",
+    "buttercup",
+    "mountain-meadow",
+    "dodger-blue",
+    "cornflower-blue",
+    "french-rose",
+  ] as const,
 });

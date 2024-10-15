@@ -3,64 +3,7 @@ import type { Question } from "~/types";
 import { isEmptyObject } from "~/utils";
 
 export const useQuestionsStore = defineStore("questions", () => {
-  const { selectedProducts } = storeToRefs(useProductsStore());
-  const currentProductIndex = ref<number>(0);
-  const currentQuestionIndex = ref<number>(0);
-  const currentProductId = computed<string>(
-    () => selectedProducts.value[currentProductIndex.value] as string
-  );
-
-  const selectedProductsQuery = computed(() =>
-    JSON.stringify(selectedProducts.value)
-  );
-
-  const { data: questions } = useFetch<Question[]>("/api/questions", {
-    query: { selectedProducts: selectedProductsQuery },
-  });
-
-  const productsQuestions = computed<{ [key: string]: Question[] }>(() => {
-    if (!questions.value || !selectedProducts.value) return {};
-    const data: { [key: string]: Question[] } = {};
-    for (let i = 0, len = selectedProducts.value.length; i < len; i++) {
-      const key = selectedProducts.value[i] as string;
-      data[key] = questions.value.filter((q) => q.product === key);
-    }
-    return data;
-  });
-  const totalQuestions = computed<number>(() => {
-    let count = 0;
-    if (!isEmptyObject(productsQuestions.value)) {
-      for (let key in productsQuestions.value) {
-        count = count + (productsQuestions.value[key]?.length || 0);
-      }
-    }
-    return count;
-  });
-
-  const productQuestions = computed<Question[]>(
-    () => productsQuestions.value[currentProductId.value] || []
-  );
-
-  const currentQuestionId = computed<string>(
-    () => productQuestions.value[currentQuestionIndex.value]?.id || ""
-  );
-
-  const lastQuestionsIndex = ref<number[]>([]);
-  for (let i = 0; i < selectedProducts.value.length; i++) {
-    lastQuestionsIndex.value[i] = 0;
-  }
-
-  return {
-    questions,
-    currentProductIndex,
-    currentProductId,
-    productsQuestions,
-    productQuestions,
-    currentQuestionIndex,
-    currentQuestionId,
-    lastQuestionsIndex,
-    totalQuestions,
-  };
+  return {};
 });
 
 if ((import.meta as any).hot) {
