@@ -49,7 +49,6 @@ const multiProducts = computed<Product[]>(() => {
       </UDashboardNavbar>
 
       <UDashboardPanelContent class="pb-24">
-        <!-- class="scroll-mt-[calc(var(--header-height)+140px+128px+96px)]" -->
         <UPageColumns
           id="testimonials"
           :ui="{
@@ -87,7 +86,6 @@ const multiProducts = computed<Product[]>(() => {
 
               <template #footer>
                 <div class="grid grid-cols-2 gap-0 h-auto w-full">
-                  <!-- <UButtonGroup orientation="horizontal" class="w-1/2 h-full"> -->
                   <UButton
                     color="white"
                     block
@@ -114,7 +112,6 @@ const multiProducts = computed<Product[]>(() => {
                       }
                     "
                   />
-                  <!-- </UButtonGroup> -->
                 </div>
               </template>
             </UCard>
@@ -125,19 +122,3 @@ const multiProducts = computed<Product[]>(() => {
     </UDashboardPanel>
   </UDashboardPage>
 </template>
-<style>
-.slide-right-enter-active,
-.slide-right-leave-active {
-  transition: all 0.25s ease-out;
-}
-
-.slide-right-enter-from {
-  opacity: 0;
-  transform: translateX(30px);
-}
-
-.slide-right-leave-to {
-  opacity: 0;
-  transform: translateX(30px);
-}
-</style>

@@ -42,21 +42,20 @@ const links = [
     to: "/admin/products",
     badge: "4",
     tooltip: {
-      text: "Item",
+      text: "Products",
       shortcuts: ["G", "P"],
     },
   },
-  //   {
-  //     id: "production",
-  //     label: "Production",
-  //     icon: "i-heroicons-cube-transparent-20-solid",
-  //     to: "/production",
-  //     badge: "4",
-  //     tooltip: {
-  //       text: "Item",
-  //       shortcuts: ["G", "I"],
-  //     },
-  //   },
+  {
+    id: "questions",
+    label: "Questions",
+    icon: "i-heroicons-question-mark-circle-16-solid",
+    to: "/admin/questions",
+    tooltip: {
+      text: "Item",
+      shortcuts: ["G", "Q"],
+    },
+  },
   //   {
   //     id: "inbox",
   //     label: "Inbox",
@@ -224,3 +223,19 @@ const colors = computed(() =>
   <UModals />
   <USlideovers />
 </template>
+<style>
+.slide-right-enter-active,
+.slide-right-leave-active {
+  transition: all 0.25s ease-out;
+}
+
+.slide-right-enter-from {
+  opacity: 0;
+  transform: translateX(30px);
+}
+
+.slide-right-leave-to {
+  opacity: 0;
+  transform: translateX(30px);
+}
+</style>

@@ -3,11 +3,16 @@ export default defineAppConfig({
     primary: "fuel-yellow",
     // primary: "great-blue",
     gray: "zinc",
+
     // tooltip: {
     //   default: {
     //     openDelay: 500,
     //   },
     // },
+    card: {
+      shadow: "shadow-md",
+      ring: "ring-2",
+    },
     notifications: {
       // Show toasts at the top right of the screen
       position: "top-0 bottom-[unset]",

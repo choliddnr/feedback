@@ -238,19 +238,3 @@ if (avatarBlob.value) {
     </UDashboardPanel>
   </UDashboardPage>
 </template>
-<style>
-.slide-right-enter-active,
-.slide-right-leave-active {
-  transition: all 0.25s ease-out;
-}
-
-.slide-right-enter-from {
-  opacity: 0;
-  transform: translateX(30px);
-}
-
-.slide-right-leave-to {
-  opacity: 0;
-  transform: translateX(30px);
-}
-</style>
