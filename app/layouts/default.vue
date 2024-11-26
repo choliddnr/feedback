@@ -3,7 +3,7 @@ const { $pb } = useNuxtApp();
 const { merchant } = storeToRefs(useFeedbackStore());
 const bgUrl = computed(() => {
   if (!merchant.value) return "";
-  return $pb.files.getUrl(merchant.value, merchant.value.image_background);
+  return $pb.files.getURL(merchant.value, merchant.value.image_background);
 });
 </script>
 

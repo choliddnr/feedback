@@ -43,7 +43,7 @@ console.log(merchants.value);
             </template>
             <template #icon>
               <UAvatar
-                :src="$pb.files.getUrl(merchant, merchant.logo)"
+                :src="$pb.files.getURL(merchant, merchant.logo)"
                 :alt="merchant.title"
                 size="lg"
               />

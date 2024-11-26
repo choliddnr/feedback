@@ -63,11 +63,11 @@ const initState = () => {
   state.description = merchant.value!.description;
   state.category = merchant.value!.category;
   state.primary_color = merchant.value!.primary_color;
-  state.image_background = $pb.files.getUrl(
+  state.image_background = $pb.files.getURL(
     merchant.value!,
     merchant.value!.image_background
   );
-  state.logo = $pb.files.getUrl(merchant.value!, merchant.value!.logo);
+  state.logo = $pb.files.getURL(merchant.value!, merchant.value!.logo);
 };
 
 if (merchant.value) {

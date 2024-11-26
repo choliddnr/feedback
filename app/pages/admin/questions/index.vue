@@ -19,7 +19,7 @@ selectedProductId.value = undefined;
           :ui="{ rounded: 'rounded-lg' }"
           size="xl"
           :alt="product.title"
-          :src="$pb.files.getUrl(product, product.images!)"
+          :src="$pb.files.getURL(product, product.images!)"
         /> </template
     ></UPageCard>
   </div>

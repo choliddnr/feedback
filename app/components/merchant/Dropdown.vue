@@ -39,7 +39,7 @@ const { activeMerchant, merchant, merchants } = storeToRefs(useMerchantStore());
 //       merchantList.value.push({
 //         label: merchants.value?.[i]?.title!,
 //         avatar: {
-//           src: $pb.files.getUrl(
+//           src: $pb.files.getURL(
 //             merchants.value?.[i]!,
 //             merchants.value?.[i]?.logo!
 //           ),
@@ -70,7 +70,7 @@ const merchantList = computed<
       id: merchants.value?.[i]?.id!,
       label: merchants.value?.[i]?.title!,
       avatar: {
-        src: $pb.files.getUrl(
+        src: $pb.files.getURL(
           merchants.value?.[i]!,
           merchants.value?.[i]?.logo!
         ),

@@ -38,7 +38,7 @@ const validate = (state: any) => {
     errors.push({ path: "password", message: "Password is required" });
   return errors;
 };
-
+const methods = await $pb.collection("users").listAuthMethods();
 const providers = [
   {
     label: "Continue with Google",
@@ -47,12 +47,14 @@ const providers = [
     click: async () => {
       await $pb.collection("users").authWithOAuth2({ provider: "google" });
       token.value = $pb.authStore.token;
-      user.value = $pb.authStore.model as User;
+      user.value = $pb.authStore.record as unknown as User;
       if (user.value.name) {
         navigateTo("/admin");
       } else {
         navigateTo("/admin/user");
       }
+
+      console.log(methods);
     },
   },
 ];

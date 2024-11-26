@@ -1,4 +1,3 @@
-import { defineStore, acceptHMRUpdate } from "pinia";
 import { type Merchant } from "~/types";
 
 export const useMerchantStore = defineStore("merchant", () => {

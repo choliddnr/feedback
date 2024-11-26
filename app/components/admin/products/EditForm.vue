@@ -27,7 +27,7 @@ const submitBtnRef = ref<HTMLButtonElement>();
 const state = reactive<Partial<Product> & { image?: string }>({
   title: props.product.title,
   description: props.product.description,
-  image: $pb.files.getUrl(props.product, props.product.images!),
+  image: $pb.files.getURL(props.product, props.product.images!),
 });
 
 const imageRef = ref<HTMLInputElement>();

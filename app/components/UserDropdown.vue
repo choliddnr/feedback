@@ -90,7 +90,7 @@ const items = computed(() => [
         <template #leading>
           <UAvatar
             v-if="user.avatar"
-            :src="$pb.files.getUrl(user, user.avatar, { thumb: '250x250' })"
+            :src="$pb.files.getURL(user, user.avatar, { thumb: '250x250' })"
             size="2xs"
           />
           <UIcon v-else name="i-heroicons-user" class="w-5 h-5" />

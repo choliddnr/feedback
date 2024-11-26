@@ -78,7 +78,7 @@ const multiProducts = computed<Product[]>(() => {
               <template #header>
                 <div
                   class="bg-cover bg-center h-full overflow-hidden rounded-t-lg"
-                  :style="{ backgroundImage: `url(${$pb.files.getUrl(product, product.images!)}` }"
+                  :style="{ backgroundImage: `url(${$pb.files.getURL(product, product.images!)}` }"
                 ></div>
               </template>
               <span class="font-bold">{{ product.title }}</span>

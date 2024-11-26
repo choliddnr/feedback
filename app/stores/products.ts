@@ -1,4 +1,3 @@
-import { defineStore, acceptHMRUpdate, skipHydrate } from "pinia";
 import type { Product } from "~/types";
 
 export const useProductsStore = defineStore("products", () => {

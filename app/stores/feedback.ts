@@ -1,4 +1,4 @@
-import { defineStore, acceptHMRUpdate } from "pinia";
+// import { defineStore, acceptHMRUpdate } from "pinia";
 import type { Merchant, Product, Respondent, Question } from "~/types";
 import { isEmptyObject } from "~/utils";
 
@@ -45,7 +45,7 @@ export const useFeedbackStore = defineStore("feedback", () => {
     }
   }
   const productsMap = computed(() => {
-    // if (!products.value) return new Map();
+    if (!products.value) return new Map();
     return new Map(products.value!.map((p) => [p.id, p]));
   });
   //   watch(selectedProducts, () => {

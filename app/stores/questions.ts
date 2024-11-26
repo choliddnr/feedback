@@ -1,4 +1,3 @@
-import { defineStore, acceptHMRUpdate, skipHydrate } from "pinia";
 import type { Question } from "~/types";
 import { isEmptyObject } from "~/utils";
 
