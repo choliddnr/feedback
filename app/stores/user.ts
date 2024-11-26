@@ -5,7 +5,6 @@ import type { User } from "~/types";
 
 export const useUserStore = defineStore("user", () => {
   const { $pb } = useNuxtApp();
-  const { activeMerchant } = storeToRefs(useMerchantStore());
   const user = ref<User>($pb.authStore.model as User);
   const userToken = useCookie("token");
   $pb.authStore.onChange((token, model) => {

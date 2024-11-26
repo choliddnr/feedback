@@ -53,6 +53,7 @@ const state = reactive({
   category: "",
   primary_color: "",
   image_background: "",
+  image_test: "",
   logo: "",
 });
 
@@ -159,6 +160,43 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {
   toast.add({ title: "Merchant updated", icon: "i-heroicons-check-circle" });
   isEdit.value = false;
 };
+
+/**
+ * Image Reducer
+ */
+
+const reducedImageUrl = ref(); // Store the reduced image URL
+
+const imageTestRef = ref<HTMLInputElement>();
+
+const changeImageTest = (e: Event) => {
+  console.log();
+
+  imageTestRef.value!.click();
+};
+const onImageTestChange = (e: Event) => {
+  const input = e.target as HTMLInputElement;
+  if (!input.files?.length) return;
+  const file = input.files[0];
+  if (file) {
+    reduceImage(file, 500, 500, (blob?: Blob) => {
+      // Generate a URL for the reduced image blob
+      reducedImageUrl.value = blob ? URL.createObjectURL(blob) : "";
+      console.log("reduced", reducedImageUrl.value, blob?.size);
+    });
+  }
+};
+
+// // Function to handle file input
+// const handleImageUpload = (event) => {
+//   const file = event.target.files[0];
+//   if (file) {
+//     reduceImage(file, 800, 800, (blob) => {
+//       // Generate a URL for the reduced image blob
+//       reducedImageUrl.value = URL.createObjectURL(blob);
+//     });
+//   }
+// };
 </script>
 
 <template>
@@ -339,6 +377,42 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {
                 size="md"
                 :disabled="!isEdit"
                 @click="changeImageBackground"
+              />
+            </UFormGroup>
+
+            <UFormGroup
+              name="image_test"
+              label="Test"
+              description="Gambar sebagai Test pada halaman feedback form."
+              class="grid grid-cols-2 gap-2"
+              help="JPG, GIF or PNG. 1MB Max."
+              :error="
+                backgroudImageError.isError && backgroudImageError.message
+              "
+              :ui="{
+                container: 'flex flex-wrap items-center gap-3',
+                help: 'mt-0',
+              }"
+            >
+              <input
+                ref="imageTestRef"
+                type="file"
+                class="hidden"
+                accept=".jpg, .jpeg, .png,"
+                @change="onImageTestChange"
+              />
+              <NuxtImg :src="state.image_test" :alt="state.title" size="lg" />
+              <div v-if="reducedImageUrl">
+                <h3>Preview of Reduced Image:</h3>
+                <NuxtImg :src="reducedImageUrl" alt="Reduced" />
+              </div>
+
+              <UButton
+                label="Choose"
+                color="white"
+                size="md"
+                :disabled="!isEdit"
+                @click="changeImageTest"
               />
             </UFormGroup>
           </UDashboardSection>
