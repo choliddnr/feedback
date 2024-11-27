@@ -1,4 +1,4 @@
-import { type Merchant } from "~/types";
+import { type Merchant } from "~~/shared/types";
 
 export const useMerchantStore = defineStore("merchant", () => {
   const { $pb } = useNuxtApp();

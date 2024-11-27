@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { FormError, FormErrorEvent, FormSubmitEvent } from "#ui/types";
+const modal = useModal();
 const colors = [...useAppConfig().primary_color];
 const merchantId = useRoute().params.id as string;
 const { $pb } = useNuxtApp();
@@ -16,7 +17,21 @@ definePageMeta({
 });
 
 import { z } from "zod";
-import type { ImageError, Merchant } from "~/types";
+import EditImage from "~/components/EditImage.vue";
+import type { ImageError, Merchant } from "~~/shared/types";
+
+const editImage = (image: File) => {
+  modal.open(EditImage, {
+    image: image,
+    onSuccess() {
+      toast.add({
+        title: "Success !",
+        id: "modal-success",
+      });
+    },
+  });
+};
+
 const MAX_FILE_SIZE = 1 * 1024 * 1024; // 1MB
 const ACCEPTED_FILE_TYPES = ["image/jpeg", "image/jpeg", "image/png"];
 
@@ -179,11 +194,7 @@ const onImageTestChange = (e: Event) => {
   if (!input.files?.length) return;
   const file = input.files[0];
   if (file) {
-    reduceImage(file, 500, 500, (blob?: Blob) => {
-      // Generate a URL for the reduced image blob
-      reducedImageUrl.value = blob ? URL.createObjectURL(blob) : "";
-      console.log("reduced", reducedImageUrl.value, blob?.size);
-    });
+    if (file.size > MAX_FILE_SIZE) editImage(file);
   }
 };
 
@@ -401,7 +412,6 @@ const onImageTestChange = (e: Event) => {
                 accept=".jpg, .jpeg, .png,"
                 @change="onImageTestChange"
               />
-              <NuxtImg :src="state.image_test" :alt="state.title" size="lg" />
               <div v-if="reducedImageUrl">
                 <h3>Preview of Reduced Image:</h3>
                 <NuxtImg :src="reducedImageUrl" alt="Reduced" />

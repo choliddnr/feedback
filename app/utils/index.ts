@@ -72,3 +72,46 @@ export const reduceImage = (
   };
   reader.readAsDataURL(file);
 };
+
+// Image reduction logic
+export const cropImage = (
+  file: File,
+  x: number,
+  y: number,
+  width: number,
+  height: number,
+  callback: Fn
+) => {
+  const reader = new FileReader();
+  reader.onload = function (event: Event) {
+    const img = new Image();
+    img.onload = function () {
+      let imgWidth = img.width;
+      let imgHeight = img.height;
+
+      // Draw the image on a canvas
+      const canvas = document.createElement("canvas");
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext("2d");
+      // ctx!.drawImage(img, 0, 0, width, height);
+      // Draw the cropped area onto the canvas
+      ctx?.drawImage(
+        img,
+        x,
+        y,
+        width,
+        height, // Source (x, y, width, height)
+        0,
+        0,
+        width,
+        height // Destination (x, y, width, height)
+      );
+
+      // Convert the canvas content to a Blob
+      canvas.toBlob(callback, file.type, 1);
+    };
+    img.src = (event.target as FileReader).result as string;
+  };
+  reader.readAsDataURL(file);
+};

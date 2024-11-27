@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { FormError, FormSubmitEvent } from "#ui/types";
 import { boolean } from "zod";
-import type { Merchant } from "~/types";
+import type { Merchant } from "~~/shared/types";
 const { $pb } = useNuxtApp();
 const { merchants } = storeToRefs(useMerchantStore());
 

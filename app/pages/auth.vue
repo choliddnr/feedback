@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { User } from "~/types";
+import type { User } from "~~/shared/types";
 
 const { userToken: token, user } = storeToRefs(useUserStore());
 const { $pb } = useNuxtApp();

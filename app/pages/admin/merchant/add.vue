@@ -16,7 +16,7 @@ definePageMeta({
 });
 
 import { z } from "zod";
-import type { ImageError, Merchant } from "~/types";
+import type { ImageError, Merchant } from "~~/shared/types";
 const MAX_FILE_SIZE = 1 * 1024 * 1024; // 1MB
 const ACCEPTED_FILE_TYPES = ["image/jpeg", "image/jpeg", "image/png"];
 

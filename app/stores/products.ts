@@ -1,4 +1,4 @@
-import type { Product } from "~/types";
+import type { Product } from "~~/shared/types";
 
 export const useProductsStore = defineStore("products", () => {
   const { $pb } = useNuxtApp();

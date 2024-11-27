@@ -5,7 +5,7 @@ import {
 } from "#components";
 import type { FormError, FormSubmitEvent } from "#ui/types";
 import { boolean } from "zod";
-import type { Product } from "~/types";
+import type { Product } from "~~/shared/types";
 const { $pb } = useNuxtApp();
 const { user, avatarBlob } = storeToRefs(useUserStore());
 definePageMeta({

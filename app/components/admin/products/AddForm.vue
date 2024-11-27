@@ -3,7 +3,7 @@ import type { FormSubmitEvent } from "#ui/types";
 import { ModalConfirm } from "#components";
 import { type output as zodOutput } from "zod";
 import { z } from "zod";
-import type { Product } from "~/types";
+import type { Product } from "~~/shared/types";
 const { products } = storeToRefs(useProductsStore());
 const { $pb } = useNuxtApp();
 const toast = useToast();

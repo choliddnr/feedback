@@ -1,5 +1,5 @@
 // import { defineStore, acceptHMRUpdate } from "pinia";
-import type { Merchant, Product, Respondent, Question } from "~/types";
+import type { Merchant, Product, Respondent, Question } from "~~/shared/types";
 import { isEmptyObject } from "~/utils";
 
 export const useFeedbackStore = defineStore("feedback", () => {

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { content } from "#tailwind-config";
-import type { Product } from "~/types";
+import type { Product } from "~~/shared/types";
 
 definePageMeta({
   layout: "dashboard",

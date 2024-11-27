@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { z } from "zod";
 import { useStorage } from "@vueuse/core";
-import type { Respondent } from "~/types";
+import type { Respondent } from "~~/shared/types";
 const { merchant } = storeToRefs(useFeedbackStore());
 const state = reactive<Partial<Respondent>>({
   name: undefined,

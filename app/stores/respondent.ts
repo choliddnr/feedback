@@ -1,4 +1,4 @@
-import type { Respondent } from "~/types";
+import type { Respondent } from "~~/shared/types";
 
 export const useRespondentStore = defineStore("respondent", () => {
   return {};

@@ -1,6 +1,6 @@
 import { type AuthModel } from "pocketbase";
 import skipHydrate from "@pinia/nuxt";
-import type { User } from "~/types";
+import type { User } from "~~/shared/types";
 // import { type User } from "~/schemas/user.schema.ts";
 
 export const useUserStore = defineStore("user", () => {

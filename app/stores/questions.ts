@@ -1,4 +1,4 @@
-import type { Question } from "~/types";
+import type { Question } from "~~/shared/types";
 import { isEmptyObject } from "~/utils";
 
 export const useQuestionsStore = defineStore("questions", () => {
