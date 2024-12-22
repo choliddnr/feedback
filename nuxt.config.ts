@@ -194,4 +194,7 @@ export default defineNuxtConfig({
       appMiddleware: ["auth"],
     },
   },
+  nitro:{
+    preset:"bun"
+  }
 });
