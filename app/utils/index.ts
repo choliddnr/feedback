@@ -115,3 +115,30 @@ export const cropImage = (
   };
   reader.readAsDataURL(file);
 };
+
+export const getImageDimensions = (
+  image: File
+): Promise<{ width: number; height: number }> => {
+  return new Promise<{ width: number; height: number }>((resolve, reject) => {
+    if (!image.type.startsWith("image/")) {
+      reject(new Error("File is not an image"));
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const img = new Image();
+      img.onload = () => {
+        resolve({ width: img.width, height: img.height });
+      };
+      img.onerror = () => {
+        reject(new Error("Failed to load image"));
+      };
+      img.src = event.target?.result as string;
+    };
+    reader.onerror = () => {
+      reject(new Error("Failed to read file"));
+    };
+    reader.readAsDataURL(image);
+  });
+};
