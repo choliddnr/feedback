@@ -1,53 +1,60 @@
 <script lang="ts" setup>
-import Cropper from "cropperjs";
+import {
+  CropperCanvas,
+  CropperCrosshair,
+  CropperImage,
+  CropperGrid,
+  CropperHandle,
+  CropperSelection,
+  CropperShade,
+} from "vue-cropperjs2";
+
 const props = defineProps<{ image: File }>();
-// const imageURL = ref<string>("");
-const originalImage = URL.createObjectURL(props.image);
 const emit = defineEmits(["success"]);
 
-const imageBlob = ref<Blob>();
-
-// reduceImage(props.image, 100, 100, (blob?: Blob) => {
-//   // Generate a URL for the reduced image blob
-//   imageBlob.value = blob;
-//   imageURL.value = blob ? URL.createObjectURL(blob) : "";
-//   console.log("reduced", imageURL.value, props.image.size, blob?.size);
-// });
-
-// cropImage(props.image, 50, 50, 200, 200, (blob?: Blob) => {
-//   // Generate a URL for the reduced image blob
-//   imageBlob.value = blob;
-//   imageURL.value = blob ? URL.createObjectURL(blob) : "";
-//   console.log("reduced", imageURL.value, props.image.size, blob?.size);
-// });
+const originalImage = URL.createObjectURL(props.image);
 function onSuccess() {
   emit("success");
 }
-
-const ctnr = useTemplateRef("cropperContainer");
-onMounted(() => {
-  const image = new Image();
-  image.src = originalImage;
-  image.alt = "Original Image";
-
-  //   const cropper = new Cropper(image, {
-  //     // container: ".cropper-container",
-  //     container: ctnr.value || "",
-  //   });
-  console.log(ctnr.value);
-});
 </script>
 
 <template>
-  <UModal ref="cropperContainer">
+  <UModal fullscreen>
     <UCard>
-      <div class="space-y-2">
-        <p>{{ imageBlob?.size }}</p>
-        <NuxtImg :src="originalImage" />
-        <!-- <NuxtImg :src="imageURL" /> -->
-        <div></div>
-        <UButton @click="onSuccess"> Click to emit a success event </UButton>
-      </div>
+      <UButton @click="onSuccess"> Click to emit a success event </UButton>
+
+      <CropperCanvas :background="true">
+        <CropperImage
+          :src="originalImage"
+          alt="Picture"
+          :rotatable="true"
+          :scalable="true"
+          :skewable="true"
+          :translatable="true"
+        />
+        <CropperShade :hidden="true" />
+        <!-- <CropperHandle action="select" :plain="true" /> -->
+        <CropperSelection
+          :movable="true"
+          :resizable="false"
+          :width="400"
+          :height="300"
+          id="Sel"
+        >
+          <!-- :initial-coverage="0.5" -2> -->
+          <CropperGrid role="grid" :covered="true" />
+          <CropperCrosshair :centered="true" />
+          <CropperHandle action="move" theme-color="rgba(255, 255, 255, 0.1)" />
+          <CropperHandle action="n-resize" />
+          <CropperHandle action="e-resize" />
+          <CropperHandle action="s-resize" />
+          <CropperHandle action="w-resize" />
+          <CropperHandle action="ne-resize" />
+          <CropperHandle action="nw-resize" />
+          <CropperHandle action="se-resize" />
+          <CropperHandle action="sw-resize" />
+        </CropperSelection>
+      </CropperCanvas>
     </UCard>
   </UModal>
 </template>

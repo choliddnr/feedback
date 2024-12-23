@@ -32,6 +32,13 @@ const editImage = (image: File) => {
   });
 };
 
+const { data: image } = await useFetch<File>(
+  "http://127.0.0.1:8090/api/files/kqsl9ce7d20tynj/x66966zmzugrkt9/whats_app_image_2024_10_05_at_8_40_NT9JtCG744.36AM1.jpeg?token="
+);
+if (image.value) {
+  editImage(image.value);
+}
+
 const MAX_FILE_SIZE = 1 * 1024 * 1024; // 1MB
 const ACCEPTED_FILE_TYPES = ["image/jpeg", "image/jpeg", "image/png"];
 
@@ -108,8 +115,6 @@ const changeLogo = (e: Event) => {
   logoRef.value!.click();
 };
 const changeImageBackground = (e: Event) => {
-  console.log();
-
   imageBackgroundRef.value!.click();
 };
 
@@ -137,7 +142,10 @@ const onImageBackgroundChange = (e: Event) => {
   const input = e.target as HTMLInputElement;
   if (!input.files?.length) return;
   const res = imageSchema.safeParse(input.files[0]);
+  console.log("res", res);
+
   if (!res.success) {
+    editImage(input.files[0]!);
     backgroudImageError.value = {
       isError: !res.success,
       message: res.error.errors[0]?.message!,
@@ -185,8 +193,6 @@ const reducedImageUrl = ref(); // Store the reduced image URL
 const imageTestRef = ref<HTMLInputElement>();
 
 const changeImageTest = (e: Event) => {
-  console.log();
-
   imageTestRef.value!.click();
 };
 const onImageTestChange = (e: Event) => {
