@@ -1,11 +1,26 @@
-import { theme } from "#tailwind-config";
+import { createRequire } from "node:module";
+const _require = createRequire(import.meta.url);
+const defaultColors = _require("tailwindcss/colors.js");
+delete defaultColors.lightBlue;
+delete defaultColors.warmGray;
+delete defaultColors.trueGray;
+delete defaultColors.coolGray;
+delete defaultColors.blueGray;
 
 // https://nuxt.com/docs/api/configuration/nuxt-config
+
 export default defineNuxtConfig({
-  compatibilityDate: "2024-04-03",
+  ssr: false,
+  compatibilityDate: "2024-11-01",
   devtools: { enabled: false },
   extends: ["@nuxt/ui-pro"],
-  modules: ["@nuxt/ui", "@nuxt/fonts", "@nuxt/image", "@pinia/nuxt"],
+  modules: [
+    "@nuxt/ui",
+    "@nuxt/fonts",
+    "@nuxt/image",
+    "@pinia/nuxt",
+    "nuxt-auth-utils",
+  ],
   future: {
     compatibilityVersion: 4,
   },
@@ -175,7 +190,6 @@ export default defineNuxtConfig({
   pinia: {
     storesDirs: ["./app/stores"],
   },
-  ssr: false,
   runtimeConfig: {
     public: {
       pocketbaseApi: "http://127.0.0.1:8090",

@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import type { FormError, FormErrorEvent, FormSubmitEvent } from "#ui/types";
+import { useUserStore } from "../../../stores/user";
+import { useMerchantStore } from "../../../stores/merchant";
 const modal = useModal();
 const colors = [...useAppConfig().primary_color];
 const merchantId = useRoute().params.id as string;
@@ -17,7 +19,7 @@ definePageMeta({
 });
 
 import { z } from "zod";
-import EditImage from "~/components/EditImage.vue";
+import EditImage from "../../../components/EditImage.vue";
 import type { ImageError, Merchant } from "~~/shared/types";
 
 const editImage = (image: File) => {
@@ -89,7 +91,7 @@ const initState = () => {
     merchant.value!,
     merchant.value!.image_background
   );
-  state.logo = $pb.files.getURL(merchant.value!, merchant.value!.logo);
+  state.logo = $pb.files.getURL(merchant.value!, merchant.value!.logo!);
 };
 
 if (merchant.value) {

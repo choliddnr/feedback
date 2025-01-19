@@ -2,6 +2,8 @@
 import { z } from "zod";
 import { useStorage } from "@vueuse/core";
 import type { Respondent } from "~~/shared/types";
+
+import { useFeedbackStore } from "../../stores/feedback";
 const { merchant } = storeToRefs(useFeedbackStore());
 const state = reactive<Partial<Respondent>>({
   name: undefined,

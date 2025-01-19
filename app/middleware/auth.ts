@@ -1,4 +1,7 @@
 export default defineNuxtRouteMiddleware((to, from) => {
-  const { $pb } = useNuxtApp();
-  if (!$pb.authStore.isValid) return navigateTo("/auth");
+  const { loggedIn } = useUserSession();
+
+  if (!loggedIn.value) {
+    return navigateTo("/auth");
+  }
 });

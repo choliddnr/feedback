@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { useProductsStore } from "../../../stores/products";
+import { useQuestionsStore } from "../../../stores/questions";
 const { products } = storeToRefs(useProductsStore());
 const { selectedProductId } = storeToRefs(useQuestionsStore());
 selectedProductId.value = undefined;

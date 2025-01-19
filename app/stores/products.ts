@@ -1,22 +1,15 @@
 import type { Product } from "~~/shared/types";
+import { useMerchantStore } from "./merchant";
 
 export const useProductsStore = defineStore("products", () => {
-  const { $pb } = useNuxtApp();
   const { merchant } = storeToRefs(useMerchantStore());
-  const products = ref<Product[]>();
-  useAsyncData(
-    async () => {
-      if (!merchant.value?.id) return;
-      const records = await $pb
-        .collection("products")
-        .getFullList({ filter: `merchant='${merchant.value?.id}'` });
-      console.log("fetch product", structuredClone(records));
-      products.value = structuredClone(records) as unknown as Product[];
+  const { data: products, execute } = useFetch<Product[]>("/api/product", {
+    query: {
+      merchant: merchant.value?.id,
     },
-    {
-      watch: [merchant],
-    }
-  );
+    immediate: false,
+    watch: [merchant],
+  });
   const productToDelete = ref<Product | undefined>();
 
   return { productToDelete, products };

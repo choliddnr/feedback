@@ -1,10 +1,9 @@
 <script setup lang="ts">
 const appConfig = useAppConfig();
-const { $pb } = useNuxtApp();
 const route = useRoute();
 const router = useRouter();
-const pbApi = useRuntimeConfig().public.pocketbaseApi as string;
-const { merchant } = storeToRefs(useFeedbackStore());
+import { useMerchantStore } from "../../stores/merchant";
+const { merchant } = storeToRefs(useMerchantStore());
 // await useFetch(`collections/merchant/records/${route.params.merchant}`, {
 //   baseURL: pbApi,
 //   query: { expand: "greeting" },
@@ -24,29 +23,33 @@ const { merchant } = storeToRefs(useFeedbackStore());
 //       image_background: response._data.image_background,
 //     };
 //     console.log(merchant.value);
-//     appConfig.ui.primary = merchant.value.primary_color;
-//     appConfig.background_image_url = `${pbApi}/api/files/merchant/${merchant.value.id}/${merchant.value.image_background}`;
+//     appConfig.ui.primary = merchant.value!.primary_color;
+//     appConfig.background_image_url = `${pbApi}/api/files/merchant/${
+//       merchant.value!.id
+//     }/${merchant.value!.image_background}`;
 //   },
 // });
 </script>
 <template>
-  <UCard>
-    <article class="text-wrap text-xl text-center items-center">
-      <p class="font-bold">
-        {{ merchant?.expand?.greeting.title }}
-      </p>
-      <UDivider class="mb-4 mt-2" />
-      <p>
-        {{ merchant?.expand?.greeting.text }}
-        <br />
-      </p>
-      <UButton
-        class="mt-5"
-        :ui="{ block: 'w-20' }"
-        size="xl"
-        :label="merchant?.expand?.greeting.btn_label"
-        @click="router.push(`/${route.params.merchant}/respondent`)"
-      />
-    </article>
-  </UCard>
+  <ClientOnly>
+    <UCard>
+      <article class="text-wrap text-xl text-center items-center">
+        <p class="font-bold">
+          {{ merchant?.expand?.greeting.title }}
+        </p>
+        <UDivider class="mb-4 mt-2" />
+        <p>
+          {{ merchant?.expand?.greeting.text }}
+          <br />
+        </p>
+        <UButton
+          class="mt-5"
+          :ui="{ block: 'w-20' }"
+          size="xl"
+          :label="merchant?.expand?.greeting.btn_label"
+          @click="router.push(`/${route.params.merchant}/respondent`)"
+        />
+      </article>
+    </UCard>
+  </ClientOnly>
 </template>

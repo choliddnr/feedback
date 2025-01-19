@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import type { Product } from "~~/shared/types";
 
+import { useUserStore } from "../../../stores/user";
+import { useProductsStore } from "../../../stores/products";
+
 const model = defineModel({
   type: Boolean,
 });
