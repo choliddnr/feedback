@@ -1,28 +1,20 @@
 import { type Merchant } from "~~/shared/types";
+import { useUserStore } from "./user";
 
 export const useMerchantStore = defineStore("merchant", () => {
-  const { $pb } = useNuxtApp();
   const { user } = storeToRefs(useUserStore());
-  const activeMerchant = ref<string>(user.value.default_merchant);
+  const activeMerchant = ref<number>();
   const merchant = computed<Merchant | undefined>(() => {
     if (!merchants.value || merchants.value.length === 0) return;
     for (let i = 0, len = merchants.value?.length || 0; i < len; i++) {
       if (merchants.value[i]?.id === activeMerchant.value)
         return merchants.value[i];
     }
-    return;
   });
-  const { data: merchants } = useAsyncData<Merchant[]>(
-    async () => {
-      const records = await $pb
-        .collection("merchant")
-        .getFullList({ filter: `owner='${user.value.id}'` });
-      return structuredClone(records) as unknown as Merchant[];
-    },
-    {
-      watch: [user],
-    }
-  );
+  const { data: merchants, execute } = useFetch<Merchant[]>("/api/merchant", {
+    immediate: false,
+    watch: [user],
+  });
   return { activeMerchant, merchant, merchants };
 });
 

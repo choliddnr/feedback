@@ -4,6 +4,7 @@ import { ModalConfirm } from "#components";
 import { type output as zodOutput } from "zod";
 import { z } from "zod";
 import type { Product } from "~~/shared/types";
+import { useProductsStore } from "../../../stores/products";
 const { products } = storeToRefs(useProductsStore());
 const { $pb } = useNuxtApp();
 const toast = useToast();

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useQuestionsStore } from "../../../stores/questions";
 const { selectedProductId, questions } = storeToRefs(useQuestionsStore());
 selectedProductId.value = useRoute().params.id as string;
 </script>
