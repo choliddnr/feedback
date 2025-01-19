@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import type { FormError, FormSubmitEvent } from "#ui/types";
+import { useUserStore } from "../../stores/user";
+
 import { boolean } from "zod";
 const { $pb } = useNuxtApp();
-const { user, avatarBlob } = storeToRefs(useUserStore());
+const { user } = storeToRefs(useUserStore());
 definePageMeta({
   layout: "dashboard",
 });
@@ -13,11 +15,12 @@ const isDeleteAccountModalOpen = ref(false);
 const isEdit = ref<boolean>(false);
 
 const state = reactive({
-  name: user.value.name,
-  email: user.value.email,
-  username: user.value.username,
-  avatar: avatarBlob.value,
+  name: user.value?.name,
+  email: user.value?.email,
+  username: user.value?.username,
+  avatar: user.value?.picture,
 });
+console.log("state", state);
 
 const toast = useToast();
 
@@ -55,33 +58,33 @@ function onFileClick() {
 
 async function onSubmit(event: FormSubmitEvent<any>) {
   const formData = new FormData();
-  formData.append("username", state.username);
-  formData.append("name", state.name);
+  formData.append("username", state.username as string);
+  formData.append("name", state.name as string);
   if (isAvatarChanged.value) {
     formData.append("avatar", fileRef.value!.files![0]!);
   }
-  user.value = await $pb.collection("users").update(user.value.id!, formData);
+  // await $pb.collection("users").update(user.value?.id!, formData);
 
   toast.add({ title: "Profile updated", icon: "i-heroicons-check-circle" });
   isEdit.value = false;
 }
 
-if (avatarBlob.value) {
-  state.avatar = avatarBlob.value;
-} else {
-  const unwatch = watch(avatarBlob, () => {
-    if (avatarBlob.value) {
-      state.avatar = avatarBlob.value;
-      unwatch();
-    }
-  });
-}
+// if (avatarBlob.value) {
+//   state.avatar = avatarBlob.value;
+// } else {
+//   const unwatch = watch(avatarBlob, () => {
+//     if (avatarBlob.value) {
+//       state.avatar = avatarBlob.value;
+//       unwatch();
+//     }
+//   });
+// }
 </script>
 
 <template>
   <UDashboardPage>
     <UDashboardPanel grow>
-      <UDashboardNavbar :title="user.name || user.username" />
+      <UDashboardNavbar :title="user.name || user?.username" />
 
       <!-- <UDashboardToolbar class="py-0 px-1.5 overflow-x-auto">
         <UHorizontalNavigation :links="links" />
@@ -195,7 +198,11 @@ if (avatarBlob.value) {
                 help: 'mt-0',
               }"
             >
-              <UAvatar :src="state.avatar" :alt="state.name" size="lg" />
+              <UAvatar
+                src="https://lh3.googleusercontent.com/a/ACg8ocKRch5RTWqZKY9lpuOkPbE8YGoemArMKztdZJLXer-tVc-kCVeE=s96-c"
+                :alt="state.name"
+                size="lg"
+              />
 
               <UButton
                 label="Choose"

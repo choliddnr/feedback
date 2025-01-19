@@ -2,6 +2,7 @@
 import type { FormError, FormSubmitEvent } from "#ui/types";
 import { boolean } from "zod";
 import type { Merchant } from "~~/shared/types";
+import { useMerchantStore } from "../../../stores/merchant";
 const { $pb } = useNuxtApp();
 const { merchants } = storeToRefs(useMerchantStore());
 
@@ -9,10 +10,11 @@ definePageMeta({
   layout: "dashboard",
 });
 
-console.log(merchants.value);
+// console.log(merchants.value);
 </script>
 
 <template>
+  <!-- <pre>{{ merchants }}</pre> -->
   <UDashboardPage>
     <UDashboardPanel grow>
       <UDashboardNavbar title="Merchant">
@@ -43,7 +45,7 @@ console.log(merchants.value);
             </template>
             <template #icon>
               <UAvatar
-                :src="$pb.files.getURL(merchant, merchant.logo)"
+                :src="$pb.files.getURL(merchant, merchant.logo!)"
                 :alt="merchant.title"
                 size="lg"
               />
@@ -51,10 +53,9 @@ console.log(merchants.value);
           </UDashboardSection>
           <UDivider />
         </div>
-
-        <!-- ~/components/settings/DeleteAccountModal.vue -->
-        <!-- <AdminUserDeleteAccountModal v-model="isDeleteAccountModalOpen" /> -->
       </UDashboardPanelContent>
     </UDashboardPanel>
   </UDashboardPage>
+  <!-- ~/components/settings/DeleteAccountModal.vue -->
+  <!-- <AdminUserDeleteAccountModal v-model="isDeleteAccountModalOpen" /> -->
 </template>

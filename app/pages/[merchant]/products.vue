@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { ClientOnly } from "#components";
 
+import { useFeedbackStore } from "../../stores/feedback";
+
 const { products, selectedProducts } = storeToRefs(useFeedbackStore());
 const { fetchQuestions } = useFeedbackStore();
 const pbApi = useRuntimeConfig().public.pocketbaseApi as string;

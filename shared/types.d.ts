@@ -28,6 +28,13 @@ export type Respondent = {
   whatsapp: number;
 };
 
+export type Greeting = {
+  id?: string;
+  title: string;
+  text: string;
+  btn_label: string;
+};
+
 export type Merchant = {
   id: string;
   title: string;
@@ -35,27 +42,14 @@ export type Merchant = {
   category: string;
   owner?: string;
   expand?: {
-    greeting: {
-      id?: string;
-      title: string;
-      text: string;
-      btn_label: string;
-    };
+    greeting: Greeting;
   };
-  greeting: string;
+  greeting: Greeting;
   primary_color: string;
   image_background: string;
-  logo: string;
+  logo?: string;
 };
 
-export type User = {
-  id?: string;
-  username: string;
-  email: string;
-  name: string;
-  avatar: string;
-  default_merchant: string;
-};
 const colors = useAppConfig().primary_color;
 
 export type Color = (typeof colors)[number];

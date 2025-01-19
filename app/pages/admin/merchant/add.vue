@@ -1,5 +1,8 @@
 <script setup lang="ts">
 import type { FormError, FormErrorEvent, FormSubmitEvent } from "#ui/types";
+
+import { useUserStore } from "../../../stores/user";
+import { useMerchantStore } from "../../../stores/merchant";
 const colors = [...useAppConfig().primary_color];
 const merchantId = useRoute().params.id as string;
 const { $pb } = useNuxtApp();
