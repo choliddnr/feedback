@@ -1,3 +1,4 @@
+import { useFeedbackStore } from "../stores/feedback";
 export default defineNuxtRouteMiddleware((to, from) => {
   if (to.params.merchant) {
     const { merchantId } = storeToRefs(useFeedbackStore());

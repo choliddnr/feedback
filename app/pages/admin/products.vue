@@ -3,6 +3,9 @@ import {
   LazyAdminProductsEditForm,
   LazyAdminProductsAddForm,
 } from "#components";
+import { useUserStore } from "../../stores/user";
+import { useProductsStore } from "../../stores/products";
+
 import type { FormError, FormSubmitEvent } from "#ui/types";
 import { boolean } from "zod";
 import type { Product } from "~~/shared/types";

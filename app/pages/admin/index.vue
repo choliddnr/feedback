@@ -1,7 +1,11 @@
 <script lang="ts" setup>
+import { useUserStore } from "../../stores/user";
 definePageMeta({
   layout: "dashboard",
 });
+const { user } = storeToRefs(useUserStore());
+const theUser = user;
+console.log("fetch", user.value?.picture);
 </script>
 
 <template>

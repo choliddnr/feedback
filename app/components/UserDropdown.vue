@@ -1,6 +1,8 @@
 <script setup lang="ts">
+import { useUserStore } from "../stores/user";
 const { $pb } = useNuxtApp();
 const { user } = storeToRefs(useUserStore());
+const { clear } = useUserSession();
 // const { data } = await useAsyncData(async () => {
 //   const records = await $pb.collection("merchant").getFullList();
 //   return structuredClone(records);
@@ -62,8 +64,8 @@ const items = computed(() => [
     {
       label: "Sign out",
       icon: "i-heroicons-arrow-left-on-rectangle",
-      click: () => {
-        $pb.authStore.clear();
+      click: async () => {
+        await clear();
         navigateTo("/auth");
       },
     },
@@ -84,15 +86,11 @@ const items = computed(() => [
         color="gray"
         variant="ghost"
         class="w-full"
-        :label="user.name || user.username"
+        :label="user.name || user?.username"
         :class="[open && 'bg-gray-50 dark:bg-gray-800']"
       >
         <template #leading>
-          <UAvatar
-            v-if="user.avatar"
-            :src="$pb.files.getURL(user, user.avatar, { thumb: '250x250' })"
-            size="2xs"
-          />
+          <UAvatar v-if="user?.picture" :src="user.picture" size="2xs" />
           <UIcon v-else name="i-heroicons-user" class="w-5 h-5" />
         </template>
 
@@ -106,7 +104,7 @@ const items = computed(() => [
       <div class="text-left">
         <p>Signed in as</p>
         <p class="truncate font-medium text-gray-900 dark:text-white">
-          {{ user.username }}
+          {{ user?.username }}
         </p>
       </div>
     </template>
