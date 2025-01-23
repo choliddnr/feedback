@@ -15,7 +15,6 @@ export default defineOAuthGoogleEventHandler({
 
     if (registeredUser.length === 0) {
       await setUserSession(event, {
-        // User data
         user: {
           id: user.sub,
           picture: user.picture,
@@ -24,9 +23,6 @@ export default defineOAuthGoogleEventHandler({
           name: user.name,
           username: ``,
         },
-        // Private data accessible only on server/ routes
-
-        // Any extra fields for the session data
         loggedInAt: new Date(),
       });
       return sendRedirect(event, "/auth/register");

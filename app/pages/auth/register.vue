@@ -111,6 +111,10 @@ const onSubmit = async (state: any) => {
         >
       </template> -->
 
+      <template #icon>
+        <UAvatar :src="user?.picture!" />
+      </template>
+
       <template #footer>
         <div class="grid grid-cols-1 gap-4">
           <div>
