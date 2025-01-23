@@ -65,10 +65,10 @@ async function onSubmit(event: FormSubmitEvent<any>) {
   await $fetch(`/api/user/${user.value?.id}`, {
     method: "PATCH",
     body: formData,
-    onRequest: ({ options }) => {
+    onRequest: ({ options }: { options: any }) => {
       console.log("formData", formData, options);
     },
-    onResponse: ({ response }) => {
+    onResponse: ({ response }: { response: any }) => {
       if (response.status === 200) {
         toast.add({
           title: "Profile updated",
@@ -79,7 +79,7 @@ async function onSubmit(event: FormSubmitEvent<any>) {
         isEdit.value = false;
       }
     },
-    onResponseError: ({ response, error }) => {
+    onResponseError: ({ response }: { response: any }) => {
       if (response.status !== 200) {
         toast.add({
           description: response._data.statusMessage,
