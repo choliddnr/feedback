@@ -16,7 +16,7 @@ const links = [
   },
   {
     id: "user",
-    label: "User",
+    label: "Pengguna",
     icon: "i-heroicons-user",
     to: "/admin/user",
     tooltip: {
@@ -37,7 +37,7 @@ const links = [
   },
   {
     id: "products",
-    label: "Products",
+    label: "Produk",
     icon: "i-heroicons-cube-20-solid",
     to: "/admin/products",
     badge: "4",
@@ -48,7 +48,7 @@ const links = [
   },
   {
     id: "questions",
-    label: "Questions",
+    label: "Pertanyaan",
     icon: "i-heroicons-question-mark-circle-16-solid",
     to: "/admin/questions",
     tooltip: {
@@ -151,19 +151,19 @@ const groups = [
   },
 ];
 
-const defaultColors = ref(
-  ["green", "teal", "cyan", "sky", "blue", "indigo", "violet"].map((color) => ({
-    label: color,
-    chip: color,
-    click: () => ((appConfig.ui as any).primary = color),
-  }))
-);
-const colors = computed(() =>
-  defaultColors.value.map((color) => ({
-    ...color,
-    active: (appConfig.ui as any).primary === color.label,
-  }))
-);
+// const defaultColors = ref(
+//   ["green", "teal", "cyan", "sky", "blue", "indigo", "violet"].map((color) => ({
+//     label: color,
+//     chip: color,
+//     click: () => ((appConfig.ui as any).primary = color),
+//   }))
+// );
+// const colors = computed(() =>
+//   defaultColors.value.map((color) => ({
+//     ...color,
+//     active: (appConfig.ui as any).primary === color.label,
+//   }))
+// );
 </script>
 
 <template>
@@ -189,10 +189,10 @@ const colors = computed(() =>
 
         <UDivider />
 
-        <UDashboardSidebarLinks
+        <!-- <UDashboardSidebarLinks
           :links="[{ label: 'Colors', draggable: true, children: colors }]"
           @update:links="(colors) => (defaultColors = colors)"
-        />
+        /> -->
 
         <div class="flex-1" />
 

@@ -1,9 +1,8 @@
 <script setup lang="ts">
 import type { FormError, FormSubmitEvent } from "#ui/types";
+import { responses } from "~~/shared/db.schema";
 import { useUserStore } from "../../stores/user";
 
-import { boolean } from "zod";
-const { $pb } = useNuxtApp();
 const { user } = storeToRefs(useUserStore());
 definePageMeta({
   layout: "dashboard",
@@ -18,7 +17,7 @@ const state = reactive({
   name: user.value?.name,
   email: user.value?.email,
   username: user.value?.username,
-  avatar: user.value?.picture,
+  picture: user.value?.picture,
 });
 console.log("state", state);
 
@@ -48,7 +47,7 @@ function onFileChange(e: Event) {
     return;
   }
 
-  state.avatar = URL.createObjectURL(input.files[0]!);
+  state.picture = URL.createObjectURL(input.files[0]!);
   isAvatarChanged.value = true;
 }
 
@@ -61,12 +60,36 @@ async function onSubmit(event: FormSubmitEvent<any>) {
   formData.append("username", state.username as string);
   formData.append("name", state.name as string);
   if (isAvatarChanged.value) {
-    formData.append("avatar", fileRef.value!.files![0]!);
+    formData.append("picture", fileRef.value!.files![0]!);
   }
-  // await $pb.collection("users").update(user.value?.id!, formData);
+  await $fetch(`/api/user/${user.value?.id}`, {
+    method: "PATCH",
+    body: formData,
+    onRequest: ({ options }) => {
+      console.log("formData", formData, options);
+    },
+    onResponse: ({ response }) => {
+      if (response.status === 200) {
+        toast.add({
+          title: "Profile updated",
+          icon: "i-heroicons-check-circle",
+        });
+        console.log("response", response._data);
 
-  toast.add({ title: "Profile updated", icon: "i-heroicons-check-circle" });
-  isEdit.value = false;
+        isEdit.value = false;
+      }
+    },
+    onResponseError: ({ response, error }) => {
+      if (response.status !== 200) {
+        toast.add({
+          description: response._data.statusMessage,
+          title: "Gagal!",
+          icon: "i-heroicons-x-circle",
+          color: "red",
+        });
+      }
+    },
+  });
 }
 
 // if (avatarBlob.value) {
