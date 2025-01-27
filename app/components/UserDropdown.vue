@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { getImageUrl } from "../../shared/utils/getImageUrl";
 import { useUserStore } from "../stores/user";
 const { $pb } = useNuxtApp();
 const { user } = storeToRefs(useUserStore());
@@ -90,7 +91,11 @@ const items = computed(() => [
         :class="[open && 'bg-gray-50 dark:bg-gray-800']"
       >
         <template #leading>
-          <UAvatar v-if="user?.picture" :src="user.picture" size="2xs" />
+          <UAvatar
+            v-if="user?.picture"
+            :src="getImageUrl(user.picture)"
+            size="2xs"
+          />
           <UIcon v-else name="i-heroicons-user" class="w-5 h-5" />
         </template>
 

@@ -2,65 +2,87 @@
 import type { FormError, FormSubmitEvent } from "#ui/types";
 import { responses } from "~~/shared/db.schema";
 import { useUserStore } from "../../stores/user";
-
-const { user } = storeToRefs(useUserStore());
+import { UButton } from "#components";
+import { getImageUrl } from "../../../shared/utils/getImageUrl";
+import { LazyAdminUserEditUserPicture } from "#components";
+import { object, string } from "zod";
+import { userSchema } from "../../../shared/zod.schemas";
+import { templateRef } from "@vueuse/core";
 definePageMeta({
   layout: "dashboard",
 });
 
+const { user } = storeToRefs(useUserStore());
 const fileRef = ref<HTMLInputElement>();
 const isAvatarChanged = ref<boolean>(false);
 const isDeleteAccountModalOpen = ref(false);
 const isEdit = ref<boolean>(false);
+const imageBlob = ref<Blob>();
+const formRef = useTemplateRef<HTMLFormElement>("formRef");
 
 const state = reactive({
   name: user.value?.name,
   email: user.value?.email,
   username: user.value?.username,
-  picture: user.value?.picture,
+  picture: getImageUrl(user.value?.picture!),
 });
-console.log("state", state);
 
+const modal = useModal();
 const toast = useToast();
 
-function validate(state: any): FormError[] {
-  const errors = [];
-  if (!state.name)
-    errors.push({ path: "name", message: "Please enter your name." });
-  if (!state.email)
-    errors.push({ path: "email", message: "Please enter your email." });
-  if (
-    (state.password_current && !state.password_new) ||
-    (!state.password_current && state.password_new)
-  )
-    errors.push({
-      path: "password",
-      message: "Please enter a valid password.",
-    });
-  return errors;
-}
+const validate = async (state: any): Promise<FormError[]> => {
+  const errors = [] as FormError[];
 
-function onFileChange(e: Event) {
+  const result = await userSchema.spa({
+    name: state.name,
+    username: state.username,
+  });
+  if (!result.success) {
+    for (let i = 0; i < result.error.errors.length; i++) {
+      errors.push({
+        path: (result.error.errors[i]?.path[0] as string) || "",
+        message: result.error.errors[i]?.message || "",
+      });
+    }
+  }
+  return errors;
+};
+
+const onFileChange = (e: Event) => {
   const input = e.target as HTMLInputElement;
 
   if (!input.files?.length) {
     return;
   }
 
-  state.picture = URL.createObjectURL(input.files[0]!);
+  // state.picture = URL.createObjectURL(input.files[0]!);
   isAvatarChanged.value = true;
-}
+  modal.open(LazyAdminUserEditUserPicture, {
+    image: URL.createObjectURL(input.files[0]!),
+    "onUpdate:imageBlob": (value) => {
+      imageBlob.value = value;
+      state.picture = URL.createObjectURL(value!);
+      modal.close();
+    },
+    onCancel: () => {
+      state.picture = getImageUrl(user.value?.picture!);
+      isAvatarChanged.value = false;
+      modal.close();
+    },
+  });
+};
 
-function onFileClick() {
+const onFileClick = () => {
   fileRef.value?.click();
-}
+};
 
-async function onSubmit(event: FormSubmitEvent<any>) {
+const submit = () => formRef.value?.submit();
+const onSubmit = async () => {
   const formData = new FormData();
   formData.append("username", state.username as string);
   formData.append("name", state.name as string);
   if (isAvatarChanged.value) {
-    formData.append("picture", fileRef.value!.files![0]!);
+    formData.append("picture", imageBlob.value!);
   }
   await $fetch(`/api/user/${user.value?.id}`, {
     method: "PATCH",
@@ -68,14 +90,15 @@ async function onSubmit(event: FormSubmitEvent<any>) {
     onRequest: ({ options }: { options: any }) => {
       console.log("formData", formData, options);
     },
-    onResponse: ({ response }: { response: any }) => {
+    onResponse: async ({ response }: { response: any }) => {
       if (response.status === 200) {
         toast.add({
           title: "Profile updated",
           icon: "i-heroicons-check-circle",
         });
         console.log("response", response._data);
-
+        const { fetch } = useUserStore();
+        await fetch();
         isEdit.value = false;
       }
     },
@@ -90,28 +113,40 @@ async function onSubmit(event: FormSubmitEvent<any>) {
       }
     },
   });
-}
-
-// if (avatarBlob.value) {
-//   state.avatar = avatarBlob.value;
-// } else {
-//   const unwatch = watch(avatarBlob, () => {
-//     if (avatarBlob.value) {
-//       state.avatar = avatarBlob.value;
-//       unwatch();
-//     }
-//   });
-// }
+};
 </script>
 
 <template>
   <UDashboardPage>
     <UDashboardPanel grow>
-      <UDashboardNavbar :title="user.name || user?.username" />
-
-      <!-- <UDashboardToolbar class="py-0 px-1.5 overflow-x-auto">
-        <UHorizontalNavigation :links="links" />
-      </UDashboardToolbar> -->
+      <UDashboardNavbar :title="user.name || user?.username">
+        <template #right>
+          <Transition mode="out-in" name="slide-right">
+            <div v-if="isEdit" class="flex gap-1">
+              <UButton
+                type="submit"
+                label="Save Changes"
+                color="black"
+                leading-icon="i-heroicons-document-check-16-solid"
+                @click="formRef!.submit"
+              />
+              <UButton
+                label="Cancel"
+                color="red"
+                leading-icon="i-heroicons-x-mark-16-solid"
+                @click="isEdit = false"
+              />
+            </div>
+            <UButton
+              v-else
+              label="Edit Profile"
+              color="black"
+              leading-icon="i-heroicons-pencil-square-16-solid"
+              @click="isEdit = true"
+            />
+          </Transition>
+        </template>
+      </UDashboardNavbar>
 
       <UDashboardPanelContent class="pb-24">
         <UForm
@@ -119,39 +154,12 @@ async function onSubmit(event: FormSubmitEvent<any>) {
           :validate="validate"
           :validate-on="['submit']"
           @submit="onSubmit"
+          ref="formRef"
         >
           <UDashboardSection
             title="Profile"
             description="Berikut ini adalah informasi mengenai diri anda. Silahkan dilengkapi."
           >
-            <template #links>
-              <Transition mode="out-in" name="slide-right">
-                <div v-if="isEdit" class="flex gap-1">
-                  <UButton
-                    type="submit"
-                    label="Save Changes"
-                    color="black"
-                    leading-icon="i-heroicons-document-check-16-solid"
-                  />
-                  <UButton
-                    label="Cancel"
-                    color="red"
-                    leading-icon="i-heroicons-x-mark-16-solid"
-                    @click="isEdit = false"
-                  />
-                </div>
-                <!-- @click="isEdit = !isEdit" -->
-                <UButton
-                  v-else
-                  label="Edit Profile"
-                  color="black"
-                  leading-icon="i-heroicons-pencil-square-16-solid"
-                  @click="isEdit = true"
-                />
-                <!-- @click="isEdit = true" -->
-              </Transition>
-            </template>
-
             <UFormGroup
               name="name"
               label="Name"
@@ -203,11 +211,6 @@ async function onSubmit(event: FormSubmitEvent<any>) {
                 input-class="ps-[20px]"
                 :disabled="!isEdit"
               >
-                <!-- <template #leading>
-                  <span class="text-gray-500 dark:text-gray-400 text-sm"
-                    >nuxt.com/</span
-                  >
-                </template> -->
               </UInput>
             </UFormGroup>
 
@@ -221,11 +224,7 @@ async function onSubmit(event: FormSubmitEvent<any>) {
                 help: 'mt-0',
               }"
             >
-              <UAvatar
-                src="https://lh3.googleusercontent.com/a/ACg8ocKRch5RTWqZKY9lpuOkPbE8YGoemArMKztdZJLXer-tVc-kCVeE=s96-c"
-                :alt="state.name"
-                size="lg"
-              />
+              <UAvatar :src="state.picture" :alt="state.name" size="lg" />
 
               <UButton
                 label="Choose"

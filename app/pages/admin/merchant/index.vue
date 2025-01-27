@@ -42,13 +42,13 @@ definePageMeta({
                 leading-icon="i-heroicons-eye"
                 @click="navigateTo(`/admin/merchant/${merchant.id}`)"
               />
-            </template>
+              <!-- </template>
             <template #icon>
               <UAvatar
                 :src="$pb.files.getURL(merchant, merchant.logo!)"
                 :alt="merchant.title"
                 size="lg"
-              />
+              /> -->
             </template>
           </UDashboardSection>
           <UDivider />

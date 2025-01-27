@@ -1,12 +1,3 @@
-// export type User = {
-//   id?: string;
-//   username: string;
-//   email: string;
-//   name: string;
-//   picture: string;
-//   default_merchant: string;
-// };
-
 declare module "#auth-utils" {
   interface User {
     id?: number;

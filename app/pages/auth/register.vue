@@ -1,34 +1,12 @@
 <script setup lang="ts">
 import type { FormError, FormErrorEvent, FormSubmitEvent } from "#ui/types";
 import type { User } from "#auth-utils";
-import { object, string, ZodError } from "zod";
-import { users, eq } from "../../../shared/db.schema";
+import { userSchema } from "../../../shared/zod.schemas";
 
 const user = useUserSession().user as ComputedRef<User | null>;
 useSeoMeta({
   title: "Daftar",
 });
-const isUsernameUnique = async (username: string): Promise<boolean> => {
-  const data = await $fetch<User[]>("/api/user/getOne", {
-    query: { k: "username", v: username },
-  });
-  return data.length === 0;
-};
-
-const schema = object({
-  name: string().min(4),
-  username: string()
-    .regex(/^[a-zA-Z0-9_.]+$/, {
-      message:
-        "Username hanya boleh berupa huruf, angka, garis bawah dan titik.",
-    })
-    .min(3, { message: "minimal 3 karakter" })
-    .max(30, { message: "maksimal 30 karakter" })
-    .refine(async (username) => await isUsernameUnique(username), {
-      message: "username sudah digunakan.",
-    }),
-});
-const nameSchema = string().min(4);
 
 const fields = [
   {
@@ -58,7 +36,7 @@ const fields = [
 const validate = async (state: any): Promise<FormError[]> => {
   const errors = [] as FormError[];
 
-  const result = await schema.spa({
+  const result = await userSchema.spa({
     name: state.name,
     username: state.username,
   });
@@ -98,19 +76,6 @@ const onSubmit = async (state: any) => {
       :submit-button="{ trailingIcon: 'i-heroicons-arrow-right-20-solid' }"
       @submit="onSubmit"
     >
-      <!-- <template #description>
-        Don't have an account?
-        <NuxtLink to="/auth/signup" class="text-primary font-medium"
-          >Sign up</NuxtLink
-        >.
-      </template> -->
-
-      <!-- <template #password-hint>
-        <NuxtLink to="/" class="text-primary font-medium"
-          >Forgot password?</NuxtLink
-        >
-      </template> -->
-
       <template #icon>
         <UAvatar :src="user?.picture!" />
       </template>
