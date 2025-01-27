@@ -1,15 +1,11 @@
 import { toNumber } from "@vue/shared";
 import { type MultiPartData } from "h3";
-import { createStorage } from "unstorage";
-import fsLiteDriver from "unstorage/drivers/fs-lite";
-import { randomUUID } from "node:crypto";
+import { userPictureStorage } from "../../utils/userPictureStorage";
 import { users, eq } from "../../../shared/db.schema";
+import { User } from "#auth-utils";
 
-const storage = createStorage({ driver: fsLiteDriver({ base: "./data" }) });
 const FILE_KEYS = ["name", "filename", "type", "data"];
 const isFIle = (data: MultiPartData) => {
-  // return Object.keys(data).every((key) => FILE_KEYS.includes(key));
-  // Object.keys(data).filter((key)=>FILE_KEYS.indexOf(key)!==-1).length === FILE_KEYS.length;
   const dataKeysSet = new Set(Object.keys(data));
   return FILE_KEYS.every((key) => dataKeysSet.has(key));
 };
@@ -22,26 +18,41 @@ const parseMultipartData = (data?: MultiPartData[]) => {
   return result;
 };
 
-const saveFile = async (file: MultiPartData) => {
-  const id = randomUUID();
+const saveFile = async (name: string, file: MultiPartData) => {
   const [_mime, ext] = String(file.type).split("/");
-  const filename = `${id}.${ext}`;
-  await storage.setItemRaw(filename, file.data);
+  const filename = `${name}_${Date.now()}.${ext}`;
+  await userPictureStorage.setItemRaw(filename, file.data);
   return filename;
 };
-
+const deleteFile = async (id: number) => {
+  const oldUserPic = await useDB()
+    .select({ picture: users.picture })
+    .from(users)
+    .where(eq(users.id, id))
+    .limit(1);
+  userPictureStorage.removeItem(oldUserPic[0].picture!);
+};
 export default defineEventHandler(async (e) => {
-  const id = toNumber(getRouterParam(e, "id"));
+  const id = toNumber(getRouterParam(e, "id")) as number;
   const body = parseMultipartData(await readMultipartFormData(e));
+  let newData = {} as Partial<User>;
+  if (body.username) newData["username"] = body.username;
+  if (body.name) newData["name"] = body.name;
+
   try {
-    console.log(body!);
-    const newData = {
-      username: body!.username,
-      name: body!.name,
-      picture: await saveFile(body!.picture),
-      updated: new Date(),
-    };
-    return await useDB().update(users).set(newData).where(eq(users.id, id));
+    if (body.picture) {
+      deleteFile(id);
+      newData["picture"] = await saveFile(`user_pic_${id}`, body.picture);
+    }
+
+    newData["updated"] = new Date();
+    const newuser = await useDB()
+      .update(users)
+      .set(newData)
+      .where(eq(users.id, id))
+      .returning();
+    await setUserSession(e, { user: newuser[0], loggedInAt: new Date() });
+    return await getUserSession(e);
   } catch (e) {
     throw createError(
       e instanceof Error ? e.message : "Unknown usr/id/patch error"

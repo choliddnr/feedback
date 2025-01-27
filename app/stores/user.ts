@@ -5,8 +5,10 @@ import type { UserSession, User } from "#auth-utils";
 // import { type User } from "~/schemas/user.schema.ts";
 
 export const useUserStore = defineStore("user", () => {
-  const { user } = useUserSession();
-  return { user };
+  // const user = ref<User | null>(null);
+  const { user, fetch } = useUserSession();
+  // user.value = usersession.value;
+  return { user, fetch };
 });
 
 if ((import.meta as any).hot) {
