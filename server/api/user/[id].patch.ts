@@ -1,6 +1,6 @@
 import { toNumber } from "@vue/shared";
 import { type MultiPartData } from "h3";
-import { userPictureStorage } from "../../utils/userPictureStorage";
+import { userPictureStorage } from "../../utils/storage";
 import { users, eq } from "../../../shared/db.schema";
 import { User } from "#auth-utils";
 

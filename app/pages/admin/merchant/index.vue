@@ -3,7 +3,6 @@ import type { FormError, FormSubmitEvent } from "#ui/types";
 import { boolean } from "zod";
 import type { Merchant } from "~~/shared/types";
 import { useMerchantStore } from "../../../stores/merchant";
-const { $pb } = useNuxtApp();
 const { merchants } = storeToRefs(useMerchantStore());
 
 definePageMeta({

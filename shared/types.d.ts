@@ -28,26 +28,22 @@ export type Respondent = {
   whatsapp: number;
 };
 
-export type Greeting = {
-  id?: string;
-  title: string;
-  text: string;
-  btn_label: string;
-};
-
 export type Merchant = {
-  id: string;
+  id: number;
   title: string;
   description: string;
-  category: string;
+  category: number;
   owner?: string;
-  expand?: {
-    greeting: Greeting;
-  };
-  greeting: Greeting;
+  greeting: string;
   primary_color: string;
   image_background: string;
   logo?: string;
+};
+
+export type MerchantCategory = {
+  id: number;
+  title: string;
+  description: string;
 };
 
 const colors = useAppConfig().primary_color;

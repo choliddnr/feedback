@@ -26,6 +26,7 @@ export const merchants = sqliteTable("merchants", {
   category: int().references((): AnySQLiteColumn => merchant_categories.id),
   owner: int().references((): AnySQLiteColumn => users.id),
   greeting: text().notNull(),
+  primery_color: text().default("fuel-yellow"),
   image_background: text(),
   logo: text(),
   ...dafaultField,

@@ -21,133 +21,42 @@ definePageMeta({
  * define global store variable
  */
 const { user } = storeToRefs(useUserStore());
-const { merchants, merchant_categories } = storeToRefs(useMerchantStore());
+const { merchants } = storeToRefs(useMerchantStore());
 
 /**
  * define variables
  */
-
-// Route params
-const id = toNumber(useRoute().params.id) as number;
 
 //global composbale
 
 const toast = useToast();
 const modal = useModal();
 
-/**
- * logic state
- */
-
-/**
- * Innitial view
- */
-
-/**
- * compute merchant data
- */
-
-const merchant = computed(() => {
-  if (!merchants.value) return;
-  return merchants.value.find((m) => m.id === id);
-});
-
-/**
- * Form
- */
-
-const formRef = useTemplateRef<HTMLFormElement>("formRef");
-
-/**
- * Form state
- * view mode or edit mode
- */
-
-const isEdit = ref<boolean>(false);
-
-// Init state
-const state = reactive<Partial<Merchant>>({});
-const initState = (merch: Merchant) => {
-  state.title = merch.title;
-  state.description = merch.description;
-  state.greeting = merch.greeting;
-  state.category = merch.category;
-  state.primary_color = merch.primary_color;
-  state.logo = merch.logo;
-  state.image_background = merch.image_background;
-};
-if (merchant.value) {
-  initState(merchant.value);
-} else {
-  const unwatch = watch(merchant, () => {
-    if (merchant.value) {
-      initState(merchant.value);
-      unwatch();
-    }
-  });
-}
-/**
- * Edit Mode
- * isEdit.value = true
- */
-
-/**
- * define Zod schema
- */
-
-const schema = z.object({
-  title: z.string().min(1, "Title is required").optional(),
-  description: z.string().min(1, "Description is required").optional(),
-  greeting: z.string().optional().optional(),
-  category: z.number().optional(),
-  primary_color: z.string().min(1, "Primary color is required").optional(),
-  logo: z.string().optional(),
-  image_background: z.string().optional(),
-});
-
-/**
- * Options
- */
-
-// Colors
+//merchant
 const colors = [...useAppConfig().primary_color];
-
-/**
- * Handle Image Change
- */
-
-// Logo
-import { LazyAdminMerchantEditLogo, UTextarea } from "#components";
-const logoRef = useTemplateRef<HTMLInputElement>("logoRef");
-const logoBlob = ref<Blob>();
-
-const onLogoChange = () => {
-  console.log("logo", logoRef.value?.files![0]);
-  modal.open(LazyAdminMerchantEditLogo, {
-    image: URL.createObjectURL(logoRef.value?.files![0]!),
-    "onUpdate:imageBlob": (value: Blob) => {
-      logoBlob.value = value;
-      state.logo = URL.createObjectURL(value);
-      modal.close();
-    },
-    onCancel: () => {
-      modal.close();
-    },
-  });
-};
-
-// ImageBackground
-import { LazyAdminMerchantEditImageBackground } from "#components";
-import { imageBlobToWebp } from "../../../../shared/utils/imageBlobToWebp";
+const merchantId = toNumber(useRoute().params.id) as number;
 
 //Image
-const MAX_FILE_SIZE = 3 * 1024 * 1024; // 3MB
-const ACCEPTED_FILE_TYPES = [
-  "image/jpeg",
-  "image/jpeg",
-  "image/png",
-  "image/webp",
-];
+const MAX_FILE_SIZE = 1 * 1024 * 1024; // 1MB
+const ACCEPTED_FILE_TYPES = ["image/jpeg", "image/jpeg", "image/png"];
+
+const logoError = ref<ImageError>({
+  isError: false,
+  message: "",
+});
+
+const backgroudImageError = ref<ImageError>({
+  isError: false,
+  message: "",
+});
+
+const schema = z.object({
+  title: z.string().min(4),
+  description: z.string().min(5),
+  category: z.string(),
+  primary_color: z.string(),
+});
+
 const imageSchema = z
   .instanceof(Blob)
   .refine((file) => ACCEPTED_FILE_TYPES.includes(file.type), {
@@ -157,84 +66,214 @@ const imageSchema = z
     message: "File size should be less than 2MB.",
   });
 
-const backgroudImageError = ref<ImageError>({
-  isError: false,
-  message: "",
+type Schema = z.output<typeof schema>;
+const state = reactive({
+  title: "",
+  description: "",
+  category: "",
+  primary_color: "",
+  image_background: "",
+  image_test: "",
+  logo: "",
 });
-const imageBackgroundRef =
-  useTemplateRef<HTMLInputElement>("imageBackgroundRef");
-const imageBackgroundBlob = ref<Blob>();
 
-const onImageBackgroundChange = async () => {
-  console.log("Image_Background", imageBackgroundRef.value?.files![0]);
-  const file = imageBackgroundRef.value?.files![0];
-  const validate = imageSchema.safeParse(file);
-  if (!validate.success) {
-    backgroudImageError.value = {
-      isError: true,
-      message: validate.error.errors[0]!.message,
-    };
-  } else {
-    backgroudImageError.value = {
-      isError: false,
-      message: "",
-    };
-    imageBackgroundBlob.value = await imageBlobToWebp(
-      new Blob([file!], { type: file!.type })
-    );
-    state.image_background = URL.createObjectURL(imageBackgroundBlob.value);
-    console.log("imNgBlob", state.image_background);
-  }
-  return;
-};
+const logoRef = ref<HTMLInputElement>();
+const imageBackgroundRef = ref<HTMLInputElement>();
+// const isAvatarChanged = ref<boolean>(false);
+// const isDeleteAccountModalOpen = ref(false);
+const isEdit = ref<boolean>(false);
+
+// Form ref
+const formRef = useTemplateRef<HTMLFormElement>("formRef");
 
 /**
- * Form submit
+ * Fetching data
  */
-const onSubmit = async () => {
-  const formdata = new FormData();
-  if (merchant.value?.category !== state.category) {
-    formdata.append("category", state.category!.toString());
-  }
-  if (merchant.value?.title !== state.title) {
-    formdata.append("title", state.title!);
-  }
-  if (merchant.value?.description !== state.description) {
-    formdata.append("description", state.description!);
-  }
-  if (merchant.value?.greeting !== state.greeting) {
-    formdata.append("greeting", state.greeting!);
-  }
-  if (merchant.value?.primary_color !== state.primary_color) {
-    formdata.append("primary_color", state.primary_color!);
-  }
-  if (logoBlob.value) {
-    formdata.append("logo", logoBlob.value);
-  }
-  if (imageBackgroundBlob.value) {
-    formdata.append("image_background", imageBackgroundBlob.value);
-  }
+// const { data: image } = await useFetch<File>(
+//   "http://127.0.0.1:8090/api/files/kqsl9ce7d20tynj/x66966zmzugrkt9/whats_app_image_2024_10_05_at_8_40_NT9JtCG744.36AM1.jpeg?token="
+// );
 
-  console.log("submit", state);
-  await $fetch("/api/merchant/" + id, {
-    method: "PATCH",
-    body: formdata,
-    onResponse: ({ response }) => {
-      if (response.status === 200) {
-        toast.add({
-          title: "Sukses",
-          description: "Data merchant berhasil diubah",
-        });
-        console.log("response", response._data);
-        isEdit.value = false;
-      }
+/**
+ * Computed variables
+ */
+const merchant = computed(() => {
+  if (!merchants.value) return;
+  for (let i = 0, len = merchants.value.length; i < len; i++) {
+    if (merchants.value[i]?.id === merchantId) {
+      return merchants.value[i];
+    }
+  }
+});
+
+/**
+ * Unknown method
+ * @param image
+ */
+
+const editImage = (image: File) => {
+  modal.open(EditImage, {
+    image: image,
+    onSuccess() {
+      toast.add({
+        title: "Success !",
+        id: "modal-success",
+      });
     },
   });
 };
-onMounted(() => {
-  // console.log("mounted");
-  isEdit.value = true;
-});
+
+// if (image.value) {
+//   editImage(image.value);
+// }
+
+/**
+ * Init state
+ */
+const initState = () => {
+  if (!merchant.value) return;
+  state.title = merchant.value!.title;
+  state.description = merchant.value!.description;
+  state.category = merchant.value!.category;
+  state.primary_color = merchant.value!.primary_color;
+  state.image_background = "";
+  state.logo = "";
+};
+
+if (merchant.value) {
+  initState();
+} else {
+  const unwatch = watch(merchant, () => {
+    if (merchant.value) {
+      initState();
+      unwatch;
+    }
+  });
+}
+
+/**
+ * Methods
+ */
+
+/**
+ * to trigger input file
+ * logo and image background
+ * @param e Event
+ */
+const changeLogo = (e: Event) => {
+  logoRef.value!.click();
+};
+
+const changeImageBackground = (e: Event) => {
+  imageBackgroundRef.value!.click();
+};
+
+/**
+ * handle chenged file
+ * logo and image background
+ * @param e Event
+ */
+const onLogoChange = (e: Event) => {
+  const input = e.target as HTMLInputElement;
+  console.log("input", input);
+
+  if (!input.files?.length) return;
+  const res = imageSchema.safeParse(input.files[0]);
+  if (!res.success) {
+    logoError.value = {
+      isError: !res.success,
+      message: res.error.errors[0]?.message!,
+    };
+  } else {
+    state.logo = URL.createObjectURL(input.files[0]!);
+    logoError.value = {
+      isError: !res.success,
+      message: "",
+    };
+  }
+};
+
+const onImageBackgroundChange = (e: Event) => {
+  const input = e.target as HTMLInputElement;
+  if (!input.files?.length) return;
+  const res = imageSchema.safeParse(input.files[0]);
+  console.log("res", res);
+
+  if (!res.success) {
+    editImage(input.files[0]!);
+    backgroudImageError.value = {
+      isError: !res.success,
+      message: res.error.errors[0]?.message!,
+    };
+  } else {
+    state.image_background = URL.createObjectURL(input.files[0]!);
+    backgroudImageError.value = {
+      isError: !res.success,
+      message: "",
+    };
+  }
+};
+
+/**
+ * Submitting form
+ */
+
+const onSubmit = async () => {
+  console.log("state", state);
+
+  // const formData = new FormData();
+  // formData.append("title", state.title);
+  // formData.append("description", state.description);
+  // formData.append("category", state.category);
+  // formData.append("primary_color", state.primary_color);
+  // if (logoRef.value!.files?.length! > 0) {
+  //   formData.append("logo", logoRef.value!.files![0]!);
+  // }
+  // if (imageBackgroundRef.value!.files?.length! > 0) {
+  //   formData.append("image_background", imageBackgroundRef.value!.files![0]!);
+  // }
+  // const newMerchantData = "";
+  // for (let i = 0, len = merchants.value?.length || 0; i < len; i++) {
+  //   if (merchants.value![i]?.id === merchant.value?.id) {
+  //     merchants.value?.splice(i, 1);
+  //     merchants.value?.push(newMerchantData as unknown as Merchant);
+  //     break;
+  //   }
+  // }
+  // toast.add({ title: "Merchant updated", icon: "i-heroicons-check-circle" });
+  // isEdit.value = false;
+};
+
+//
+/**
+ * Image Reducer
+ */
+
+const reducedImageUrl = ref(); // Store the reduced image URL
+
+const imageTestRef = ref<HTMLInputElement>();
+
+const changeImageTest = (e: Event) => {
+  imageTestRef.value!.click();
+};
+const onImageTestChange = (e: Event) => {
+  const input = e.target as HTMLInputElement;
+  if (!input.files?.length) return;
+  const file = input.files[0];
+  if (file) {
+    if (file.size > MAX_FILE_SIZE) editImage(file);
+  }
+};
+
+// // Function to handle file input
+// const handleImageUpload = (event) => {
+//   const file = event.target.files[0];
+//   if (file) {
+//     reduceImage(file, 800, 800, (blob) => {
+//       // Generate a URL for the reduced image blob
+//       reducedImageUrl.value = URL.createObjectURL(blob);
+//     });
+//   }
+// };
 </script>
 
 <template>
@@ -311,19 +350,6 @@ onMounted(() => {
             </UFormGroup>
 
             <UFormGroup
-              name="greeeting"
-              label="Salam Pembuka"
-              description="salam yang ditampilkan saat responden hendak memberikan ulasannya"
-            >
-              <UTextarea
-                v-model="state.greeting"
-                autocomplete="off"
-                size="md"
-                :disabled="!isEdit"
-              />
-            </UFormGroup>
-
-            <UFormGroup
               name="category"
               label="Kategori"
               description="Apakah jenis merchant anda ini? misalkan cafe, warung padang, dll."
@@ -331,20 +357,14 @@ onMounted(() => {
               class="grid grid-cols-2 gap-2"
               :ui="{ container: '' }"
             >
-              <!-- <UInput
+              <UInput
                 v-model="state.category"
                 autocomplete="off"
                 size="md"
                 :disabled="!isEdit"
-              > -->
-              <!-- input-class="ps-[20px]" -->
-              <!-- </UInput> -->
-              <USelectMenu
-                v-model="state.category"
-                :options="merchant_categories"
-                option-attribute="title"
-                value-attribute="id"
-              ></USelectMenu>
+              >
+                <!-- input-class="ps-[20px]" -->
+              </UInput>
             </UFormGroup>
 
             <UFormGroup
@@ -375,19 +395,19 @@ onMounted(() => {
               name="logo"
               label="Logo"
               class="grid grid-cols-2 gap-2"
-              description="Pilih gambar dengan format JPG, GIF, PNG dan WEBP dengan  maks 1MB."
+              help="JPG, JPEG or PNG. 1MB Max."
+              :error="logoError.isError && logoError.message"
               :ui="{
                 container: 'flex flex-wrap items-center gap-3',
                 help: 'mt-0',
               }"
             >
-              <!-- :error="logoError.isError && logoError.message" -->
               <input
                 type="file"
                 class="hidden"
                 accept=".jpg, .jpeg, .png"
-                ref="logoRef"
                 @change="onLogoChange"
+                ref="logoRef"
               />
 
               <UAvatar :src="state.logo" :alt="state.title" size="lg" />
@@ -397,26 +417,16 @@ onMounted(() => {
                 color="white"
                 size="md"
                 :disabled="!isEdit"
-                @click="logoRef?.click()"
-              />
-              <UButton
-                v-if="logoBlob"
-                label="Batalkan perubahan"
-                color="red"
-                @click="
-                  () => {
-                    state.logo = merchant?.logo;
-                    logoBlob = undefined;
-                  }
-                "
+                @click="changeLogo"
               />
             </UFormGroup>
 
             <UFormGroup
               name="image_background"
               label="Background"
-              description="Gambar sebagai background pada halaman feedback form. Pilih gambar dengan format JPG, GIF, PNG dan WEBP dengan  maks 3MB."
+              description="Gambar sebagai background pada halaman feedback form."
               class="grid grid-cols-2 gap-2"
+              help="JPG, GIF or PNG. 1MB Max."
               :error="
                 backgroudImageError.isError && backgroudImageError.message
               "
@@ -425,9 +435,6 @@ onMounted(() => {
                 help: 'mt-0',
               }"
             >
-              <!-- :error="
-                  backgroudImageError.isError && backgroudImageError.message
-                " -->
               <input
                 ref="imageBackgroundRef"
                 type="file"
@@ -446,18 +453,42 @@ onMounted(() => {
                 color="white"
                 size="md"
                 :disabled="!isEdit"
-                @click="imageBackgroundRef?.click()"
+                @click="changeImageBackground"
               />
+            </UFormGroup>
+
+            <UFormGroup
+              name="image_test"
+              label="Test"
+              description="Gambar sebagai Test pada halaman feedback form."
+              class="grid grid-cols-2 gap-2"
+              help="JPG, GIF or PNG. 1MB Max."
+              :error="
+                backgroudImageError.isError && backgroudImageError.message
+              "
+              :ui="{
+                container: 'flex flex-wrap items-center gap-3',
+                help: 'mt-0',
+              }"
+            >
+              <input
+                ref="imageTestRef"
+                type="file"
+                class="hidden"
+                accept=".jpg, .jpeg, .png,"
+                @change="onImageTestChange"
+              />
+              <div v-if="reducedImageUrl">
+                <h3>Preview of Reduced Image:</h3>
+                <NuxtImg :src="reducedImageUrl" alt="Reduced" />
+              </div>
+
               <UButton
-                v-if="imageBackgroundBlob"
-                label="Batalkan perubahan"
-                color="red"
-                @click="
-                  () => {
-                    state.image_background = merchant?.image_background;
-                    imageBackgroundBlob = undefined;
-                  }
-                "
+                label="Choose"
+                color="white"
+                size="md"
+                :disabled="!isEdit"
+                @click="changeImageTest"
               />
             </UFormGroup>
           </UDashboardSection>
