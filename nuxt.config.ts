@@ -14,13 +14,7 @@ export default defineNuxtConfig({
   compatibilityDate: "2024-11-01",
   devtools: { enabled: false },
   extends: ["@nuxt/ui-pro"],
-  modules: [
-    "@nuxt/ui",
-    "@nuxt/fonts",
-    "@nuxt/image",
-    "@pinia/nuxt",
-    "nuxt-auth-utils",
-  ],
+  modules: ["@nuxt/ui", "@nuxt/fonts", "@nuxt/image", "@pinia/nuxt"],
   future: {
     compatibilityVersion: 4,
   },
