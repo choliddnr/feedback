@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import { useQuestionsStore } from "../../../stores/questions";
-const { selectedProductId, questions } = storeToRefs(useQuestionsStore());
-selectedProductId.value = useRoute().params.id as string;
+// import { useQuestionsStore } from "../../../_stores/questions";/
+// const { selectedProductId, questions } = storeToRefs(useQuestionsStore());
+// selectedProductId.value = useRoute().params.id as string;
 </script>
 <template>
   <!-- <pre>{{ questions }}</pre> -->
-  <div v-for="question in questions">
-    <UDashboardSection :title="`${question.q} (${question.type})`">
+  <!-- <div v-for="question in questions">
+    <UPageCard :title="`${question.q} (${question.type})`">
       <template #description>
         <div v-if="question.answer_options" class="flex gap-1">
           <UBadge
@@ -16,7 +16,7 @@ selectedProductId.value = useRoute().params.id as string;
           />
         </div>
       </template>
-    </UDashboardSection>
-    <UDivider />
-  </div>
+    </UPageCard>
+    <USeparator />
+  </div> -->
 </template>

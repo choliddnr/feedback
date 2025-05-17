@@ -1,18 +1,18 @@
-import { type AuthModel } from "pocketbase";
-import skipHydrate from "@pinia/nuxt";
-// import type { User } from "~~/shared/user";
-import type { UserSession, User } from "#auth-utils";
-// import { type User } from "~/schemas/user.schema.ts";
+import { defineStore, acceptHMRUpdate } from "pinia";
+import type { User } from "~~/shared/types";
 
 export const useUserStore = defineStore("user", () => {
-  // const user = ref<User | null>(null);
-  const { user, fetch } = useUserSession();
-  // user.value = usersession.value;
+  const user = ref<User>();
+  const { active_merchant } = storeToRefs(useMerchantsStore());
+  const fetch = async () => {
+    user.value = (await authClient.useSession(useFetch)).data.value
+      ?.user as User;
+    active_merchant.value = user.value.defaultMerchant as number;
+  };
+
   return { user, fetch };
 });
 
-if ((import.meta as any).hot) {
-  (import.meta as any).hot.accept(
-    acceptHMRUpdate(useUserStore, (import.meta as any).hot)
-  );
+if (import.meta.hot) {
+  import.meta.hot.accept(acceptHMRUpdate(useUserStore, import.meta.hot));
 }

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { getImageUrl } from "../../shared/utils/getImageUrl";
-import { useUserStore } from "../stores/user";
+import { useUserStore } from "../_stores/user";
 const { $pb } = useNuxtApp();
 const { user } = storeToRefs(useUserStore());
 const { clear } = useUserSession();
@@ -84,7 +84,7 @@ const items = computed(() => [
   >
     <template #default="{ open }">
       <UButton
-        color="gray"
+        color="neutral"
         variant="ghost"
         class="w-full"
         :label="user?.username || user?.name"

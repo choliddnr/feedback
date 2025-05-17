@@ -1,241 +1,230 @@
 <script setup lang="ts">
+const { user } = storeToRefs(useUserStore());
+const { fetch } = useUserStore();
+callOnce("user", async () => await fetch());
+
 const route = useRoute();
-const appConfig = useAppConfig();
-const { isHelpSlideoverOpen } = useDashboard();
+const toast = useToast();
+
+const open = ref(false);
 
 const links = [
-  {
-    id: "home",
-    label: "Home",
-    icon: "i-heroicons-home",
-    to: "/admin",
-    tooltip: {
-      text: "Home",
-      shortcuts: ["G", "H"],
+  [
+    {
+      id: "home",
+      label: "Home",
+      icon: "i-heroicons-home",
+      to: "/admin",
+      tooltip: {
+        text: "Home",
+        shortcuts: ["G", "H"],
+      },
     },
-  },
-  {
-    id: "user",
-    label: "Pengguna",
-    icon: "i-heroicons-user",
-    to: "/admin/user",
-    tooltip: {
-      text: "User",
-      shortcuts: ["G", "U"],
+    {
+      id: "user",
+      label: "Pengguna",
+      icon: "i-heroicons-user",
+      to: "/admin/user",
+      tooltip: {
+        text: "User",
+        shortcuts: ["G", "U"],
+      },
     },
-  },
-  {
-    id: "merchant",
-    label: "Merchant",
-    icon: "i-heroicons-building-storefront",
-    to: "/admin/merchant",
-    // badge: "4",
-    tooltip: {
-      text: "Merchant",
-      shortcuts: ["G", "M"],
+    {
+      id: "merchant",
+      label: "Merchant",
+      icon: "i-heroicons-building-storefront",
+      to: "/admin/merchants",
+      // badge: "4",
+      tooltip: {
+        text: "Merchant",
+        shortcuts: ["G", "M"],
+      },
     },
-  },
-  {
-    id: "products",
-    label: "Produk",
-    icon: "i-heroicons-cube-20-solid",
-    to: "/admin/products",
-    badge: "4",
-    tooltip: {
-      text: "Products",
-      shortcuts: ["G", "P"],
+    {
+      id: "products",
+      label: "Produk",
+      icon: "i-heroicons-cube-20-solid",
+      to: "/admin/products",
+      badge: "4",
+      tooltip: {
+        text: "Products",
+        shortcuts: ["G", "P"],
+      },
     },
-  },
-  {
-    id: "questions",
-    label: "Pertanyaan",
-    icon: "i-heroicons-question-mark-circle-16-solid",
-    to: "/admin/questions",
-    tooltip: {
-      text: "Item",
-      shortcuts: ["G", "Q"],
+    {
+      id: "questions",
+      label: "Pertanyaan",
+      icon: "i-heroicons-question-mark-circle-16-solid",
+      to: "/admin/questions",
+      tooltip: {
+        text: "Item",
+        shortcuts: ["G", "Q"],
+      },
     },
-  },
-  //   {
-  //     id: "inbox",
-  //     label: "Inbox",
-  //     icon: "i-heroicons-inbox",
-  //     to: "/inbox",
-  //     badge: "4",
-  //     tooltip: {
-  //       text: "Inbox",
-  //       shortcuts: ["G", "I"],
-  //     },
-  //   },
-  //   {
-  //     id: "users",
-  //     label: "Users",
-  //     icon: "i-heroicons-user-group",
-  //     to: "/users",
-  //     tooltip: {
-  //       text: "Users",
-  //       shortcuts: ["G", "U"],
-  //     },
-  //   },
-  //   {
-  //     id: "settings",
-  //     label: "Settings",
-  //     to: "/settings",
-  //     icon: "i-heroicons-cog-8-tooth",
-  //     children: [
-  //       {
-  //         label: "General",
-  //         to: "/settings",
-  //         exact: true,
-  //       },
-  //       {
-  //         label: "Members",
-  //         to: "/settings/members",
-  //       },
-  //       {
-  //         label: "Notifications",
-  //         to: "/settings/notifications",
-  //       },
-  //       {
-  //         label: "Items",
-  //         to: "/settings/items",
-  //       },
-  //     ],
-  //     tooltip: {
-  //       text: "Settings",
-  //       shortcuts: ["G", "S"],
-  //     },
-  //   },
+    //   {
+    //     id: "inbox",
+    //     label: "Inbox",
+    //     icon: "i-heroicons-inbox",
+    //     to: "/inbox",
+    //     badge: "4",
+    //     tooltip: {
+    //       text: "Inbox",
+    //       shortcuts: ["G", "I"],
+    //     },
+    //   },
+    //   {
+    //     id: "users",
+    //     label: "Users",
+    //     icon: "i-heroicons-user-group",
+    //     to: "/users",
+    //     tooltip: {
+    //       text: "Users",
+    //       shortcuts: ["G", "U"],
+    //     },
+    //   },
+    //   {
+    //     id: "settings",
+    //     label: "Settings",
+    //     to: "/settings",
+    //     icon: "i-heroicons-cog-8-tooth",
+    //     children: [
+    //       {
+    //         label: "General",
+    //         to: "/settings",
+    //         exact: true,
+    //       },
+    //       {
+    //         label: "Members",
+    //         to: "/settings/members",
+    //       },
+    //       {
+    //         label: "Notifications",
+    //         to: "/settings/notifications",
+    //       },
+    //       {
+    //         label: "Items",
+    //         to: "/settings/items",
+    //       },
+    //     ],
+    //     tooltip: {
+    //       text: "Settings",
+    //       shortcuts: ["G", "S"],
+    //     },
+    //   },
+  ],
+  [
+    {
+      label: "Feedback",
+      icon: "i-lucide-message-circle",
+      to: "https://github.com/nuxt-ui-pro/dashboard",
+      target: "_blank",
+    },
+    {
+      label: "Help & Support",
+      icon: "i-lucide-info",
+      to: "https://github.com/nuxt/ui-pro",
+      target: "_blank",
+    },
+  ],
 ];
 
-const footerLinks = [
-  //   {
-  //     label: "Invite people",
-  //     icon: "i-heroicons-plus",
-  //     to: "/settings/members",
-  //   },
+const groups = computed(() => [
   {
-    label: "Help & Support",
-    icon: "i-heroicons-question-mark-circle",
-    click: () => (isHelpSlideoverOpen.value = true),
-  },
-];
-
-const groups = [
-  {
-    key: "links",
+    id: "links",
     label: "Go to",
-    commands: links.map((link) => ({
-      ...link,
-      shortcuts: link.tooltip?.shortcuts,
-    })),
+    items: links.flat(),
   },
   {
-    key: "code",
+    id: "code",
     label: "Code",
-    commands: [
+    items: [
       {
         id: "source",
         label: "View page source",
         icon: "i-simple-icons-github",
-        click: () => {
-          window.open(
-            `https://github.com/nuxt-ui-pro/dashboard/blob/main/pages${
-              route.path === "/" ? "/index" : route.path
-            }.vue`,
-            "_blank"
-          );
-        },
+        to: `https://github.com/nuxt-ui-pro/dashboard/blob/main/app/pages${
+          route.path === "/" ? "/index" : route.path
+        }.vue`,
+        target: "_blank",
       },
     ],
   },
-];
+]);
 
-// const defaultColors = ref(
-//   ["green", "teal", "cyan", "sky", "blue", "indigo", "violet"].map((color) => ({
-//     label: color,
-//     chip: color,
-//     click: () => ((appConfig.ui as any).primary = color),
-//   }))
-// );
-// const colors = computed(() =>
-//   defaultColors.value.map((color) => ({
-//     ...color,
-//     active: (appConfig.ui as any).primary === color.label,
-//   }))
-// );
+onMounted(async () => {
+  const cookie = useCookie("cookie-consent");
+  if (cookie.value === "accepted") {
+    return;
+  }
+
+  toast.add({
+    title:
+      "We use first-party cookies to enhance your experience on our website.",
+    duration: 0,
+    close: false,
+    actions: [
+      {
+        label: "Accept",
+        color: "neutral",
+        variant: "outline",
+        onClick: () => {
+          cookie.value = "accepted";
+        },
+      },
+      {
+        label: "Opt out",
+        color: "neutral",
+        variant: "ghost",
+      },
+    ],
+  });
+});
 </script>
 
 <template>
-  <UDashboardLayout>
-    <UDashboardPanel
-      :width="250"
-      :resizable="{ min: 200, max: 300 }"
+  <UDashboardGroup unit="rem">
+    <UDashboardSidebar
+      id="default"
+      v-model:open="open"
       collapsible
+      resizable
+      class="bg-elevated/25"
+      :ui="{ footer: 'lg:border-t lg:border-default' }"
     >
-      <UDashboardNavbar class="!border-transparent" :ui="{ left: 'flex-1' }">
-        <template #left>
-          <!-- <TeamsDropdown /> -->
-          <MerchantDropdown />
-        </template>
-      </UDashboardNavbar>
+      <template #header="{ collapsed }">
+        <TeamsMenu :collapsed="collapsed" />
+      </template>
 
-      <UDashboardSidebar>
-        <template #header>
-          <UDashboardSearchButton />
-        </template>
+      <template #default="{ collapsed }">
+        <UDashboardSearchButton
+          :collapsed="collapsed"
+          class="bg-transparent ring-default"
+        />
 
-        <UDashboardSidebarLinks :links="links" />
+        <UNavigationMenu
+          :collapsed="collapsed"
+          :items="links[0]"
+          orientation="vertical"
+        />
 
-        <UDivider />
+        <UNavigationMenu
+          :collapsed="collapsed"
+          :items="links[1]"
+          orientation="vertical"
+          class="mt-auto"
+        />
+      </template>
 
-        <!-- <UDashboardSidebarLinks
-          :links="[{ label: 'Colors', draggable: true, children: colors }]"
-          @update:links="(colors) => (defaultColors = colors)"
-        /> -->
+      <template #footer="{ collapsed }">
+        <UserMenu :collapsed="collapsed" />
+      </template>
+    </UDashboardSidebar>
 
-        <div class="flex-1" />
-
-        <UDashboardSidebarLinks :links="footerLinks" />
-
-        <UDivider class="sticky bottom-0" />
-
-        <template #footer>
-          <!-- ~/components/UserDropdown.vue -->
-          <UserDropdown />
-        </template>
-      </UDashboardSidebar>
-    </UDashboardPanel>
+    <UDashboardSearch :groups="groups" />
 
     <slot />
 
-    <!-- ~/components/HelpSlideover.vue -->
-    <HelpSlideover />
-    <!-- ~/components/NotificationsSlideover.vue -->
     <NotificationsSlideover />
-
-    <ClientOnly>
-      <LazyUDashboardSearch :groups="groups" />
-    </ClientOnly>
-  </UDashboardLayout>
-
-  <UNotifications />
-  <UModals />
-  <USlideovers />
+  </UDashboardGroup>
 </template>
-<style>
-.slide-right-enter-active,
-.slide-right-leave-active {
-  transition: all 0.25s ease-out;
-}
-
-.slide-right-enter-from {
-  opacity: 0;
-  transform: translateX(30px);
-}
-
-.slide-right-leave-to {
-  opacity: 0;
-  transform: translateX(30px);
-}
-</style>

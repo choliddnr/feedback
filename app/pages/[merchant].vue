@@ -1,0 +1,35 @@
+<script setup lang="ts">
+import type { Merchant } from "~~/shared/types";
+const route = useRoute();
+const merchant_id = Number(route.params.merchant);
+const { data } = await useFetch("/api/merchants/" + merchant_id, {
+  transform: (data: Merchant[]) => data[0],
+});
+
+onMounted(() => {
+  if (import.meta.client) {
+    const { merchant, respondent, selected_product, products } = storeToRefs(
+      useResponseStore()
+    );
+    merchant.value = data.value;
+
+    respondent.value =
+      JSON.parse(localStorage.getItem(`${merchant.value?.id}_respondent`)!) ||
+      undefined;
+    selected_product.value =
+      JSON.parse(
+        localStorage.getItem(`${merchant.value?.id}_selected_product`)!
+      ) || undefined;
+    products.value =
+      JSON.parse(localStorage.getItem(`${merchant.value?.id}_products`)!) ||
+      undefined;
+  }
+});
+</script>
+<template>
+  <UMain
+    class="flex felx-row my-auto items-center justify-center w-full sm:w-2xl mx-auto"
+  >
+    <NuxtPage />
+  </UMain>
+</template>

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useQuestionsStore } from "../stores/questions";
+import { useQuestionsStore } from "../_stores/questions";
 const id = useRoute().params.id;
 const { productQuesions: questions, currentProduct } = storeToRefs(
   useQuestionsStore()
@@ -30,7 +30,7 @@ onMounted(() => {});
       :ui="{ constrained: 'max-w-4xl', base: 'h-screen content-center' }"
     >
       <UCard :ui="{ background: 'backdrop-blur-sm bg-white/60' }">
-        <UFormGroup :ui="{ label: { base: 'text-2xl mb-2' } }">
+        <UFormField :ui="{ label: { base: 'text-2xl mb-2' } }">
           <template #label>
             <span>{{ questions[currentState]?.q }}</span>
           </template>
@@ -44,12 +44,12 @@ onMounted(() => {});
               variant: { outline: 'ring-2 focus:ring-2 focus:border-b-4' },
             }"
           />
-        </UFormGroup>
+        </UFormField>
         <div class="flex flex-row gap-1 my-2">
           <UButton
             v-for="(opt, index) in questions[currentState]?.options"
             :label="opt"
-            color="white"
+            color="neutral"
             :ui="{ rounded: 'rounded-full' }"
             @click="answers[currentState] = opt"
           />

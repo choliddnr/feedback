@@ -117,7 +117,7 @@ const onChange = (e: any) => {
           >
           <UButton
             @click="emit('cancel')"
-            color="red"
+            color="error"
             class="w-full justify-center"
             leading-icon="i-heroicons-x-mark-16-solid"
             >Batal</UButton
