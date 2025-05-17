@@ -1,11 +1,12 @@
 <script setup lang="ts">
-import { authClient } from "~/utils/client";
-const session = authClient.useSession();
+// import { authClient } from "~/utils/client";
+// const session = authClient.useSession();
+navigateTo("/admin");
 </script>
 
 <template>
   <div>
-    <button
+    <!-- <button
       v-if="!session?.data"
       @click="
         () =>
@@ -21,6 +22,6 @@ const session = authClient.useSession();
       <button v-if="session.data" @click="authClient.signOut()">
         Sign out
       </button>
-    </div>
+    </div> -->
   </div>
 </template>

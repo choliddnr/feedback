@@ -1,15 +1,6 @@
 <script lang="ts" setup>
-import type { FormSubmitEvent } from "#ui/types";
-import { ModalConfirm } from "#components";
-import { type output as zodOutput } from "zod";
 import { z } from "zod";
-import type { NewProduct, Product } from "~~/shared/types";
-
-// import { useProductsStore } from "../../../_stores/products";
-
-// const { products } = storeToRefs(useProductsStore());
-
-// const { $pb } = useNuxtApp();
+import type { NewProduct } from "~~/shared/types";
 
 const { merchants, active_merchant } = storeToRefs(useMerchantsStore());
 const { fetch } = useProductsStore();

@@ -45,10 +45,6 @@ const onSave = async () => {
   // imageRef.value.$center();
   console.log("zoomed", selectionRef.value.selection, imageRef.value.image);
   isZoomable.value = false;
-  // const canvas =
-  //   (await selectionRef.value.selection.$toCanvas()) as HTMLCanvasElement;
-  // imageBlob.value = await convertCanvasToWebp(canvas);
-  // console.log("blob", imageBlob.value);
 };
 watch(selectionRef, () => {
   if (selectionRef.value) {

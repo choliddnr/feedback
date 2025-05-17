@@ -88,12 +88,5 @@ console.log("modal loaded", props.image);
         </div>
       </UCard>
     </template>
-
-    <!-- <template #footer>
-      <div class="flex gap-2">
-        <UButton color="neutral" label="Dismiss" @click="emit('cancel')" />
-        <UButton label="Success" @click="emit('cancel')" />
-      </div>
-    </template> -->
   </UModal>
 </template>

@@ -1,6 +1,7 @@
 <script setup lang="ts">
 const { merchant } = storeToRefs(useResponseStore());
 const route = useRoute();
+navigateTo(`/${route.params.merchant}/respondent`);
 </script>
 <template>
   <UCard>
