@@ -30,22 +30,9 @@ const onSubmit = () => {
 };
 </script>
 <template>
-  <template>
-    <UCard variant="subtle">
-      <template #header>
-        <Placeholder class="h-8" />
-      </template>
-
-      <Placeholder class="h-32" />
-
-      <template #footer>
-        <Placeholder class="h-8" />
-      </template>
-    </UCard>
-  </template>
   <UCard
     :ui="{ root: 'backdrop-blur-sm bg-neutral/80 ring-primary' }"
-    class="w-full"
+    class="w-full sm:w-sm"
   >
     <p class="font-bold mb-3 text-xl mx-auto text-center w-[250px]">
       Please, choose some product to be reviewed.
