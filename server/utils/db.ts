@@ -1,5 +1,9 @@
-import "dotenv/config";
-import { drizzle } from "drizzle-orm/bun-sqlite";
-export { sql, eq, and, or } from "drizzle-orm";
-import { users } from "../../shared/db.schema";
-export const useDB = () => drizzle(process.env.DB_FILE_NAME!);
+import { drizzle } from "drizzle-orm/better-sqlite3";
+import Database from "better-sqlite3";
+
+const sqlite = new Database(process.env.DB_PATH!);
+// sqlite.pragma("PRAGMA foreign_keys = ON");
+export const db = drizzle({
+  client: sqlite,
+  casing: "snake_case",
+});

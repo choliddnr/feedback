@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useUserStore } from "../stores/user";
+import { useUserStore } from "../_stores/user";
 const model = defineModel({
   type: Boolean,
 });
@@ -85,12 +85,12 @@ const onDelete = async () => {
   >
     <template #footer>
       <UButton
-        color="red"
+        color="error"
         label="Delete"
         :loading="loading"
         @click="onDelete"
       />
-      <UButton color="white" label="Cancel" @click="model = false" />
+      <UButton color="neutral" label="Cancel" @click="model = false" />
     </template>
   </UDashboardModal>
 </template>

@@ -5,9 +5,9 @@ import { type output as zodOutput } from "zod";
 import { z } from "zod";
 import type { Product } from "~~/shared/types";
 
-import { useProductsStore } from "../../../stores/products";
-const { products } = storeToRefs(useProductsStore());
-const { $pb } = useNuxtApp();
+// import { useProductsStore } from "../../../_stores/products";
+// const { products } = storeToRefs(useProductsStore());
+// const { $pb } = useNuxtApp();
 const toast = useToast();
 
 const EditSchema = z.object({
@@ -17,7 +17,7 @@ const EditSchema = z.object({
 });
 
 const props = defineProps<{
-  product: Product;
+  product: Partial<Product>;
 }>();
 
 const emits = defineEmits<{
@@ -29,7 +29,7 @@ const submitBtnRef = ref<HTMLButtonElement>();
 const state = reactive<Partial<Product> & { image?: string }>({
   title: props.product.title,
   description: props.product.description,
-  image: $pb.files.getURL(props.product, props.product.images!),
+  // image: $pb.files.getURL(props.product, props.product.images!),
 });
 
 const imageRef = ref<HTMLInputElement>();
@@ -73,15 +73,15 @@ const onSubmit = async () => {
   if (imageRef.value?.files?.length) {
     formData.append("images", imageRef.value!.files![0]!);
   }
-  const updatedProduct = await $pb
-    .collection("products")
-    .update(props.product.id!, formData);
-  for (let i = 0, len = products.value?.length || 0; i < len; i++) {
-    if (products.value![i]?.id === props.product.id) {
-      products.value![i] = updatedProduct as unknown as Product;
-      break;
-    }
-  }
+  // const updatedProduct = await $pb
+  //   .collection("products")
+  //   .update(props.product.id!, formData);
+  // for (let i = 0, len = products.value?.length || 0; i < len; i++) {
+  //   if (products.value![i]?.id === props.product.id) {
+  //     products.value![i] = updatedProduct as unknown as Product;
+  //     break;
+  //   }
+  // }
   emits("close");
   toast.add({ title: "Product updated", icon: "i-heroicons-check-circle" });
 };
@@ -92,9 +92,8 @@ const onSubmit = async () => {
     <UCard
       class="flex flex-col flex-1"
       :ui="{
-        body: { base: 'flex-1' },
-        ring: '',
-        divide: 'divide-y divide-gray-100 dark:divide-gray-800',
+        body: 'flex-1',
+        root: 'divide-y divide-gray-100 dark:divide-gray-800 ring-0',
       }"
     >
       <template #header>
@@ -113,7 +112,7 @@ const onSubmit = async () => {
               @click="submitBtnRef!.click()"
             />
             <UButton
-              color="red"
+              color="error"
               icon="i-heroicons-x-mark-20-solid"
               @click="emits('close')"
             />
@@ -122,13 +121,13 @@ const onSubmit = async () => {
       </template>
 
       <UForm :schema="EditSchema" :state="state" class="space-y-4">
-        <UFormGroup label="Title" name="title">
+        <UFormField label="Title" name="title">
           <UInput v-model="state.title" />
-        </UFormGroup>
-        <UFormGroup label="Description" name="description">
+        </UFormField>
+        <UFormField label="Description" name="description">
           <UTextarea v-model="state.description" />
-        </UFormGroup>
-        <UFormGroup
+        </UFormField>
+        <UFormField
           name="images"
           label="Gambar"
           class="grid grid-cols-2 gap-2"
@@ -152,11 +151,11 @@ const onSubmit = async () => {
 
           <UButton
             label="Choose"
-            color="white"
+            color="neutral"
             size="md"
             @click="changeImage"
           />
-        </UFormGroup>
+        </UFormField>
 
         <button @click="onSubmit" hidden ref="submitBtnRef">Submit</button>
       </UForm>

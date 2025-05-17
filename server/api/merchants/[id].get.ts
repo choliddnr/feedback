@@ -1,0 +1,19 @@
+import { merchants, eq, and } from "~~/server/utils/db/schema";
+
+export default defineEventHandler(async (e) => {
+  const id = Number(getRouterParam(e, "id"));
+  const session = await auth.api.getSession({
+    headers: e.headers,
+  });
+  // console.log(session?.user);
+  if (!session?.user)
+    throw createError({ statusCode: 401, statusMessage: "Unauthorized" });
+
+  return await db
+    .select()
+    .from(merchants)
+    .where(
+      and(eq(merchants.owner, Number(session?.user.id)), eq(merchants.id, id))
+    )
+    .limit(1);
+});

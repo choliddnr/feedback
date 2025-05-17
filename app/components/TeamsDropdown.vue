@@ -44,7 +44,7 @@ const team = ref(teams[0]);
     :popper="{ strategy: 'absolute' }"
   >
     <UButton
-      color="gray"
+      color="neutral"
       variant="ghost"
       :class="[open && 'bg-gray-50 dark:bg-gray-800']"
       class="w-full"

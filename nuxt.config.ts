@@ -1,208 +1,28 @@
-import { createRequire } from "node:module";
-const _require = createRequire(import.meta.url);
-const defaultColors = _require("tailwindcss/colors.js");
-delete defaultColors.lightBlue;
-delete defaultColors.warmGray;
-delete defaultColors.trueGray;
-delete defaultColors.coolGray;
-delete defaultColors.blueGray;
-
 // https://nuxt.com/docs/api/configuration/nuxt-config
-
 export default defineNuxtConfig({
-  ssr: false,
   compatibilityDate: "2024-11-01",
-  devtools: { enabled: false },
-  extends: ["@nuxt/ui-pro"],
-  modules: ["@nuxt/ui", "@nuxt/fonts", "@nuxt/image", "@pinia/nuxt"],
+  devtools: { enabled: true },
   future: {
     compatibilityVersion: 4,
   },
-  colorMode: {
-    preference: "light",
-  },
-  tailwindcss: {
-    config: {
-      theme: {
-        extend: {
-          fontFamily: {
-            sans: ["Playpen Sans"],
-          },
-          colors: {
-            "great-blue": {
-              DEFAULT: "#2A669F",
-              50: "#E4F7F8",
-              100: "#CCEEF2",
-              200: "#9CD7E5",
-              300: "#6CB9D8",
-              400: "#3B94CB",
-              500: "#2A669F",
-              600: "#234B83",
-              700: "#1B3366",
-              800: "#14204A",
-              900: "#0C102E",
-            },
-            "fuel-yellow": {
-              DEFAULT: "#EEA12E",
-              50: "#FCEDD8",
-              100: "#FAE5C5",
-              200: "#F7D49F",
-              300: "#F4C379",
-              400: "#F1B254",
-              500: "#EEA12E",
-              600: "#D38511",
-              700: "#9F640D",
-              800: "#6B4409",
-              900: "#372304",
-              950: "#1D1202",
-            },
-            astra: {
-              DEFAULT: "#F9F3BC",
-              50: "#FFFFFF",
-              100: "#FFFFFF",
-              200: "#FFFFFF",
-              300: "#FFFFFF",
-              400: "#FCFAE1",
-              500: "#F9F3BC",
-              600: "#F4EA89",
-              700: "#F0E155",
-              800: "#EBD722",
-              900: "#C3B211",
-              950: "#A99A0F",
-            },
-            "pale-sky": {
-              DEFAULT: "#6B7280",
-              50: "#CDD0D5",
-              100: "#C2C5CC",
-              200: "#ACB0BA",
-              300: "#969BA7",
-              400: "#7F8694",
-              500: "#6B7280",
-              600: "#515761",
-              700: "#383C43",
-              800: "#1E2024",
-              900: "#050506",
-              950: "#000000",
-            },
-            flamingo: {
-              DEFAULT: "#EF4444",
-              50: "#FDEDED",
-              100: "#FCDADA",
-              200: "#F9B5B5",
-              300: "#F58F8F",
-              400: "#F26A6A",
-              500: "#EF4444",
-              600: "#E71414",
-              700: "#B30F0F",
-              800: "#800B0B",
-              900: "#4C0707",
-              950: "#320404",
-            },
-            buttercup: {
-              DEFAULT: "#F59E0B",
-              50: "#FCE4BB",
-              100: "#FBDCA8",
-              200: "#FACD81",
-              300: "#F8BD59",
-              400: "#F7AE32",
-              500: "#F59E0B",
-              600: "#C07C08",
-              700: "#8A5906",
-              800: "#543603",
-              900: "#1E1401",
-              950: "#030200",
-            },
-            "mountain-meadow": {
-              DEFAULT: "#10B981",
-              50: "#8CF5D2",
-              100: "#79F3CB",
-              200: "#53F0BC",
-              300: "#2EEDAE",
-              400: "#13DF9B",
-              500: "#10B981",
-              600: "#0C855D",
-              700: "#075239",
-              800: "#031E15",
-              900: "#000000",
-              950: "#000000",
-            },
-            "dodger-blue": {
-              DEFAULT: "#3B82F6",
-              50: "#EBF2FE",
-              100: "#D7E6FD",
-              200: "#B0CDFB",
-              300: "#89B4FA",
-              400: "#629BF8",
-              500: "#3B82F6",
-              600: "#0B61EE",
-              700: "#084BB8",
-              800: "#063583",
-              900: "#041F4D",
-              950: "#021532",
-            },
-            "cornflower-blue": {
-              DEFAULT: "#6366F1",
-              50: "#FFFFFF",
-              100: "#F9F9FE",
-              200: "#D3D4FB",
-              300: "#AEAFF8",
-              400: "#888BF4",
-              500: "#6366F1",
-              600: "#3034EC",
-              700: "#1317D1",
-              800: "#0E119E",
-              900: "#0A0C6A",
-              950: "#070950",
-            },
-            "french-rose": {
-              DEFAULT: "#EC4899",
-              50: "#FDEEF6",
-              100: "#FBDCEB",
-              200: "#F8B7D7",
-              300: "#F492C2",
-              400: "#F06DAE",
-              500: "#EC4899",
-              600: "#E4187D",
-              700: "#B11261",
-              800: "#7F0D45",
-              900: "#4C0829",
-              950: "#32051B",
-            },
-          },
-        },
-      },
-    },
-  },
+  modules: ["@nuxt/ui-pro", "@pinia/nuxt", "@nuxt/image"],
+  css: ["~/assets/css/main.css"],
   ui: {
-    icons: ["heroicons", "simple-icons"],
-    safelistColors: ["primary", "red", "orange", "green"],
-  } as any,
-
-  fonts: {
-    provider: "google",
+    fonts: false,
+    colorMode: true,
   },
+  colorMode: {
+    preference: "dark",
+  },
+  // fonts: {
+  //   provider: "google",
+  // },
   pinia: {
     storesDirs: ["./app/stores"],
-  },
-  runtimeConfig: {
-    public: {
-      pocketbaseApi: "http://127.0.0.1:8090",
-    },
-  },
-  image: {
-    // provider: "pocketbase",
-    // pocketbase: {
-    //   baseUrl:
-    //     process.env.NUXT_PUBLIC_POCKETBASE_API + "files" ||
-    //     "http://127.0.0.1:8090/api/files",
-    // },
   },
   routeRules: {
     "/admin/**": {
       appMiddleware: ["auth"],
     },
-  },
-  nitro: {
-    preset: "bun",
   },
 });

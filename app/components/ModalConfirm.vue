@@ -19,39 +19,90 @@ type OnCreate = {
 const props = withDefaults(
   defineProps<{
     message: string;
-    label?: {
-      continue?: string;
-      cancel?: string;
+    action?: {
+      continue?: {
+        label?: string;
+        color?:
+          | "primary"
+          | "secondary"
+          | "neutral"
+          | "success"
+          | "info"
+          | "warning"
+          | "error";
+      };
+      cancel?: {
+        label?: string;
+        color?:
+          | "primary"
+          | "secondary"
+          | "neutral"
+          | "success"
+          | "info"
+          | "warning"
+          | "error";
+      };
     };
   }>(),
   {
-    label: () => {
+    message: "Are you sure?",
+    action: () => {
       return {
-        cancel: "Batal",
-        continue: "Lanjut",
+        continue: {
+          label: "Yes",
+          color: "primary",
+        },
+        cancel: {
+          label: "Cancel",
+          color: "warning",
+        },
       };
     },
   }
 );
-
+// () => {
+//       return {
+//         cancel: "Batal",
+//         continue: "Lanjut",
+//       };
+//     },
 const emit = defineEmits(["continue", "cancel"]);
+const onloading = ref<boolean>(false);
+onMounted(() => {
+  console.log("props", props);
+});
+onBeforeUnmount(() => {
+  onloading.value = false;
+});
 </script>
 
 <template>
   <UModal>
-    <UCard>
-      <div class="space-y-2">
-        <h6>{{ message }}</h6>
-        <UButton @click="emit('continue')" class="w-min-20 justify-center mr-3">
-          {{ label.continue }} </UButton
-        ><UButton
-          @click="emit('cancel')"
-          class="w-min-20 justify-center"
-          color="red"
-        >
-          {{ label.cancel }}
-        </UButton>
-      </div>
-    </UCard>
+    <template #content>
+      <UCard>
+        <div class="space-y-2">
+          <h6>{{ message }}</h6>
+          <UButton
+            :loading="onloading"
+            @click="
+              () => {
+                onloading = true;
+                emit('continue');
+              }
+            "
+            class="w-min-20 justify-center mr-3"
+            :color="action.continue?.color || 'primary'"
+          >
+            {{ action.continue?.label }} </UButton
+          ><UButton
+            @click="emit('cancel')"
+            class="w-min-20 justify-center"
+            :color="action.cancel?.color || 'warning'"
+          >
+            {{ action.cancel?.label || "Cancel" }}
+          </UButton>
+        </div>
+      </UCard>
+    </template>
   </UModal>
 </template>
