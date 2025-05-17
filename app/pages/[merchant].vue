@@ -2,7 +2,7 @@
 import type { Merchant } from "~~/shared/types";
 const route = useRoute();
 const merchant_id = Number(route.params.merchant);
-const { data } = await useFetch("/api/merchants/" + merchant_id, {
+const { data } = await useFetch("/api/public/merchants/" + merchant_id, {
   transform: (data: Merchant[]) => data[0],
 });
 

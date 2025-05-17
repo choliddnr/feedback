@@ -42,13 +42,6 @@ const providers = [
       console.log(data);
     },
   },
-  // {
-  //   label: "GitHub",
-  //   icon: "i-simple-icons-github",
-  //   onClick: () => {
-  //     toast.add({ title: "GitHub", description: "Login with GitHub" });
-  //   },
-  // },
 ];
 
 const schema = z.object({

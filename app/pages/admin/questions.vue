@@ -1,56 +1,194 @@
 <script setup lang="ts">
-import {
-  LazyAdminQuestionsAddForm,
-  // LazyAdminQuestionsEditForm,
-} from "#components";
-
-// import { content } from "#tailwind-config";
-// import type { Product } from "~~/shared/types";
-// import { useQuestionsStore } from "../../_stores/questions";
-// import { useProductsStore } from "../../_stores/products";
+import { LazyAdminQuestionsAddForm } from "#components";
+import { LazyAdminQuestionsEditForm } from "#components";
+import type { TableColumn } from "@nuxt/ui";
+import type { Question } from "~~/shared/types";
+import { LazyModalConfirm } from "#components";
 
 definePageMeta({
   layout: "dashboard",
 });
-
 const { products, active_product } = storeToRefs(useProductsStore());
 const { merchants, active_merchant } = storeToRefs(useMerchantsStore());
 const overlay = useOverlay();
+const UBadge = resolveComponent("UBadge");
+const UDropdownMenu = resolveComponent("UDropdownMenu");
+const UButton = resolveComponent("UButton");
+
+const toast = useToast();
+const { questions } = storeToRefs(useQuestionsStore());
+
+const slideover_edit = overlay.create(LazyAdminQuestionsEditForm);
+const modal_delete_question = overlay.create(LazyModalConfirm);
 const slideover_add = overlay.create(LazyAdminQuestionsAddForm);
-// const slideover_edit = overlay.create(LazyAdminQuestionsEditForm);
+const table = useTemplateRef("table");
+const q_type = new Map([
+  [1, "Text"],
+  [2, "Reting"],
+]);
 
-// const { $pb } = useNuxtApp();
-// const { products } = storeToRefs(useProductsStore());
-// const { selectedProductId } = storeToRefs(useQuestionsStore());
+const columns: TableColumn<Question>[] = [
+  {
+    accessorKey: "id",
+    header: "#",
+    cell: ({ row }) => `#${row.getValue("id")}`,
+  },
+  {
+    accessorKey: "question",
+    header: "Question",
+  },
+  {
+    accessorKey: "type",
+    header: "Type",
+    cell: ({ row }) => {
+      const color = {
+        text: "success" as const,
+        rating: "info" as const,
+      }[row.getValue("type") as string];
 
-// const sp = { id: "", title: "Select Product" };
-// const productOptions = ref<Product[]>([sp]);
-// watchEffect(() => {
-//   console.log(
-//     "here",
-//     products.value && !selectedProductId.value,
-//     products.value,
-//     selectedProductId.value
-//   );
-//   if (products.value && !selectedProductId.value) {
-//     productOptions.value = [sp, ...products.value];
-//     return;
-//   }
-//   if (products.value && selectedProductId.value) {
-//     productOptions.value = products.value;
-//     navigateTo(`/admin/questions/${selectedProductId.value}`);
-//   }
-//   return;
-// });
+      return h(UBadge, { class: "capitalize", variant: "subtle", color }, () =>
+        q_type.get(row.getValue("type"))
+      );
+    },
+  },
+  {
+    accessorKey: "answer_options",
+    header: "Options",
+    cell: ({ row }) => {
+      const opt = row.getValue("answer_options") as string[];
+      if (opt.length > 1) {
+        return h("div", { class: "flex gap-2" }, [
+          h(
+            UBadge,
+            {
+              class: "capitalize",
+              variant: "subtle",
+              color: "neutral",
+              size: "sm",
+            },
+            () => opt[0]
+          ),
+          h(UButton, {
+            label: row.getIsExpanded() ? "See less" : "See more",
+            color: "neutral",
+            variant: "outline",
+            size: "sm",
+            onClick: () => row.toggleExpanded(),
+          }),
+        ]);
+      } else if (opt.length === 1) {
+        return h(
+          UBadge,
+          { class: "capitalize", variant: "subtle", color: "neutral" },
+          () => opt[0]
+        );
+      } else {
+        return h(
+          UBadge,
+          { class: "capitalize", variant: "subtle", color: "neutral" },
+          () => "no options provided."
+        );
+      }
+    },
+  },
+  {
+    id: "actions",
+    enableHiding: false,
+    cell: ({ row }) => {
+      const items = [
+        {
+          type: "label",
+          label: "Actions",
+        },
+        {
+          label: "Copy payment ID",
+          onSelect() {
+            navigator.clipboard.writeText(String(row.original.id));
+
+            toast.add({
+              title: "Payment ID copied to clipboard!",
+              color: "success",
+              icon: "i-lucide-circle-check",
+            });
+          },
+        },
+        {
+          label: "Edit",
+          onSelect() {
+            slideover_edit.open({
+              question: row.original,
+            });
+          },
+        },
+        {
+          label: "Delete",
+          onSelect() {
+            deleteQuestion(row.getValue("id"));
+          },
+        },
+      ];
+
+      return h(
+        "div",
+        { class: "text-right" },
+        h(
+          UDropdownMenu,
+          {
+            content: {
+              align: "end",
+            },
+            items,
+            "aria-label": "Actions dropdown",
+          },
+          () =>
+            h(UButton, {
+              icon: "i-lucide-ellipsis-vertical",
+              color: "neutral",
+              variant: "ghost",
+              class: "ml-auto",
+              "aria-label": "Actions dropdown",
+            })
+        )
+      );
+    },
+  },
+];
+
+const processDelete = async (id: string | number) => {
+  await $fetch("/api/products/" + id, {
+    method: "DELETE",
+    onResponse: async ({ response }) => {
+      if (response.ok) {
+        const index = questions.value.findIndex((p) => p.id === id);
+        questions.value.splice(index, 1);
+      }
+    },
+  });
+  modal_delete_question.close();
+};
+
+const deleteQuestion = async (id: string | number) => {
+  modal_delete_question.open({
+    message: "Are you sure?",
+    action: {
+      cancel: { color: "neutral" },
+      continue: { color: "error", label: "Delete" },
+    },
+    onCancel: () => modal_delete_question.close(),
+    onContinue: () => {
+      processDelete(id);
+    },
+  });
+  //
+};
 </script>
 <template>
-  <UDashboardPanel id="questions" resizeable>
+  <UDashboardPanel id="questions" resizeable :ui="{ body: 'px-0 sm:px-0' }">
     <template #header>
-      <!-- :badge="products?.length || 0" -->
       <UDashboardNavbar title="Questions">
         <template #right>
           <UButton
-            label="New Item"
+            label="New Question"
             trailing-icon="i-heroicons-plus"
             color="neutral"
             @click="
@@ -84,23 +222,30 @@ const slideover_add = overlay.create(LazyAdminQuestionsAddForm);
         </template>
       </UDashboardToolbar>
     </template>
-    <!-- 
-    <UDashboardNavbar title="Questions" />
-    <UDashboardToolbar> -->
-    <!-- <USelectMenu
-          v-model="selectedProductId"
-          :options="productOptions"
-          option-attribute="title"
-          value-attribute="id"
-        >
-        </USelectMenu> -->
-    <!-- </UDashboardToolbar> -->
+
     <template #body>
-      <!-- <div
-        class="flex flex-col gap-4 sm:gap-6 lg:gap-12 w-full lg:max-w-2xl mx-auto"
+      <UTable
+        ref="table"
+        :data="questions"
+        :columns="columns"
+        sticky
+        class="h-full"
       >
-    </div> -->
-      <NuxtPage />
+        <template #expanded="{ row }">
+          <div class="flex justify-center gap-3">
+            <UBadge
+              v-for="opt in row.original.answer_options"
+              color="neutral"
+              variant="subtle"
+              >{{ opt }}</UBadge
+            >
+          </div>
+        </template>
+      </UTable>
+
+      <div class="px-4 py-3.5 text-sm text-muted">
+        {{ table?.tableApi?.getFilteredRowModel().rows.length || 0 }} row(s)
+      </div>
     </template>
   </UDashboardPanel>
 </template>

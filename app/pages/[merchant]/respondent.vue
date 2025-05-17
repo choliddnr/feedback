@@ -1,15 +1,9 @@
 <script setup lang="ts">
 import { z } from "zod";
 import { useStorage } from "@vueuse/core";
-import type {
-  NewRespondent,
-  Respondent,
-  RespondentForm,
-} from "~~/shared/types";
+import type { RespondentForm } from "~~/shared/types";
 
 const route = useRoute();
-// import { useFeedbackStore } from "../../_stores/feedback";
-// const { merchant } = storeToRefs(useFeedbackStore());
 const state = reactive<RespondentForm>({
   name: "",
   gender: "female",
@@ -41,11 +35,9 @@ const onsubmit = () => {
     gender: state.gender || "female",
     whatsapp: state.whatsapp || 0,
   };
-  // useRouter().push(`/${merchant.value?.id}/products`);
   navigateTo(`/${route.params.merchant}/products`);
 };
 onMounted(() => {
-  // const respondent = ref<Respondent>();
   if (import.meta.client) {
     if (localStorage.getItem(`${merchant.value?.id}_respondent`)) {
       respondent.value = JSON.parse(
@@ -128,9 +120,6 @@ onMounted(() => {
         >
           <template #leading>
             <UBadge>+62</UBadge>
-            <!-- <span class="text-gray-500 dark:text-gray-400 text-xs"
-            >+62
-          </span> -->
           </template>
         </UInput>
       </UFormField>

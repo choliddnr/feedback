@@ -1,7 +1,5 @@
 <script lang="ts" setup>
-import type { FormSubmitEvent, InputMenuItem } from "#ui/types";
-import { ModalConfirm, UInput } from "#components";
-import { type output as zodOutput } from "zod";
+import { UInput } from "#components";
 import { z } from "zod";
 import type {
   NewProduct,

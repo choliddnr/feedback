@@ -4,10 +4,6 @@ import {
   LazyAdminProductsAddForm,
   LazyModalConfirm,
 } from "#components";
-import type { FormError, FormSubmitEvent } from "#ui/types";
-import { boolean } from "zod";
-// import IdGet from "~~/server/api/merchants/xxx[id].get";
-import type { Product } from "~~/shared/types";
 const { merchants, active_merchant } = storeToRefs(useMerchantsStore());
 definePageMeta({
   layout: "dashboard",
@@ -26,8 +22,6 @@ const processDelete = async (id: string | number) => {
     method: "DELETE",
     onResponse: async ({ response }) => {
       if (response.ok) {
-        // const { fetch } = useProductsStore();
-        // await fetch();
         const index = products.value.findIndex((p) => p.id === id);
         products.value.splice(index, 1);
         active_product.value = products.value[0]?.id || undefined;
@@ -60,7 +54,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <UDashboardPanel id="products">
+  <UDashboardPanel id="products" resizeable>
     <template #header>
       <UDashboardNavbar title="Products" :ui="{ right: 'gap-3' }">
         <template #leading>

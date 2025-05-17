@@ -62,56 +62,6 @@ const links = [
         shortcuts: ["G", "Q"],
       },
     },
-    //   {
-    //     id: "inbox",
-    //     label: "Inbox",
-    //     icon: "i-heroicons-inbox",
-    //     to: "/inbox",
-    //     badge: "4",
-    //     tooltip: {
-    //       text: "Inbox",
-    //       shortcuts: ["G", "I"],
-    //     },
-    //   },
-    //   {
-    //     id: "users",
-    //     label: "Users",
-    //     icon: "i-heroicons-user-group",
-    //     to: "/users",
-    //     tooltip: {
-    //       text: "Users",
-    //       shortcuts: ["G", "U"],
-    //     },
-    //   },
-    //   {
-    //     id: "settings",
-    //     label: "Settings",
-    //     to: "/settings",
-    //     icon: "i-heroicons-cog-8-tooth",
-    //     children: [
-    //       {
-    //         label: "General",
-    //         to: "/settings",
-    //         exact: true,
-    //       },
-    //       {
-    //         label: "Members",
-    //         to: "/settings/members",
-    //       },
-    //       {
-    //         label: "Notifications",
-    //         to: "/settings/notifications",
-    //       },
-    //       {
-    //         label: "Items",
-    //         to: "/settings/items",
-    //       },
-    //     ],
-    //     tooltip: {
-    //       text: "Settings",
-    //       shortcuts: ["G", "S"],
-    //     },
-    //   },
   ],
   [
     {

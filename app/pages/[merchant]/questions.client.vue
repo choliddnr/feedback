@@ -34,8 +34,6 @@ const question = computed<Question | undefined>(
 );
 const questions_length = computed<number>(() => questions.value!.length);
 const keyid = computed<string>(() => {
-  console.log("product", product.value);
-
   if (product.value && question.value) {
     return `${product.value!.id}_${question.value!.id}`;
   } else {
@@ -53,9 +51,18 @@ const saveState = () => {
 };
 const loadState = () => {
   const on_map_store = answers.value.get(keyid.value);
-  if (!on_map_store && on_map_store === "") {
-    answer.value = JSON.parse(localStorage.getItem(keyid.value)!);
-  } else [(answer.value = on_map_store)];
+  if (!on_map_store || on_map_store === "") {
+    answer.value = localStorage.getItem(keyid.value)!;
+  } else {
+    answer.value = on_map_store;
+  }
+  /**
+   * if question need a number as the answer, pass loaded string answer into
+   * answer_as_number variable as number.
+   */
+  if (question.value!.type === 2) {
+    answer_as_number.value = Number(answer.value);
+  }
 };
 
 const prevProduct = () => {
@@ -89,11 +96,9 @@ const nextQuestion = () => {
   }
 };
 const jumpQuestion = (index: number) => {
-  if (state.question_index !== questions_length.value - 1) {
-    saveState();
-    state.question_index = index;
-    loadState();
-  }
+  saveState();
+  state.question_index = index;
+  loadState();
 };
 
 /**
@@ -120,6 +125,7 @@ const isAllValid = () => {
 };
 
 const submitFeedback = async () => {
+  saveState();
   if (!isAllValid) return;
 
   toast.add({
@@ -146,7 +152,7 @@ watchDebounced(
   },
   { debounce: 500, maxWait: 2000, deep: true }
 );
-onMounted(() => {
+watch(keyid, () => {
   loadState();
 });
 
@@ -158,7 +164,7 @@ const rating = ref<number>(0);
       <h1>{{ answer_invalid }}</h1>
     </UCard>
     <UCard
-      :ui="{ root: 'backdrop-blur-sm bg-white/60' }"
+      :ui="{ root: 'backdrop-blur-sm bg-neutral/60' }"
       class="w-full md:w-2/3"
     >
       <template #header>

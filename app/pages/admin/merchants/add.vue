@@ -86,19 +86,6 @@ const onLogoChange = (e: Event) => {
       modal_edit_logo.close();
     },
   });
-  // const res = imageSchema.safeParse(input.files[0]);
-  // if (!res.success) {
-  //   logoError.value = {
-  //     isError: !res.success,
-  //     message: res.error.errors[0]?.message!,
-  //   };
-  // } else {
-  //   state.logo = URL.createObjectURL(input.files[0]!);
-  //   logoError.value = {
-  //     isError: !res.success,
-  //     message: "",
-  //   };
-  // }
 };
 
 const onImageBackgroundChange = (e: Event) => {
@@ -145,103 +132,93 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {
     },
   });
 
-  // const newMerchantData = await $pb
-  //   .collection("merchant")
-  //   .update(merchant.value!.id, formData);
-  // for (let i = 0, len = merchants.value?.length || 0; i < len; i++) {
-  //   if (merchants.value![i]?.id === merchant.value?.id) {
-  //     merchants.value?.splice(i, 1);
-  //     merchants.value?.push(newMerchantData as unknown as Merchant);
-  //     break;
-  //   }
-  // }
   toast.add({ title: "Merchant updated", icon: "i-heroicons-check-circle" });
 };
 </script>
 
 <template>
-  <UDashboardPanel resizable>
-    <!-- :title="user.name || user.username"  -->
-    <UDashboardNavbar>
-      <template #right>
-        <Transition mode="out-in" name="slide-right">
-          <div class="flex gap-1">
-            <UButton
-              label="Save Changes"
-              color="neutral"
-              leading-icon="i-heroicons-document-check-16-solid"
-              @click="form?.submit()"
-            />
-            <UButton
-              label="Cancel"
-              color="error"
-              leading-icon="i-heroicons-x-mark-16-solid"
-              @click="navigateTo('/admin/merchants')"
-            />
-          </div>
-        </Transition>
-      </template>
-    </UDashboardNavbar>
+  <UDashboardPanel id="add-merchant" resizable>
+    <template #header>
+      <UDashboardNavbar title="Add merchant" :ui="{ right: 'gap-3' }">
+        <template #leading>
+          <UDashboardSidebarCollapse />
+        </template>
 
-    <!-- <template #body> -->
-    <!-- :validate="validate" -->
-    <UForm :state="state" :schema="schema" @submit="onSubmit" ref="form">
-      <!-- :title="merchant?.title"
+        <template #right>
+          <Transition mode="out-in" name="slide-right">
+            <div class="flex gap-1">
+              <UButton
+                label="Save Changes"
+                color="neutral"
+                leading-icon="i-heroicons-document-check-16-solid"
+                @click="form?.submit()"
+              />
+              <UButton
+                label="Cancel"
+                color="error"
+                leading-icon="i-heroicons-x-mark-16-solid"
+                @click="navigateTo('/admin/merchants')"
+              />
+            </div>
+          </Transition>
+        </template>
+      </UDashboardNavbar>
+    </template>
+    <template #body>
+      <!-- :validate="validate" -->
+      <UForm :state="state" :schema="schema" @submit="onSubmit" ref="form">
+        <!-- :title="merchant?.title"
           :description="merchant?.description" -->
-      <UPageCard>
-        <UFormField
-          name="title"
-          label="Nama"
-          required
-          class="grid grid-cols-2 gap-2 items-center"
-          :ui="{ container: '' }"
-        >
-          <UInput
-            v-model="state.title"
-            autocomplete="off"
-            class="w-full"
-            size="md"
-          />
-        </UFormField>
+        <UPageCard>
+          <UFormField
+            name="title"
+            label="Nama"
+            required
+            class="grid grid-cols-2 gap-2 items-center"
+            :ui="{ container: '' }"
+          >
+            <UInput
+              v-model="state.title"
+              autocomplete="off"
+              class="w-full"
+              size="md"
+            />
+          </UFormField>
 
-        <UFormField
-          name="description"
-          label="Deskripsi"
-          description="Deskripsikan mengenai merchant anda"
-          required
-          class="grid grid-cols-2 gap-2"
-          :ui="{ container: '' }"
-        >
-          <UTextarea
-            v-model="state.description"
-            class="w-full"
-            autocomplete="off"
-            size="md"
-          />
-        </UFormField>
+          <UFormField
+            name="description"
+            label="Deskripsi"
+            description="Deskripsikan mengenai merchant anda"
+            required
+            class="grid grid-cols-2 gap-2"
+            :ui="{ container: '' }"
+          >
+            <UTextarea
+              v-model="state.description"
+              class="w-full"
+              autocomplete="off"
+              size="md"
+            />
+          </UFormField>
 
-        <UFormField
-          name="category"
-          label="Kategori"
-          description="Apakah jenis merchant anda ini? misalkan cafe, warung padang, dll."
-          required
-          class="grid grid-cols-2 gap-2"
-          :ui="{ container: '' }"
-        >
-          <!-- <UInput v-model="state.category" autocomplete="off" size="md"> -->
-          <!-- input-class="ps-[20px]" -->
-          <!-- </UInput> -->
+          <UFormField
+            name="category"
+            label="Kategori"
+            description="Apakah jenis merchant anda ini? misalkan cafe, warung padang, dll."
+            required
+            class="grid grid-cols-2 gap-2"
+            :ui="{ container: '' }"
+          >
+            <USelectMenu
+              class="w-full"
+              :items="merchant_categories"
+              v-model="state.category"
+              label-key="title"
+              value-key="id"
+            />
+          </UFormField>
 
-          <USelectMenu
-            class="w-full"
-            :items="merchant_categories"
-            v-model="state.category"
-            label-key="title"
-            value-key="id"
-          />
-        </UFormField>
-
-        <!-- <UFormField
+          <!-- <UFormField
           name="primary_color"
           label="Warna Primer"
           description="Digunakan pada form feedback sebagai warna primer"
@@ -265,99 +242,69 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {
           </USelectMenu>
         </UFormField> -->
 
-        <UFormField
-          name="logo"
-          label="Logo"
-          class="grid grid-cols-2 gap-2"
-          help="JPG, JPEG or PNG. 1MB Max."
-          :error="logoError.isError && logoError.message"
-          :ui="{
-            container: 'flex flex-wrap items-center gap-3',
-            help: 'mt-0',
-          }"
-        >
-          <input
-            type="file"
-            class="hidden"
-            accept=".jpg, .jpeg, .png"
-            @change="onLogoChange"
-            ref="logoRef"
-          />
-
-          <UAvatar :src="state.logo" :alt="state.title" size="lg" />
-
-          <UButton
-            label="Choose"
-            color="neutral"
-            size="md"
-            @click="changeLogo"
-          />
-        </UFormField>
-
-        <UFormField
-          name="image_background"
-          label="Background"
-          description="Gambar sebagai background pada halaman feedback form."
-          class="grid grid-cols-2 gap-2"
-          help="JPG, GIF or PNG. 1MB Max."
-          :error="backgroudImageError.isError && backgroudImageError.message"
-          :ui="{
-            container: 'flex flex-wrap items-center gap-3',
-            help: 'mt-0',
-          }"
-        >
-          <input
-            ref="imageBackgroundRef"
-            type="file"
-            class="hidden"
-            accept=".jpg, .jpeg, .png,"
-            @change="onImageBackgroundChange"
-          />
-          <NuxtImg :src="state.image_background" :alt="state.title" size="lg" />
-
-          <UButton
-            label="Choose"
-            color="neutral"
-            size="md"
-            @click="changeImageBackground"
-          />
-        </UFormField>
-      </UPageCard>
-    </UForm>
-
-    <USeparator class="mb-4" />
-
-    <!-- <UPageCard
-          title="Account"
-          description="Tidak lagi membutuhkan layanan kami? Anda dapat menghapus akun anda disini. Aksi ini tidak dapat dibatalkan. Semua data yang berhubungan dengan akun ini akan dihapus secara permanen."
-        >
-          <div>
-            <UButton
-              color="error"
-              label="Delete account"
-              size="md"
-              @click="isDeleteAccountModalOpen = true"
+          <UFormField
+            name="logo"
+            label="Logo"
+            class="grid grid-cols-2 gap-2"
+            help="JPG, JPEG or PNG. 1MB Max."
+            :error="logoError.isError && logoError.message"
+            :ui="{
+              container: 'flex flex-wrap items-center gap-3',
+              help: 'mt-0',
+            }"
+          >
+            <input
+              type="file"
+              class="hidden"
+              accept=".jpg, .jpeg, .png"
+              @change="onLogoChange"
+              ref="logoRef"
             />
-          </div>
-        </UPageCard>
 
-        <AdminUserDeleteAccountModal v-model="isDeleteAccountModalOpen" /> -->
-    <!-- <template> -->
+            <UAvatar :src="state.logo" :alt="state.title" size="lg" />
+
+            <UButton
+              label="Choose"
+              color="neutral"
+              size="md"
+              @click="changeLogo"
+            />
+          </UFormField>
+
+          <UFormField
+            name="image_background"
+            label="Background"
+            description="Gambar sebagai background pada halaman feedback form."
+            class="grid grid-cols-2 gap-2"
+            help="JPG, GIF or PNG. 1MB Max."
+            :error="backgroudImageError.isError && backgroudImageError.message"
+            :ui="{
+              container: 'flex flex-wrap items-center gap-3',
+              help: 'mt-0',
+            }"
+          >
+            <input
+              ref="imageBackgroundRef"
+              type="file"
+              class="hidden"
+              accept=".jpg, .jpeg, .png,"
+              @change="onImageBackgroundChange"
+            />
+            <NuxtImg
+              :src="state.image_background"
+              :alt="state.title"
+              size="lg"
+            />
+
+            <UButton
+              label="Choose"
+              color="neutral"
+              size="md"
+              @click="changeImageBackground"
+            />
+          </UFormField>
+        </UPageCard>
+      </UForm>
+    </template>
   </UDashboardPanel>
 </template>
-<style>
-.slide-right-enter-active,
-.slide-right-leave-active {
-  transition: all 0.25s ease-out;
-}
-
-.slide-right-enter-from {
-  opacity: 0;
-  transform: translateX(30px);
-}
-
-.slide-right-leave-to {
-  opacity: 0;
-  transform: translateX(30px);
-}
-</style>

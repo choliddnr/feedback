@@ -45,7 +45,6 @@ watch(
 );
 const on_post = ref<boolean>(false);
 const onSubmit = async () => {
-  // console.log("state", state);
   const res = await $fetch<Response>("/api/questions", {
     method: "post",
     body: state,
@@ -98,7 +97,6 @@ const onSubmit = async () => {
                 @click="pushNewOption"
               />
             </UButtonGroup>
-            <!-- :items="answer_options" -->
           </UFormField>
           <UInputMenu
             v-model="state.answer_options as string[]"
@@ -131,8 +129,6 @@ const onSubmit = async () => {
             />
           </UFormField>
 
-          <!-- <button @click="onSubmit" hidden ref="submitBtnRef">Submit</button> -->
-          <!-- <div class="flex flex-row gap-1 w-full"> -->
           <UButtonGroup class="w-full">
             <UButton
               block
@@ -150,7 +146,6 @@ const onSubmit = async () => {
               @click="emits('close')"
             />
           </UButtonGroup>
-          <!-- </div> -->
         </UForm>
       </UCard>
     </template>
