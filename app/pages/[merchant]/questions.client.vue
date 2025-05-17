@@ -1,12 +1,19 @@
 <script setup lang="ts">
 import type { Product, Question } from "~~/shared/types";
-const { selected_product, products, answers } = storeToRefs(useResponseStore());
-const { data: all_questions } = await useFetch<Question[]>(
+
+const route = useRoute();
+const { selected_product, products, answers, all_questions } = storeToRefs(
+  useResponseStore()
+);
+const { data: all_questions_data } = await useFetch<Question[]>(
   "/api/public/questions",
   {
     server: false,
     query: {
       q: selected_product,
+    },
+    onResponse: ({ response }) => {
+      all_questions.value = response._data;
     },
   }
 );
@@ -21,8 +28,8 @@ const product = computed<Product | undefined>(
 );
 const products_length = computed<number>(() => products.value!.length);
 const questions = computed<Question[] | undefined>(() => {
-  if (all_questions.value && products.value) {
-    return all_questions.value!.filter(
+  if (all_questions_data.value && products.value) {
+    return all_questions_data.value!.filter(
       (question) => question.product === product.value!.id
     );
   } else {
@@ -42,6 +49,7 @@ const keyid = computed<string>(() => {
 });
 const answer = ref<string>("");
 import { watchDebounced } from "@vueuse/core";
+import { router } from "better-auth/api";
 
 const toast = useToast();
 
@@ -50,6 +58,8 @@ const saveState = () => {
   localStorage.setItem(keyid.value, answer.value);
 };
 const loadState = () => {
+  console.log("load state");
+
   const on_map_store = answers.value.get(keyid.value);
   if (!on_map_store || on_map_store === "") {
     answer.value = localStorage.getItem(keyid.value)!;
@@ -124,14 +134,10 @@ const isAllValid = () => {
   return true;
 };
 
-const submitFeedback = async () => {
+const submitFeedback = () => {
   saveState();
   if (!isAllValid) return;
-
-  toast.add({
-    title: "Thanks",
-    description: "Feedback anda berhasil kami terima!.",
-  });
+  navigateTo(`/${route.params.merchant}/review`);
 };
 const answer_as_number = ref<number>(0);
 watch(answer_as_number, () => {
@@ -156,7 +162,9 @@ watch(keyid, () => {
   loadState();
 });
 
-const rating = ref<number>(0);
+onMounted(() => {
+  loadState();
+});
 </script>
 <template>
   <ClientOnly>
