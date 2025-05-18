@@ -39,7 +39,12 @@ const imageError = ref<{ isError: boolean; message: string }>({
 });
 
 const MAX_FILE_SIZE = 1 * 1024 * 1024; // 1MB
-const ACCEPTED_FILE_TYPES = ["image/jpeg", "image/jpeg", "image/png"];
+const ACCEPTED_FILE_TYPES = [
+  "image/jpeg",
+  "image/jpeg",
+  "image/png",
+  "image/webp",
+];
 
 const imageSchema = z
   .instanceof(Blob)
