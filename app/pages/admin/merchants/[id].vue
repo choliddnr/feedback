@@ -38,7 +38,12 @@ const modal_delete_merchant = overlay.create(LazyModalConfirm);
 const form = useTemplateRef("form");
 
 const MAX_FILE_SIZE = 1 * 1024 * 1024; // 1MB
-const ACCEPTED_FILE_TYPES = ["image/jpeg", "image/jpeg", "image/png"];
+const ACCEPTED_FILE_TYPES = [
+  "image/jpeg",
+  "image/jpeg",
+  "image/png",
+  "image/webp",
+];
 
 const logoError = ref<ImageError>({
   isError: false,

@@ -1,13 +1,43 @@
 <script setup lang="ts">
 import type { Product, Question } from "~~/shared/types";
-const { answers, products, all_questions } = storeToRefs(useResponseStore());
-
+const { answers, products, all_questions, respondent } = storeToRefs(
+  useResponseStore()
+);
+const route = useRoute();
 const toast = useToast();
 
-const submitFeedback = () => {
-  toast.add({
-    title: "Thanks",
-    description: "Feedback anda berhasil kami terima!.",
+const submitFeedback = async () => {
+  await $fetch("/api/public/response", {
+    method: "POST",
+    body: {
+      respondent: {
+        ...respondent.value,
+        gender: respondent.value?.gender === "male" ? true : false,
+      },
+      // respondent: respondent.value,
+      answers: Object.fromEntries(answers.value),
+    },
+    onResponse: ({ response }) => {
+      if (response.ok) {
+        toast.add({
+          title: "Thanks",
+          description: "Feedback anda berhasil kami terima!.",
+        });
+        navigateTo(`/${route.params.merchant}/thankyou`);
+      }
+    },
+    onResponseError: ({ response, error }) => {
+      if (!response.ok) {
+        toast.add({
+          title: "Failded",
+          description: response._data.statusMessage,
+          color: "error",
+          icon: "i-lucide-octagon-x",
+          duration: 100000,
+        });
+        console.log("error", response._data);
+      }
+    },
   });
 };
 </script>
@@ -56,7 +86,15 @@ const submitFeedback = () => {
           </p>
         </div>
       </UPageCard>
-      <UButton block label="Submit" class="mt-4" />
+      <UButtonGroup class="mt-4 w-full">
+        <UButton
+          block
+          label="Back"
+          color="neutral"
+          @click="navigateTo(`/${route.params.merchant}/questions`)"
+        />
+        <UButton block label="Submit" @click="submitFeedback" />
+      </UButtonGroup>
     </UCard>
   </ClientOnly>
 </template>
