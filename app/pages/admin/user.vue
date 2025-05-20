@@ -170,7 +170,7 @@ const deleteAccount = () => {
     <template #body>
       <UPageCard
         v-if="!merchants || merchants?.length === 0"
-        :ui="{ root: 'rounded-none mx-5 my-5 border-0' }"
+        :ui="{ root: 'mx-5 my-5 border-0' }"
         spotlight
         spotlight-color="warning"
         highlight
@@ -191,7 +191,6 @@ const deleteAccount = () => {
       </UPageCard>
       <UForm :state="state" :schema="schema" @submit="onSubmit" ref="formRef">
         <UPageCard
-          :ui="{ root: 'rounded-none' }"
           :variant="isEdit ? 'subtle' : 'outline'"
           title="Profile"
           description="Berikut ini adalah informasi mengenai diri anda. Silahkan dilengkapi."
@@ -306,10 +305,10 @@ const deleteAccount = () => {
         </UPageCard>
       </UForm>
 
-      <USeparator class="mb-4" />
+      <USeparator class="mb-4" v-if="false" />
 
       <UPageCard
-        :ui="{ root: 'rounded-none' }"
+        v-if="false"
         spotlight
         spotlight-color="error"
         title="Account"

@@ -1,0 +1,107 @@
+<script setup lang="ts">
+import type { DropdownMenuItem } from "@nuxt/ui";
+import type { Merchant } from "~~/shared/types";
+defineProps<{
+  collapsed?: boolean;
+}>();
+
+const { merchants, active_merchant } = storeToRefs(useMerchantsStore());
+const merchant_list = computed<DropdownMenuItem[]>(() => {
+  const items = [] as DropdownMenuItem[];
+  merchants.value?.forEach((m) => {
+    items.push({
+      label: m.title,
+      avatar: {
+        src: "/merchant/logo/" + m.logo,
+        alt: m.title,
+      },
+      onSelect: () => (active_merchant.value = m.id),
+    });
+  });
+  return items;
+});
+
+// const teams = ref([
+//   {
+//     label: "Nuxt",
+//     avatar: {
+//       src: "https://github.com/nuxt.png",
+//       alt: "Nuxt",
+//     },
+//   },
+//   {
+//     label: "NuxtHub",
+//     avatar: {
+//       src: "https://github.com/nuxt-hub.png",
+//       alt: "NuxtHub",
+//     },
+//   },
+//   {
+//     label: "NuxtLabs",
+//     avatar: {
+//       src: "https://github.com/nuxtlabs.png",
+//       alt: "NuxtLabs",
+//     },
+//   },
+// ]);
+// const selectedTeam = ref(teams.value[0]);
+
+// const items = computed(() => {
+//   return [
+//     teams.value.map((team) => ({
+//       ...team,
+//       onSelect() {
+//         selectedTeam.value = team;
+//       },
+//     })),
+//     [
+//       {
+//         label: "Create team",
+//         icon: "i-lucide-circle-plus",
+//       },
+//       {
+//         label: "Manage teams",
+//         icon: "i-lucide-cog",
+//       },
+//     ],
+//   ];
+// });
+
+const selected_merchant = computed<Merchant | undefined>(() => {
+  return merchants.value!.find((m) => m.id === active_merchant.value);
+});
+// watch(merchants, () => {
+//   console.log("merchant", merchants.value);
+// });
+</script>
+
+<template>
+  <UDropdownMenu
+    v-if="merchant_list"
+    :items="merchant_list"
+    :content="{ align: 'center', collisionPadding: 12 }"
+    :ui="{
+      content: collapsed ? 'w-40' : 'w-(--reka-dropdown-menu-trigger-width)',
+    }"
+  >
+    <UButton
+      v-bind="{
+        ...merchants,
+        label: collapsed ? undefined : selected_merchant?.title,
+        trailingIcon: collapsed ? undefined : 'i-lucide-chevrons-up-down',
+      }"
+      color="neutral"
+      variant="ghost"
+      :avatar="{
+        src: '/merchant/logo/' + selected_merchant?.logo,
+      }"
+      block
+      :square="collapsed"
+      class="data-[state=open]:bg-elevated"
+      :class="[!collapsed && 'py-2']"
+      :ui="{
+        trailingIcon: 'text-dimmed',
+      }"
+    />
+  </UDropdownMenu>
+</template>

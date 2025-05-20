@@ -18,6 +18,7 @@ import { createInsertSchema, createUpdateSchema } from "drizzle-zod";
 
 export const merchants = sqliteTable("merchants", {
   title: text().notNull(),
+  slug: text().notNull(),
   description: text(),
   category: int().references((): AnySQLiteColumn => merchant_categories.id, {
     onDelete: "set null",
@@ -113,6 +114,9 @@ export const InsertRespondentsSchema = createInsertSchema(respondents, {
 });
 
 export const responses = sqliteTable("responses", {
+  merchant: int()
+    .notNull()
+    .references((): AnySQLiteColumn => merchants.id, { onDelete: "cascade" }),
   respondent: int()
     .references((): AnySQLiteColumn => respondents.id, {
       onDelete: "set default",

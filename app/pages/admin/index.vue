@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { sub } from "date-fns";
-import type { Period, Range } from "~/types";
+import type { Period, Range } from "~~/shared/types";
 
 definePageMeta({
   layout: "dashboard",
@@ -38,7 +38,7 @@ const period = ref<Period>("daily");
           <UDashboardSidebarCollapse />
         </template>
 
-        <template #right>
+        <!-- <template #right>
           <UTooltip text="Notifications" :shortcuts="['N']">
             <UButton
               color="neutral"
@@ -55,10 +55,10 @@ const period = ref<Period>("daily");
           <UDropdownMenu :items="items">
             <UButton icon="i-lucide-plus" size="md" class="rounded-full" />
           </UDropdownMenu>
-        </template>
+        </template> -->
       </UDashboardNavbar>
 
-      <UDashboardToolbar>
+      <UDashboardToolbar v-if="false">
         <template #left>
           <!-- NOTE: The `-ms-1` class is used to align with the `DashboardSidebarCollapse` button here. -->
           <HomeDateRangePicker v-model="range" class="-ms-1" />
@@ -70,8 +70,8 @@ const period = ref<Period>("daily");
 
     <template #body>
       <HomeStats :period="period" :range="range" />
-      <HomeChart :period="period" :range="range" />
-      <HomeSales :period="period" :range="range" />
+      <!-- <HomeChart :period="period" :range="range" /> -->
+      <HomeResponses :period="period" :range="range" />
     </template>
   </UDashboardPanel>
 </template>

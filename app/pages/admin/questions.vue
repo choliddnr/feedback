@@ -24,7 +24,7 @@ const slideover_add = overlay.create(LazyAdminQuestionsAddForm);
 const table = useTemplateRef("table");
 const q_type = new Map([
   [1, "Text"],
-  [2, "Reting"],
+  [2, "Rating"],
 ]);
 
 const columns: TableColumn<Question>[] = [
@@ -41,14 +41,27 @@ const columns: TableColumn<Question>[] = [
     accessorKey: "type",
     header: "Type",
     cell: ({ row }) => {
+      const data = q_type.get(row.getValue("type"));
       const color = {
-        text: "success" as const,
-        rating: "info" as const,
-      }[row.getValue("type") as string];
+        Text: "secondary" as const,
+        Rating: "warning" as const,
+      }[data as string];
+      console.log("color", data, typeof data, color);
 
-      return h(UBadge, { class: "capitalize", variant: "subtle", color }, () =>
-        q_type.get(row.getValue("type"))
+      return h(
+        UBadge,
+        { class: "capitalize", variant: "subtle", color },
+        () => data
       );
+
+      // const color = {
+      //   text: "secondary" as const,
+      //   rating: "warning" as const,
+      // }[q_type.get(row.getValue("type")) as string];
+
+      // return h(UBadge, { class: "capitalize", variant: "subtle", color }, () =>
+      //   q_type.get(row.getValue("type"))
+      // );
     },
   },
   {
@@ -181,11 +194,22 @@ const deleteQuestion = async (id: string | number) => {
   });
   //
 };
+onMounted(() => {
+  // const data = "rating";
+  // const color = {
+  //   text: "secondary" as const,
+  //   rating: "warning" as const,
+  // }[data as string];
+  // console.log("on mounted color", data, color);
+});
 </script>
 <template>
   <UDashboardPanel id="questions" resizeable :ui="{ body: 'px-0 sm:px-0' }">
     <template #header>
-      <UDashboardNavbar title="Questions">
+      <UDashboardNavbar title="Questions" :ui="{ right: 'gap-3' }">
+        <template #leading>
+          <UDashboardSidebarCollapse />
+        </template>
         <template #right>
           <UButton
             label="New Question"
