@@ -3,8 +3,16 @@ import type { Merchant } from "~~/shared/types";
 
 export const useMerchantsStore = defineStore("merchants", () => {
   const active_merchant = ref<number>();
-  const { data: merchants, execute: fetch } =
-    useFetch<Merchant[]>("/api/merchants");
+  const { data: merchants, execute: fetch } = useFetch<Merchant[]>(
+    "/api/merchants",
+    {
+      onResponse: ({ response }) => {
+        if (response.ok && !active_merchant.value) {
+          active_merchant.value = response._data[0].id;
+        }
+      },
+    }
+  );
   return { merchants, active_merchant, fetch };
 });
 

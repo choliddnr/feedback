@@ -1,14 +1,16 @@
 <script setup lang="ts">
-const { user } = storeToRefs(useUserStore());
 const { fetch } = useUserStore();
 callOnce("user", async () => await fetch());
+const { merchants } = storeToRefs(useMerchantsStore());
+const { products } = storeToRefs(useProductsStore());
+const { questions } = storeToRefs(useQuestionsStore());
 
 const route = useRoute();
 const toast = useToast();
 
 const open = ref(false);
 
-const links = [
+const links = computed(() => [
   [
     {
       id: "home",
@@ -35,7 +37,7 @@ const links = [
       label: "Merchant",
       icon: "i-heroicons-building-storefront",
       to: "/admin/merchants",
-      // badge: "4",
+      badge: merchants.value?.length,
       tooltip: {
         text: "Merchant",
         shortcuts: ["G", "M"],
@@ -46,7 +48,7 @@ const links = [
       label: "Produk",
       icon: "i-heroicons-cube-20-solid",
       to: "/admin/products",
-      badge: "4",
+      badge: products.value?.length,
       tooltip: {
         text: "Products",
         shortcuts: ["G", "P"],
@@ -57,79 +59,80 @@ const links = [
       label: "Pertanyaan",
       icon: "i-heroicons-question-mark-circle-16-solid",
       to: "/admin/questions",
+      badge: questions.value.length,
       tooltip: {
         text: "Item",
         shortcuts: ["G", "Q"],
       },
     },
   ],
-  [
-    {
-      label: "Feedback",
-      icon: "i-lucide-message-circle",
-      to: "https://github.com/nuxt-ui-pro/dashboard",
-      target: "_blank",
-    },
-    {
-      label: "Help & Support",
-      icon: "i-lucide-info",
-      to: "https://github.com/nuxt/ui-pro",
-      target: "_blank",
-    },
-  ],
-];
-
-const groups = computed(() => [
-  {
-    id: "links",
-    label: "Go to",
-    items: links.flat(),
-  },
-  {
-    id: "code",
-    label: "Code",
-    items: [
-      {
-        id: "source",
-        label: "View page source",
-        icon: "i-simple-icons-github",
-        to: `https://github.com/nuxt-ui-pro/dashboard/blob/main/app/pages${
-          route.path === "/" ? "/index" : route.path
-        }.vue`,
-        target: "_blank",
-      },
-    ],
-  },
+  // [
+  //   {
+  //     label: "Feedback",
+  //     icon: "i-lucide-message-circle",
+  //     to: "https://github.com/nuxt-ui-pro/dashboard",
+  //     target: "_blank",
+  //   },
+  //   {
+  //     label: "Help & Support",
+  //     icon: "i-lucide-info",
+  //     to: "https://github.com/nuxt/ui-pro",
+  //     target: "_blank",
+  //   },
+  // ],
 ]);
 
-onMounted(async () => {
-  const cookie = useCookie("cookie-consent");
-  if (cookie.value === "accepted") {
-    return;
-  }
+// const groups = computed(() => [
+//   {
+//     id: "links",
+//     label: "Go to",
+//     items: links.value.flat(),
+//   },
+//   {
+//     id: "code",
+//     label: "Code",
+//     items: [
+//       {
+//         id: "source",
+//         label: "View page source",
+//         icon: "i-simple-icons-github",
+//         to: `https://github.com/nuxt-ui-pro/dashboard/blob/main/app/pages${
+//           route.path === "/" ? "/index" : route.path
+//         }.vue`,
+//         target: "_blank",
+//       },
+//     ],
+//   },
+// ]);
 
-  toast.add({
-    title:
-      "We use first-party cookies to enhance your experience on our website.",
-    duration: 0,
-    close: false,
-    actions: [
-      {
-        label: "Accept",
-        color: "neutral",
-        variant: "outline",
-        onClick: () => {
-          cookie.value = "accepted";
-        },
-      },
-      {
-        label: "Opt out",
-        color: "neutral",
-        variant: "ghost",
-      },
-    ],
-  });
-});
+// onMounted(async () => {
+//   const cookie = useCookie("cookie-consent");
+//   if (cookie.value === "accepted") {
+//     return;
+//   }
+
+//   toast.add({
+//     title:
+//       "We use first-party cookies to enhance your experience on our website.",
+//     duration: 0,
+//     close: false,
+//     actions: [
+//       {
+//         label: "Accept",
+//         color: "neutral",
+//         variant: "outline",
+//         onClick: () => {
+//           cookie.value = "accepted";
+//         },
+//       },
+//       {
+//         label: "Opt out",
+//         color: "neutral",
+//         variant: "ghost",
+//       },
+//     ],
+//   });
+// });
 </script>
 
 <template>
@@ -143,11 +146,12 @@ onMounted(async () => {
       :ui="{ footer: 'lg:border-t lg:border-default' }"
     >
       <template #header="{ collapsed }">
-        <TeamsMenu :collapsed="collapsed" />
+        <AdminMerchantsMenu :collapsed="collapsed" />
       </template>
 
       <template #default="{ collapsed }">
         <UDashboardSearchButton
+          v-if="false"
           :collapsed="collapsed"
           class="bg-transparent ring-default"
         />
@@ -171,7 +175,7 @@ onMounted(async () => {
       </template>
     </UDashboardSidebar>
 
-    <UDashboardSearch :groups="groups" />
+    <!-- <UDashboardSearch :groups="groups" /> -->
 
     <slot />
 

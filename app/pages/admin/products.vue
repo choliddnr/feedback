@@ -50,6 +50,9 @@ const deleteProduct = async (id: string | number) => {
 
 onMounted(() => {
   active_merchant.value = Number(active_merchant.value);
+  if (!active_merchant.value && merchants.value?.length! > 0) {
+    active_merchant.value = merchants.value![0]?.id;
+  }
 });
 </script>
 

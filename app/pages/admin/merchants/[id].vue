@@ -405,7 +405,6 @@ const deleteMerchant = async () => {
       <USeparator class="mb-4" />
       <UPageCard
         v-if="merchants?.length! > 1"
-        :ui="{ root: 'rounded-none' }"
         spotlight
         spotlight-color="error"
         title="Delete Merchant"
