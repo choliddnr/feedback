@@ -1,13 +1,4 @@
-<script setup lang="ts">
-import { useFeedbackStore } from "../stores/feedback";
-
-const { $pb } = useNuxtApp();
-const { merchant } = storeToRefs(useFeedbackStore());
-// const bgUrl = computed(() => {
-//   if (!merchant.value) return "";
-//   return $pb.files.getURL(merchant.value, merchant.value.image_background);
-// });
-</script>
+<script setup lang="ts"></script>
 
 <template>
   <!--  :style="{ backgroundImage: `url(${bgUrl})` }" -->
@@ -23,7 +14,4 @@ const { merchant } = storeToRefs(useFeedbackStore());
       </div>
     </UContainer>
   </div>
-  <UNotifications />
-  <UModals />
-  <USlideovers />
 </template>

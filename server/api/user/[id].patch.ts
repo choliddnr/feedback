@@ -1,8 +1,10 @@
 import { toNumber } from "@vue/shared";
-import { type MultiPartData } from "h3";
-import { userPictureStorage } from "../../utils/storage";
-import { users, eq } from "../../../shared/db.schema";
-import { User } from "#auth-utils";
+import { H3Event, type MultiPartData } from "h3";
+import { userPictureStorage } from "~~/server/utils/storage";
+import { user, eq } from "~~/server/utils/db/schema";
+import { User } from "~~/shared/types";
+
+// import { User } from "#auth-utils";
 
 const FILE_KEYS = ["name", "filename", "type", "data"];
 const isFIle = (data: MultiPartData) => {
@@ -25,34 +27,40 @@ const saveFile = async (name: string, file: MultiPartData) => {
   return filename;
 };
 const deleteFile = async (id: number) => {
-  const oldUserPic = await useDB()
-    .select({ picture: users.picture })
-    .from(users)
-    .where(eq(users.id, id))
+  const oldUserPic = await db
+    .select({ image: user.image })
+    .from(user)
+    .where(eq(user.id, id))
     .limit(1);
-  userPictureStorage.removeItem(oldUserPic[0].picture!);
+  userPictureStorage.removeItem(oldUserPic[0].image!);
 };
-export default defineEventHandler(async (e) => {
+
+export default defineEventHandler(async (e: H3Event) => {
   const id = toNumber(getRouterParam(e, "id")) as number;
   const body = parseMultipartData(await readMultipartFormData(e));
+
   let newData = {} as Partial<User>;
   if (body.username) newData["username"] = body.username;
   if (body.name) newData["name"] = body.name;
+  if (body.defaultMerchant) newData["defaultMerchant"] = body.defaultMerchant;
 
   try {
-    if (body.picture) {
+    if (body.image) {
       deleteFile(id);
-      newData["picture"] = await saveFile(`user_pic_${id}`, body.picture);
+      newData["image"] = await saveFile(`user_pic_${id}`, body.image);
     }
 
-    newData["updated"] = new Date();
-    const newuser = await useDB()
-      .update(users)
+    // newData["updatedAt"] = Date.now();
+    const newuser = await db
+      .update(user)
       .set(newData)
-      .where(eq(users.id, id))
+      .where(eq(user.id, id))
       .returning();
-    await setUserSession(e, { user: newuser[0], loggedInAt: new Date() });
-    return await getUserSession(e);
+    // await setUserSession(e, { user: newuser[0], loggedInAt: new Date() });
+    // return await getUserSession(e);
+    return auth.api.getSession({
+      headers: e.headers,
+    });
   } catch (e) {
     throw createError(
       e instanceof Error ? e.message : "Unknown usr/id/patch error"

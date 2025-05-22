@@ -1,0 +1,8 @@
+DB_PATH=./database/local.sqlite3
+
+BETTER_AUTH_SECRET=x56pjy3KDI0j7C23oPwqIHTyMuFQyN7i
+BETTER_AUTH_URL=http://localhost:3000 #Base URL of your app
+
+
+GOOGLE_CLIENT_ID=271550286464-9fdjqmli4sbr5jvb8ka0gqlcm16kd8je.apps.googleusercontent.com
+GOOGLE_CLIENT_SECRET=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
