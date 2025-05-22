@@ -24,8 +24,8 @@ const emits = defineEmits<{
 }>();
 
 const state = reactive<NewQuestion>({
-  question: "what do you think about live",
-  answer_options: ["makan", "tidur"],
+  question: "",
+  answer_options: [],
   type: 0,
   product: active_product.value || 0,
 });
