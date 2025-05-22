@@ -2,8 +2,6 @@ import { inArray } from "drizzle-orm";
 
 export default defineEventHandler(async (e) => {
   const q = getQuery(e).q as number | number[];
-  console.log(q, q instanceof Array);
-
   if (q instanceof Array) {
     return await db
       .select()

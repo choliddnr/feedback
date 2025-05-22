@@ -68,11 +68,11 @@ const merchant_list = computed<DropdownMenuItem[]>(() => {
 // });
 
 const selected_merchant = computed<Merchant | undefined>(() => {
+  if (merchants.value === undefined) return undefined;
+  if (active_merchant.value === undefined) return undefined;
+  if (merchants.value.length === 0) return undefined;
   return merchants.value!.find((m) => m.id === active_merchant.value);
 });
-// watch(merchants, () => {
-//   console.log("merchant", merchants.value);
-// });
 </script>
 
 <template>

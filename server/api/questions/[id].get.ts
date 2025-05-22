@@ -2,7 +2,6 @@ export default defineEventHandler(async (e) => {
   // const selectedProducts = JSON.parse(
   //   getQuery(e).selectedProducts as string
   // ) as string[];
-  // console.log("server questions!", selectedProducts);
   const product_id = getRouterParam(e, "id");
   // const questions = [
   //   {

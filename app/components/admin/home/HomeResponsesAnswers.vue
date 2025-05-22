@@ -2,7 +2,7 @@
 import { h, resolveComponent } from "vue";
 import type { TableColumn } from "@nuxt/ui";
 import type { Period, Range, ResponseTable } from "~~/shared/types";
-import { LazyHomeResponsesAnswers } from "#components";
+import { LazyAdminHomeResponsesAnswers } from "#components";
 type ResponseData = {
   product: string;
   question: string;

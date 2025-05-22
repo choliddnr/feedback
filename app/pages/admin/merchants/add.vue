@@ -38,6 +38,20 @@ const backgroudImageError = ref<ImageError>({
 
 const schema = z.object({
   title: z.string().min(4),
+  slug: z
+    .string()
+    .min(4)
+    .refine((val) => {
+      const regex = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+      return regex.test(val);
+    }, "Slug must be lowercase and can only contain letters, numbers, and dashes.")
+    .refine(async (val) => {
+      if (val === "") return true;
+      const data = await $fetch<Merchant>("/api/merchants/slug/" + val, {
+        method: "get",
+      });
+      return !data ? true : false;
+    }, "Slug already exists"),
   description: z.string().min(5),
   category: z.number(),
   primary_color: z.string(),
@@ -54,8 +68,9 @@ const imageSchema = z
 
 type Schema = z.output<typeof schema>;
 const state = reactive({
-  title: "Tsurayya Food",
-  description: "the most delicious indonesian food producer",
+  title: "",
+  slug: "",
+  description: "",
   category: 1,
   primary_color: "blue",
   image_background: "",
@@ -113,6 +128,8 @@ const onImageBackgroundChange = (e: Event) => {
 const onSubmit = async (event: FormSubmitEvent<Schema>) => {
   const formData = new FormData();
   formData.append("title", state.title);
+
+  formData.append("slug", state.slug);
   formData.append("description", state.description);
   formData.append("category", String(state.category));
   formData.append("primary_color", state.primary_color);
@@ -137,14 +154,14 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {
     },
   });
 
-  toast.add({ title: "Merchant updated", icon: "i-heroicons-check-circle" });
+  toast.add({ title: "Merchant created", icon: "i-heroicons-check-circle" });
 };
 </script>
 
 <template>
   <UDashboardPanel id="add-merchant" resizable>
     <template #header>
-      <UDashboardNavbar title="Add merchant" :ui="{ right: 'gap-3' }">
+      <UDashboardNavbar title="Add Merchant" :ui="{ right: 'gap-3' }">
         <template #leading>
           <UDashboardSidebarCollapse />
         </template>
@@ -171,7 +188,14 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {
     </template>
     <template #body>
       <!-- :validate="validate" -->
-      <UForm :state="state" :schema="schema" @submit="onSubmit" ref="form">
+      <UForm
+        :state="state"
+        :schema="schema"
+        @submit="onSubmit"
+        ref="form"
+        :validate-on="['blur']"
+        :validate-on-input-delay="500"
+      >
         <!-- :title="merchant?.title"
           :description="merchant?.description" -->
         <UPageCard>
@@ -184,6 +208,20 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {
           >
             <UInput
               v-model="state.title"
+              autocomplete="off"
+              class="w-full"
+              size="md"
+            />
+          </UFormField>
+          <UFormField
+            name="slug"
+            label="Slug"
+            required
+            class="grid grid-cols-2 gap-2 items-center"
+            :ui="{ container: '' }"
+          >
+            <UInput
+              v-model="state.slug"
               autocomplete="off"
               class="w-full"
               size="md"
@@ -297,7 +335,7 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {
             />
             <NuxtImg
               :src="state.image_background"
-              :alt="state.title"
+              alt="New Image Background"
               size="lg"
             />
 

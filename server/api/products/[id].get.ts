@@ -1,6 +1,5 @@
 export default defineEventHandler(async (e) => {
   const id = Number(getRouterParam(e, "id"));
-  // console.log("hit products get");
 
   return await db.select().from(products).where(eq(products.merchant, id));
 

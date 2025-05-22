@@ -2,7 +2,7 @@
 import { h, resolveComponent } from "vue";
 import type { TableColumn } from "@nuxt/ui";
 import type { Period, Range, ResponseTable } from "~~/shared/types";
-import { LazyHomeResponsesAnswers } from "#components";
+import { LazyAdminHomeResponsesAnswers } from "#components";
 
 const props = defineProps<{
   period: Period;
@@ -48,15 +48,12 @@ const { active_merchant } = storeToRefs(useMerchantsStore());
 // })
 
 const overlay = useOverlay();
-const modal = overlay.create(LazyHomeResponsesAnswers);
+const modal = overlay.create(LazyAdminHomeResponsesAnswers);
 
 const { data } = await useFetch<ResponseTable[]>(
   () => "/api/statistics/" + active_merchant.value + "/responses",
   {
     watch: [active_merchant],
-    onResponse: ({ response }) => {
-      console.log("res", response._data);
-    },
   }
 );
 
@@ -89,11 +86,6 @@ const columns: TableColumn<ResponseTable>[] = [
     accessorKey: "gender",
     header: "Gender",
     cell: ({ row }) => {
-      console.log(
-        "gender",
-        typeof row.getValue("gender"),
-        row.getValue("gender")
-      );
       const isMale = row.getValue("gender");
       return h(
         UBadge,

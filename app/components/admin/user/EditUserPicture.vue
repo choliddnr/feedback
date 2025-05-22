@@ -38,7 +38,6 @@ const onSave = async () => {
     (await selectionRef.value.selection.$toCanvas()) as HTMLCanvasElement;
   imageBlob.value = await convertCanvasToWebp(canvas);
 };
-console.log("modal loaded", props.image);
 </script>
 <template>
   <UModal :close="{ onClick: () => emit('cancel') }">

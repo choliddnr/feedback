@@ -35,7 +35,6 @@ const submitFeedback = async () => {
           icon: "i-lucide-octagon-x",
           duration: 100000,
         });
-        console.log("error", response._data);
       }
     },
   });

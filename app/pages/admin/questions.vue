@@ -21,7 +21,7 @@ const { questions } = storeToRefs(useQuestionsStore());
 const slideover_edit = overlay.create(LazyAdminQuestionsEditForm);
 const modal_delete_question = overlay.create(LazyModalConfirm);
 const slideover_add = overlay.create(LazyAdminQuestionsAddForm);
-const table = useTemplateRef("table");
+const table = useTemplateRef<any>("table");
 const q_type = new Map([
   [1, "Text"],
   [2, "Rating"],
@@ -46,7 +46,6 @@ const columns: TableColumn<Question>[] = [
         Text: "secondary" as const,
         Rating: "warning" as const,
       }[data as string];
-      console.log("color", data, typeof data, color);
 
       return h(
         UBadge,
@@ -168,7 +167,7 @@ const columns: TableColumn<Question>[] = [
 ];
 
 const processDelete = async (id: string | number) => {
-  await $fetch("/api/products/" + id, {
+  await $fetch("/api/questions/" + id, {
     method: "DELETE",
     onResponse: async ({ response }) => {
       if (response.ok) {
@@ -194,14 +193,6 @@ const deleteQuestion = async (id: string | number) => {
   });
   //
 };
-onMounted(() => {
-  // const data = "rating";
-  // const color = {
-  //   text: "secondary" as const,
-  //   rating: "warning" as const,
-  // }[data as string];
-  // console.log("on mounted color", data, color);
-});
 </script>
 <template>
   <UDashboardPanel id="questions" resizeable :ui="{ body: 'px-0 sm:px-0' }">

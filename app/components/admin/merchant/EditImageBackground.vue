@@ -38,17 +38,14 @@ const convertCanvasToWebp = async (
 
 const onSave = async () => {
   // const scale = 1280 / selectionRef.value.selection.width - 1;
-  // console.log("scale", scale);
   isZoomable.value = true;
   selectionRef.value.selection.$zoom(1);
   imageRef.value.image.$zoom(1);
   // imageRef.value.$center();
-  console.log("zoomed", selectionRef.value.selection, imageRef.value.image);
   isZoomable.value = false;
 };
 watch(selectionRef, () => {
   if (selectionRef.value) {
-    console.log("sel", selectionRef.value.selection);
     isZoomable.value = true;
     // imageRef.value.$scale(0.1);
     selectionRef.value.selection.$zoom(-2);
@@ -57,9 +54,6 @@ watch(selectionRef, () => {
     isZoomable.value = false;
   }
 });
-const onChange = (e: any) => {
-  console.log("changed", e.detail.width, e.detail.height);
-};
 </script>
 <template>
   <UModal :prevent-close="true" fullscreen>
@@ -85,7 +79,6 @@ const onChange = (e: any) => {
           ref="sel"
           :width="1280"
           :height="720"
-          @change="onChange"
         >
           <CropperGrid role="grid" covered></CropperGrid>
           <CropperCrosshair centered></CropperCrosshair>

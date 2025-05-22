@@ -23,7 +23,6 @@ const parseMultipartData = (data?: MultiPartData[]) => {
 const saveFile = async (name: string, file: MultiPartData) => {
   const [_mime, ext] = String(file.type).split("/");
   const filename = `${name}_${Date.now()}.${ext}`;
-  console.log(filename);
   await userPictureStorage.setItemRaw(filename, file.data);
   return filename;
 };
@@ -39,17 +38,11 @@ const deleteFile = async (id: number) => {
 export default defineEventHandler(async (e: H3Event) => {
   const id = toNumber(getRouterParam(e, "id")) as number;
   const body = parseMultipartData(await readMultipartFormData(e));
-  // console.log(id, body);
 
   let newData = {} as Partial<User>;
   if (body.username) newData["username"] = body.username;
   if (body.name) newData["name"] = body.name;
   if (body.defaultMerchant) newData["defaultMerchant"] = body.defaultMerchant;
-  console.log(
-    "newData[defaultMerchant]",
-    newData["defaultMerchant"],
-    body.defaultMerchant
-  );
 
   try {
     if (body.image) {

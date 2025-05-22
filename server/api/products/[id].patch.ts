@@ -5,6 +5,7 @@ import { stringToSlug } from "~~/server/utils";
 import type { Storage } from "unstorage";
 import { productImageStorage } from "~~/server/utils/storage";
 import { record } from "better-auth";
+import { error } from "better-auth/api";
 
 /**
  *
@@ -39,28 +40,16 @@ const saveFile = async (
 };
 
 export default defineEventHandler(async (e) => {
-  // const session = await auth.api.getSession({
-  //   headers: e.headers,
-  // });
-  // if (!session?.user)
-  //   throw createError({ statusCode: 401, statusMessage: "Unauthorized" });
-  // return await db.select().from(merchants).where(eq(merchants.owner, user.id!));
-
+  const merchant_id = Number(getRouterParam(e, "id"));
   const body = parseMultipartData(await readMultipartFormData(e)) as Record<
-    keyof NewProduct,
+    keyof Product,
     any
   >;
-  let newData = {} as NewProduct;
+  let newData = {} as Product;
   // newData["owner"] = Number(session.user.id);
-  if (!body.title || !body.merchant || !body.description)
-    createError({
-      statusCode: 400,
-      statusMessage: "Invalid Bed Request",
-    });
-
-  newData["merchant"] = Number(body.merchant) as number;
-  newData["title"] = body.title;
-  newData["description"] = body.description;
+  if (body.merchant) newData["merchant"] = Number(body.merchant) as number;
+  if (body.title) newData["title"] = body.title;
+  if (body.description) newData["description"] = body.description;
 
   // const body =
   // return await db.insert(merchants).values({ name: "Dan" }).returning();});
@@ -73,14 +62,16 @@ export default defineEventHandler(async (e) => {
         productImageStorage
       );
     }
-    // newData["updatedAt"] = Date.now();
-    return await db.insert(products).values(newData).returning();
-    // await setUserSession(e, { user: newuser[0], loggedInAt: new Date() });
-    // return await getUserSession(e);
-    // return anew;
-  } catch (e) {
-    throw createError(
-      e instanceof Error ? e.message : "Unknown usr/id/patch error"
+    return await db
+      .update(products)
+      .set(newData)
+      .where(eq(products.id, merchant_id));
+  } catch (err) {
+    return sendError(
+      e,
+      createError(
+        err instanceof Error ? err.message : "Unknown usr/id/patch error"
+      )
     );
   }
 });
