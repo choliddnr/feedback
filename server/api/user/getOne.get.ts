@@ -1,4 +1,4 @@
-import { users, eq } from "../../../shared/db.schema";
+import { user, eq } from "~~/server/utils/db/schema";
 import { toNumber } from "@vue/shared";
 export default defineEventHandler(async (e) => {
   const key = getQuery(e).k as string;
@@ -6,10 +6,9 @@ export default defineEventHandler(async (e) => {
   let query;
   if (!key || !value)
     throw createError({ status: 400, message: "Missing k/v" });
-  if (key === "id") query = eq(users.id, toNumber(value));
-  if (key === "username") query = eq(users.username, toNumber(value));
-  if (key === "email") query = eq(users.email, toNumber(value));
+  if (key === "id") query = eq(user.id, toNumber(value));
+  if (key === "username") query = eq(user.username, toNumber(value));
+  if (key === "email") query = eq(user.email, toNumber(value));
 
-  const user = await useDB().select().from(users).where(query).limit(1);
-  return user;
+  return await db.select().from(user).where(query).limit(1);
 });

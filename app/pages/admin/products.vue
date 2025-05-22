@@ -2,48 +2,77 @@
 import {
   LazyAdminProductsEditForm,
   LazyAdminProductsAddForm,
+  LazyModalConfirm,
 } from "#components";
-import { useUserStore } from "../../stores/user";
-import { useProductsStore } from "../../stores/products";
-
-import type { FormError, FormSubmitEvent } from "#ui/types";
-import { boolean } from "zod";
-import type { Product } from "~~/shared/types";
-const { $pb } = useNuxtApp();
-const { user, avatarBlob } = storeToRefs(useUserStore());
+const { merchants, active_merchant } = storeToRefs(useMerchantsStore());
 definePageMeta({
   layout: "dashboard",
 });
-const { products, productToDelete } = storeToRefs(useProductsStore());
-const slideover = useSlideover();
-const modal = useModal();
-const confirmDeleteProduct = ref<boolean>(false);
+const overlay = useOverlay();
+const slideover_add = overlay.create(LazyAdminProductsAddForm);
+const slideover_edit = overlay.create(LazyAdminProductsEditForm);
 
-const multiProducts = computed<Product[]>(() => {
-  if (!products.value) return [];
-  return [
-    ...products.value!,
-    ...products.value!,
-    ...products.value!,
-    ...products.value!,
-    ...products.value!,
-  ];
+const modal_delete_product = overlay.create(LazyModalConfirm);
+const { products, active_product } = storeToRefs(useProductsStore());
+
+const product_to_delete = ref<string | number>();
+const processDelete = async (id: string | number) => {
+  product_to_delete.value = id;
+  await $fetch("/api/products/" + id, {
+    method: "DELETE",
+    onResponse: async ({ response }) => {
+      if (response.ok) {
+        const index = products.value.findIndex((p) => p.id === id);
+        products.value.splice(index, 1);
+        active_product.value = products.value[0]?.id || undefined;
+        product_to_delete.value = undefined;
+        // navigateTo("/admin/prodcts");
+      }
+    },
+  });
+};
+
+const deleteProduct = async (id: string | number) => {
+  modal_delete_product.open({
+    message: "Are you sure?",
+    action: {
+      cancel: { color: "neutral" },
+      continue: { color: "error", label: "Delete" },
+    },
+    onCancel: () => modal_delete_product.close(),
+    onContinue: () => {
+      processDelete(id);
+      modal_delete_product.close();
+    },
+  });
+  //
+};
+
+onMounted(() => {
+  active_merchant.value = Number(active_merchant.value);
+  if (!active_merchant.value && merchants.value?.length! > 0) {
+    active_merchant.value = merchants.value![0]?.id;
+  }
 });
 </script>
 
 <template>
-  <UDashboardPage>
-    <UDashboardPanel grow>
-      <UDashboardNavbar title="Products" :badge="products?.length || 0">
+  <UDashboardPanel id="products" resizeable>
+    <template #header>
+      <UDashboardNavbar title="Products" :ui="{ right: 'gap-3' }">
+        <template #leading>
+          <UDashboardSidebarCollapse />
+        </template>
+
         <template #right>
           <UButton
-            label="New Item"
+            label="New Product"
             trailing-icon="i-heroicons-plus"
-            color="gray"
+            color="neutral"
             @click="
               () => {
-                slideover.open(LazyAdminProductsAddForm, {
-                  onClose: slideover.close,
+                slideover_add.open({
+                  onClose: slideover_add.close,
                 });
               }
             "
@@ -51,77 +80,73 @@ const multiProducts = computed<Product[]>(() => {
         </template>
       </UDashboardNavbar>
 
-      <UDashboardPanelContent class="pb-24">
-        <UPageColumns
-          id="testimonials"
-          :ui="{
-            wrapper: 'sm:column-2 md:columns-3 lg:columns-4 gap-8 space-y-8',
-          }"
-        >
-          <div
-            v-for="(product, index) in multiProducts"
-            :key="index"
-            class="break-inside-avoid"
-          >
-            <UCard
-              class=""
-              :ui="{
-                header: {
-                  padding: 'p-0 sm:px-0 overflow-hidden',
-                  base: 'h-56',
-                },
-                footer: {
-                  padding: 'p-1 sm:px-1 overflow-hidden',
-                  base: '',
-                },
-                base: 'content-between',
-                divide: 'divide-y-0',
-              }"
-            >
-              <template #header>
-                <div
-                  class="bg-cover bg-center h-full overflow-hidden rounded-t-lg"
-                  :style="{ backgroundImage: `url(${$pb.files.getURL(product, product.images!)}` }"
-                ></div>
-              </template>
-              <span class="font-bold">{{ product.title }}</span>
-              <p>{{ product.description }}</p>
+      <UDashboardToolbar>
+        <template #left>
+          <USelect
+            v-if="active_merchant"
+            v-model="active_merchant"
+            :items="[...merchants]"
+            label-key="title"
+            value-key="id"
+            variant="ghost"
+            class="w-full"
+            :default-value="1"
+          />
+        </template>
+      </UDashboardToolbar>
+    </template>
 
-              <template #footer>
-                <div class="grid grid-cols-2 gap-0 h-auto w-full">
-                  <UButton
-                    color="white"
-                    block
-                    icon="i-heroicons-pencil-square-16-solid"
-                    :ui="{ rounded: 'rounded-r-none' }"
-                    @click="
-                      () => {
-                        slideover.open(LazyAdminProductsEditForm, {
-                          product: product,
-                          onClose: slideover.close,
-                        });
-                      }
-                    "
-                  />
-                  <UButton
-                    color="red"
-                    block
-                    icon="i-heroicons-trash-16-solid"
-                    :ui="{ rounded: 'rounded-l-none' }"
-                    @click="
-                      () => {
-                        productToDelete = product;
-                        confirmDeleteProduct = true;
-                      }
-                    "
-                  />
-                </div>
-              </template>
-            </UCard>
-          </div>
-        </UPageColumns>
-        <LazyAdminProductsDeleteConfirm v-model="confirmDeleteProduct" />
-      </UDashboardPanelContent>
-    </UDashboardPanel>
-  </UDashboardPage>
+    <template #body>
+      <div class="flex flex-row gap-3">
+        <UPageCard
+          v-for="product in products"
+          :title="product.title"
+          :description="product.description"
+          orientation="vertical"
+          spotlight
+          spotlight-color="primary"
+          class="w-[25%]"
+          :ui="{ footer: 'w-full' }"
+          reverse
+        >
+          <template #default>
+            <NuxtImg
+              :src="`/product/` + product.image"
+              :alt="product.title"
+              class="w-full"
+            />
+          </template>
+          <template #footer>
+            <UButtonGroup class="w-full">
+              <UButton
+                block
+                color="neutral"
+                icon="i-heroicons-pencil-square-16-solid"
+                :loading="product_to_delete === product.id"
+                @click="
+                  () => {
+                    slideover_edit.open({
+                      product: product,
+                      onClose: slideover_edit.close,
+                    });
+                  }
+                "
+              />
+              <UButton
+                block
+                color="error"
+                icon="i-heroicons-trash-16-solid"
+                :loading="product_to_delete === product.id"
+                @click="
+                  () => {
+                    deleteProduct(product.id);
+                  }
+                "
+              />
+            </UButtonGroup>
+          </template>
+        </UPageCard>
+      </div>
+    </template>
+  </UDashboardPanel>
 </template>
