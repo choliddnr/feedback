@@ -23,7 +23,6 @@ const schema = z.object({
 const { merchant, respondent } = storeToRefs(useResponseStore());
 
 const onsubmit = () => {
-  console.log(state);
   useStorage("respondent", state);
   localStorage.setItem(
     `${merchant.value?.id}_respondent`,

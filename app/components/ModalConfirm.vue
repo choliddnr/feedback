@@ -68,9 +68,7 @@ const props = withDefaults(
 //     },
 const emit = defineEmits(["continue", "cancel"]);
 const onloading = ref<boolean>(false);
-onMounted(() => {
-  console.log("props", props);
-});
+
 onBeforeUnmount(() => {
   onloading.value = false;
 });

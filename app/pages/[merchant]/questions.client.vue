@@ -58,8 +58,6 @@ const saveState = () => {
   localStorage.setItem(keyid.value, answer.value);
 };
 const loadState = () => {
-  console.log("load state");
-
   const on_map_store = answers.value.get(keyid.value);
   if (!on_map_store || on_map_store === "") {
     answer.value = localStorage.getItem(keyid.value)!;

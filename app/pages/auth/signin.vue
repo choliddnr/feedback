@@ -39,7 +39,6 @@ const providers = [
         provider: "google",
       });
       toast.add({ title: "Google", description: "Login with Google" });
-      console.log(data);
     },
   },
 ];
@@ -53,8 +52,6 @@ const schema = z.object({
 type Schema = z.output<typeof schema>;
 
 const onSubmit = async (payload: FormSubmitEvent<Schema>) => {
-  console.log("Submitted", payload);
-
   const { data, error } = await authClient.signIn.email(
     {
       /**
@@ -100,12 +97,18 @@ const onSubmit = async (payload: FormSubmitEvent<Schema>) => {
       <UAuthForm
         :schema="schema"
         title="Login"
-        description="Enter your credentials to access your account."
         icon="i-lucide-user"
         :fields="fields"
         :providers="providers"
         @submit="onSubmit"
-      />
+      >
+        <template #description>
+          Don't have an account?
+          <ULink to="/auth/signup" class="text-primary font-medium"
+            >Sign up</ULink
+          >.
+        </template>
+      </UAuthForm>
     </UPageCard>
   </div>
 </template>

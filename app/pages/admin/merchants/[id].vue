@@ -10,6 +10,7 @@ const merchantId = useRoute().params.id as string;
 const merchant = ref<Merchant>();
 const state = reactive({
   title: "",
+  slug: "",
   description: "",
   category: 0,
   primary_color: "",
@@ -21,21 +22,17 @@ definePageMeta({
   layout: "dashboard",
 });
 
-if (import.meta.server) {
-  console.log("server merchant", merchant.value);
-}
-if (import.meta.client) {
-  console.log("clinet merchant", merchant.value);
-}
-
 const { merchant_categories } = storeToRefs(useMerchantCategoriesStore());
+if (merchant_categories.value === undefined) {
+  await useMerchantCategoriesStore().fetch();
+}
 
 const overlay = useOverlay();
 
 const modal_edit_logo = overlay.create(LazyAdminMerchantEditLogo);
 const modal_delete_merchant = overlay.create(LazyModalConfirm);
 
-const form = useTemplateRef("form");
+const form = useTemplateRef<HTMLFormElement>("form");
 
 const MAX_FILE_SIZE = 1 * 1024 * 1024; // 1MB
 const ACCEPTED_FILE_TYPES = [
@@ -57,6 +54,27 @@ const backgroudImageError = ref<ImageError>({
 
 const schema = z.object({
   title: z.string().min(4),
+  slug: z
+    .string()
+    .min(4)
+    .refine((val) => {
+      const regex = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+      return regex.test(val);
+    }, "Slug must be lowercase and can only contain letters, numbers, and dashes.")
+    .refine(async (val) => {
+      if (val === "") return true;
+      const data = await $fetch<Merchant>("/api/merchants/slug/" + val, {
+        method: "get",
+      });
+      if (!data) {
+        return true;
+      } else {
+        if (data.id === Number(merchantId)) {
+          return true;
+        }
+        return false;
+      }
+    }, "Slug already exists"),
   description: z.string().min(5),
   category: z.number(),
   primary_color: z.string(),
@@ -125,6 +143,7 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {
 
   if (state.title !== merchant.value?.title)
     formData.append("title", state.title!);
+  if (state.slug !== merchant.value?.slug) formData.append("slug", state.slug!);
 
   if (state.description !== merchant.value?.description)
     formData.append("description", state.description!);
@@ -177,6 +196,8 @@ onMounted(() => {
     });
   }
   state.title = merchant.value?.title!;
+
+  state.slug = merchant.value?.slug!;
   state.description = merchant.value?.description! + " people said";
   state.category = merchant.value?.category!;
   state.primary_color = "blue";
@@ -259,7 +280,13 @@ const deleteMerchant = async () => {
       </UDashboardNavbar>
     </template>
     <template #body>
-      <UForm :state="state" :schema="schema" @submit="onSubmit" ref="form">
+      <UForm
+        :state="state"
+        :schema="schema"
+        @submit="onSubmit"
+        ref="form"
+        :validate-on="['blur']"
+      >
         <UPageCard>
           <UFormField
             name="title"
@@ -270,6 +297,22 @@ const deleteMerchant = async () => {
           >
             <UInput
               v-model="state.title"
+              autocomplete="off"
+              class="w-full"
+              size="md"
+              :readonly="!isEdit"
+            />
+          </UFormField>
+
+          <UFormField
+            name="slug"
+            label="Slug"
+            required
+            class="grid grid-cols-2 gap-2 items-center"
+            :ui="{ container: '' }"
+          >
+            <UInput
+              v-model="state.slug"
               autocomplete="off"
               class="w-full"
               size="md"

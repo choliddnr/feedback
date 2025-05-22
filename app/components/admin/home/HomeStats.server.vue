@@ -19,7 +19,7 @@ const stats = computed<Stat[]>(() => [
   {
     title: "Respondents",
     icon: "i-lucide-users",
-    value: data.value!.respondent,
+    value: data.value!.respondent === undefined ? 0 : data.value!.respondent,
     variation: 10,
   },
   {
@@ -31,7 +31,8 @@ const stats = computed<Stat[]>(() => [
   {
     title: "Rating",
     icon: "i-lucide-star",
-    value: data.value!.avg_rating.toFixed(1),
+    value:
+      data.value!.avg_rating === null ? 0.0 : data.value!.avg_rating.toFixed(1),
     variation: 10,
   },
 ]);

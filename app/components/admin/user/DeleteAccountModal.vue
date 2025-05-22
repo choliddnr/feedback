@@ -25,7 +25,6 @@ const onDelete = async () => {
   //   navigateTo("/auth");
   // }, 2000);
 };
-console.log("modal call");
 </script>
 
 <template>

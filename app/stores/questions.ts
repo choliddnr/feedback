@@ -9,9 +9,7 @@ export const useQuestionsStore = defineStore("questions", () => {
     {
       immediate: true,
       watch: [active_product],
-      onRequest: ({ request }) => {
-        console.log("req", request);
-      },
+      onRequest: ({ request }) => {},
       onResponse: ({ response }) => {
         if (response.ok) {
           questions.value = response._data;

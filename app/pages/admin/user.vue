@@ -32,7 +32,6 @@ const state = reactive({
   image: "/user_picture/" + user.value?.image,
   defaultMerchant: Number(user.value?.defaultMerchant) as number,
 });
-console.log("defaultMerchant", typeof user.value?.defaultMerchant);
 
 const schema = z.object({
   name: z.string().min(4),
@@ -52,8 +51,6 @@ const onFileChange = (e: Event) => {
   const input = e.target as HTMLInputElement;
 
   if (!input.files?.length) {
-    console.log("returning ", input.files?.length);
-
     return;
   }
 

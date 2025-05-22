@@ -15,7 +15,7 @@ definePageMeta({
 
         <template #right>
           <UButton
-            label="New Item"
+            label="New Merchant"
             trailing-icon="i-heroicons-plus"
             color="neutral"
             @click="navigateTo('/admin/merchants/add')"

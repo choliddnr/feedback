@@ -22,11 +22,8 @@ export const useProductsStore = defineStore("products", () => {
     {
       immediate: true,
       watch: [active_merchant],
-      onRequest: () => {
-        // console.log("request");
-      },
+      onRequest: () => {},
       onResponse: ({ response }) => {
-        // console.log("response ", response);
         if (response.ok) {
           products.value = response._data;
           if (!active_product.value) {

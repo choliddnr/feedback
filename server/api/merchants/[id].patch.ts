@@ -32,7 +32,6 @@ const saveFile = async (
 ) => {
   const [_mime, ext] = String(file.type).split("/");
   const filename = `${name}.${ext}`;
-  console.log(filename);
   await storage.setItemRaw(filename, file.data);
   return filename;
 };
@@ -50,6 +49,7 @@ export default defineEventHandler(async (e) => {
   let newData = {} as Partial<Omit<Merchant, "id">>;
 
   if (body.title) newData["title"] = body.title;
+  if (body.slug) newData["slug"] = body.slug;
   if (body.description) newData["description"] = body.description;
   if (body.category) newData["category"] = body.category;
   if (body.greeting) newData["greeting"] = body.category;
@@ -63,27 +63,33 @@ export default defineEventHandler(async (e) => {
       oldData = await $fetch<Merchant[]>("/api/merchants/" + id, {
         headers: e.headers,
       });
-    }
-    if (oldData?.length === 0)
-      throw createError({
-        statusCode: 403,
-        statusMessage: "merchant doesn't exist",
-      });
-    if (body.logo) {
-      merchantLogoStorage.removeItem(oldData[0]!.logo!);
-      newData["logo"] = await saveFile(
-        Date.now().toString(),
-        body.logo,
-        merchantLogoStorage
-      );
-    }
-    if (body.image_background) {
-      merchantImageBackgroundStorage.removeItem(oldData[0]!.image_background!);
-      newData["image_background"] = await saveFile(
-        Date.now().toString(),
-        body.image_background,
-        merchantImageBackgroundStorage
-      );
+      if (oldData?.length === 0) {
+        return sendError(
+          e,
+          createError({
+            statusCode: 403,
+            statusMessage: "merchant doesn't exist",
+          })
+        );
+      }
+      if (body.logo) {
+        merchantLogoStorage.removeItem(oldData[0]!.logo!);
+        newData["logo"] = await saveFile(
+          Date.now().toString(),
+          body.logo,
+          merchantLogoStorage
+        );
+      }
+      if (body.image_background) {
+        merchantImageBackgroundStorage.removeItem(
+          oldData[0]!.image_background!
+        );
+        newData["image_background"] = await saveFile(
+          Date.now().toString(),
+          body.image_background,
+          merchantImageBackgroundStorage
+        );
+      }
     }
 
     return await db
@@ -99,9 +105,12 @@ export default defineEventHandler(async (e) => {
     // await setUserSession(e, { user: newuser[0], loggedInAt: new Date() });
     // return await getUserSession(e);
     // return anew;
-  } catch (e) {
-    throw createError(
-      e instanceof Error ? e.message : "Unknown usr/id/patch error"
+  } catch (err) {
+    return sendError(
+      e,
+      createError(
+        err instanceof Error ? err.message : "Unknown usr/id/patch error"
+      )
     );
   }
 });

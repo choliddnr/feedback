@@ -75,8 +75,6 @@ const schema = z.object({
 type Schema = z.output<typeof schema>;
 
 const onSubmit = async (payload: FormSubmitEvent<Schema>) => {
-  console.log("Submitted", payload);
-
   const session = authClient.useSession();
 
   const { data, error } = await authClient.signUp.email(
@@ -116,7 +114,14 @@ const onSubmit = async (payload: FormSubmitEvent<Schema>) => {
         :fields="fields"
         :providers="providers"
         @submit="onSubmit"
-      />
+      >
+        <template #description>
+          Have an account?
+          <ULink to="/auth/signin" class="text-primary font-medium"
+            >Sign in</ULink
+          >.
+        </template>
+      </UAuthForm>
     </UPageCard>
   </div>
 </template>

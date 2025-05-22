@@ -148,6 +148,15 @@ const items = computed<DropdownMenuItem[][]>(() => [
     {
       label: "Log out",
       icon: "i-lucide-log-out",
+      onSelect: async () => {
+        await authClient.signOut({
+          fetchOptions: {
+            onSuccess: () => {
+              navigateTo("/auth/signin"); // redirect to login page
+            },
+          },
+        });
+      },
     },
   ],
 ]);

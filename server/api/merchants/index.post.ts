@@ -32,7 +32,6 @@ const saveFile = async (
 ) => {
   const [_mime, ext] = String(file.type).split("/");
   const filename = `${name}.${ext}`;
-  // console.log(filename);
   await storage.setItemRaw(filename, file.data);
   return filename;
 };
@@ -49,6 +48,7 @@ export default defineEventHandler(async (e) => {
   let newData = {} as Omit<Merchant, "id">;
   newData["owner"] = Number(session.user.id);
   newData["title"] = body.title || "no title";
+  newData["slug"] = body.slug || "no slug";
   newData["description"] = body.description;
   newData["category"] = body.category;
   newData["greeting"] = "kjdsghksdjg ";

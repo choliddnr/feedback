@@ -88,8 +88,6 @@ const onSubmit = async () => {
     },
   });
 
-  console.log("res", res);
-
   // const updatedProduct = await $pb.collection("products").create(formData);
   // products.value!.push(updatedProduct as unknown as Product); // ;
 
@@ -99,7 +97,7 @@ const onSubmit = async () => {
 </script>
 
 <template>
-  <USlideover prevent-close title="Add new Product">
+  <USlideover prevent-close title="Add New Product">
     <template #body>
       <UCard
         class="flex flex-col flex-1"
