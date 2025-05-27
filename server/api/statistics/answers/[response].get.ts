@@ -1,6 +1,6 @@
 export default defineEventHandler(async (e) => {
   const response = Number(getRouterParam(e, "response"));
-  const answers = await db
+  const answers = await db(e)
     .select({
       product: products.title,
       question: questions.question,
@@ -13,7 +13,7 @@ export default defineEventHandler(async (e) => {
     .innerJoin(products, eq(products.id, questions.product))
     .orderBy(products.title);
 
-  const type = await db
+  const type = await db(e)
     .select({ id: question_types.id, title: question_types.title })
     .from(question_types);
 

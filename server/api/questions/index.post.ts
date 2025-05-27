@@ -12,5 +12,5 @@ export default defineEventHandler(async (e) => {
       })
     );
   }
-  return await db.insert(questions).values(res.data).returning();
+  return await db(e).insert(questions).values(res.data).returning();
 });

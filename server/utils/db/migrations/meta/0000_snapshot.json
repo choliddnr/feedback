@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "5be7f5c0-1252-4e57-ba35-c0a24f365815",
+  "id": "67ed2bfd-1a67-40ae-8db4-914d99a7f07b",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "account": {
@@ -413,6 +413,13 @@
       "columns": {
         "title": {
           "name": "title",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "slug": {
+          "name": "slug",
           "type": "text",
           "primaryKey": false,
           "notNull": true,
@@ -888,6 +895,13 @@
     "responses": {
       "name": "responses",
       "columns": {
+        "merchant": {
+          "name": "merchant",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
         "respondent": {
           "name": "respondent",
           "type": "integer",
@@ -921,6 +935,19 @@
       },
       "indexes": {},
       "foreignKeys": {
+        "responses_merchant_merchants_id_fk": {
+          "name": "responses_merchant_merchants_id_fk",
+          "tableFrom": "responses",
+          "tableTo": "merchants",
+          "columnsFrom": [
+            "merchant"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        },
         "responses_respondent_respondents_id_fk": {
           "name": "responses_respondent_respondents_id_fk",
           "tableFrom": "responses",

@@ -1,0 +1,11 @@
+name = "feedback-demo"
+pages_build_output_dir = "./dist"
+
+compatibility_flags = [ "nodejs_compat" ]
+compatibility_date = "2024-09-23"
+
+[[d1_databases]]
+binding = "NUXT_DB"
+database_name = "feedback-demo"
+database_id = "b8aae717-1c37-4077-9ea8-92ebf1280eb0"
+migrations_dir = "./server/utils/db/migrations"

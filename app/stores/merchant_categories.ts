@@ -4,10 +4,13 @@ import type { MerchantCategory } from "~~/shared/types";
 export const useMerchantCategoriesStore = defineStore(
   "merchant_categories",
   () => {
-    const { data: merchant_categories, refresh: fetch } = useAsyncData<
+    const { data: merchant_categories, refresh: fetch } = useFetch<
       MerchantCategory[]
-    >("merchant_categories", () => $fetch("/api/merchants/categories"));
-
+    >("/api/merchants/categories", {
+      onRequest: ({ request }) => {
+        console.log("Fetching merchant categories", request);
+      },
+    });
     return { merchant_categories, fetch };
   }
 );

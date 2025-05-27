@@ -39,7 +39,7 @@ definePageMeta({
         >
           <template #default>
             <NuxtImg
-              :src="`/merchant/logo/` + merchant.logo"
+              :src="merchant.logo ? getImg(merchant.logo) : ''"
               :alt="merchant.title"
               class="w-full"
             />

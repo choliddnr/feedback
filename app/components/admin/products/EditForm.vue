@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import type { FormSubmitEvent } from "#ui/types";
-import { ModalConfirm } from "#components";
+import { LazyAdminProductsEditImage, ModalConfirm } from "#components";
 import { type output as zodOutput } from "zod";
 import { z } from "zod";
 import type { Product } from "~~/shared/types";
@@ -13,14 +13,14 @@ const { merchants, active_merchant } = storeToRefs(useMerchantsStore());
 const { fetch } = useProductsStore();
 const toast = useToast();
 
-const imageSchema = z
-  .instanceof(Blob)
-  .refine((file) => ACCEPTED_FILE_TYPES.includes(file.type), {
-    message: "Invalid file type. Only JPEG and PNG files are allowed.",
-  })
-  .refine((file) => file.size <= MAX_FILE_SIZE, {
-    message: "File size should be less than 1MB.",
-  });
+// const imageSchema = z
+//   .instanceof(Blob)
+//   .refine((file) => ACCEPTED_FILE_TYPES.includes(file.type), {
+//     message: "Invalid file type. Only JPEG and PNG files are allowed.",
+//   })
+//   .refine((file) => file.size <= MAX_FILE_SIZE, {
+//     message: "File size should be less than 1MB.",
+//   });
 const EditSchema = z.object({
   title: z.string().min(5).max(25),
   description: z.string().optional(),
@@ -35,12 +35,12 @@ const emits = defineEmits<{
   close: [];
 }>();
 
-const submitBtnRef = ref<HTMLButtonElement>();
+// const submitBtnRef = ref<HTMLButtonElement>();
 
 const state = reactive<Partial<Product>>({
   title: props.product.title,
   description: props.product.description,
-  image: "/product/" + props.product.image,
+  image: props.product.image ? getImg(props.product.image) : "",
   merchant: props.product.merchant,
 });
 
@@ -50,43 +50,83 @@ const imageError = ref<{ isError: boolean; message: string }>({
   message: "",
 });
 
-const MAX_FILE_SIZE = 1 * 1024 * 1024; // 1MB
-const ACCEPTED_FILE_TYPES = [
-  "image/jpeg",
-  "image/jpeg",
-  "image/png",
-  "image/webp",
-];
+// const MAX_FILE_SIZE = 1 * 1024 * 1024; // 1MB
+// const ACCEPTED_FILE_TYPES = [
+//   "image/jpeg",
+//   "image/jpeg",
+//   "image/png",
+//   "image/webp",
+// ];
 
 const changeImage = () => {
   imageRef.value?.click();
 };
-const onImageChange = () => {
-  if (!imageRef.value?.files?.length) return;
-  const validate = imageSchema.safeParse(imageRef.value.files[0]);
-  if (validate.success) {
-    state.image = URL.createObjectURL(imageRef.value.files[0]!);
-    imageError.value.isError = false;
-  } else {
+
+const overlay = useOverlay();
+const modal_edit_image = overlay.create(LazyAdminProductsEditImage);
+const imageBlob = ref<Blob>();
+const onImageChange = (e: Event) => {
+  // if (!imageRef.value?.files?.length) return;
+  // const validate = imageSchema.safeParse(imageRef.value.files[0]);
+  // if (validate.success) {
+  //   state.image = URL.createObjectURL(imageRef.value.files[0]!);
+  //   imageError.value.isError = false;
+  // } else {
+  //   imageError.value = {
+  //     isError: true,
+  //     message: validate.error.errors[0]?.message!,
+  //   };
+  // }
+
+  const input = e.target as HTMLInputElement;
+  if (!input.files || input.files.length === 0) {
     imageError.value = {
       isError: true,
-      message: validate.error.errors[0]?.message!,
+      message: "No file selected.",
     };
+    return;
   }
+  //   if (!ACCEPTED_FILE_TYPES.includes(file.type)) {
+  //     imageError.value = {
+  //       isError: true,
+  //       message: "Invalid file type. Only JPEG and PNG files are allowed.",
+  //     };
+  //     return;
+  //   } else {
+  //   imageError.value.isError = false;
+  // }
+  //   if (file.size > MAX_FILE_SIZE) {
+  //     imageError.value = {
+  //       isError: true,
+  //       message: "File size should be less than 1MB.",
+  //     };
+  //     return;
+  //   }
+
+  const file = input.files[0];
+  state.image = URL.createObjectURL(file!);
+  imageError.value.isError = false;
+  modal_edit_image.open({
+    image: URL.createObjectURL(input.files[0]!),
+    "onUpdate:imageBlob": (value) => {
+      imageBlob.value = value;
+      state.image = URL.createObjectURL(value!);
+      modal_edit_image.close();
+    },
+    onCancel: () => {
+      modal_edit_image.close();
+    },
+  });
 };
 const onSubmit = async () => {
   const formData = new FormData();
   formData.append("title", state.title!);
   formData.append("description", state.description!);
   formData.append("merchant", state.merchant!.toString());
-  if (imageRef.value?.files?.length) {
-    formData.append("image", imageRef.value!.files![0]!);
-  } else {
-    imageError.value = {
-      isError: true,
-      message: "Image is required",
-    };
-    return;
+
+  if (imageBlob.value) {
+    formData.append("image_filename", props.product.image || "");
+    formData.append("image", imageBlob.value);
   }
   const res = await $fetch<Response>("/api/products/" + props.product.id, {
     method: "PATCH",

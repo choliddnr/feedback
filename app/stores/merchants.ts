@@ -2,7 +2,7 @@ import { defineStore, acceptHMRUpdate } from "pinia";
 import type { Merchant } from "~~/shared/types";
 
 export const useMerchantsStore = defineStore("merchants", () => {
-  const active_merchant = ref<number>();
+  const active_merchant = ref<number>(0);
   const { data: merchants, execute: fetch } = useFetch<Merchant[]>(
     "/api/merchants",
     {

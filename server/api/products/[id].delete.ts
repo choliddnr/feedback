@@ -1,26 +1,24 @@
 export default defineEventHandler(async (e) => {
   const id = Number(getRouterParam(e, "id"));
+  try {
+    const product = await db(e)
+      .select()
+      .from(products)
+      .where(eq(products.id, id))
+      .get();
+    if (!product)
+      return sendError(
+        e,
+        createError({ statusCode: 404, statusMessage: "product not found" })
+      );
 
-  return await db.delete(products).where(eq(products.id, id));
+    await deleteImg(e, product.image);
 
-  // return [
-  //   {
-  //     id: "ms",
-  //     title: "Mie  Setan",
-  //     description: "lorem ipsun dolor sit amet",
-  //     image: "1.jpg",
-  //   },
-  //   {
-  //     id: "mi",
-  //     title: "Mie Iblis",
-  //     description: "lorem ipsun dolor sit amet",
-  //     image: "2.jpg",
-  //   },
-  //   {
-  //     id: "mj",
-  //     title: "Mie Jebew",
-  //     description: "lorem ipsun dolor sit amet",
-  //     image: "3.jpg",
-  //   },
-  // ];
+    return await db(e).delete(products).where(eq(products.id, id));
+  } catch (err) {
+    return sendError(
+      e,
+      createError({ statusCode: 500, statusMessage: "Unknown Error - " + err })
+    );
+  }
 });

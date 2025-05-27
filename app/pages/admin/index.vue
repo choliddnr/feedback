@@ -6,7 +6,7 @@ definePageMeta({
   layout: "dashboard",
 });
 
-const { isNotificationsSlideoverOpen } = useDashboard();
+// const { isNotificationsSlideoverOpen } = useDashboard();
 
 const items = [
   [

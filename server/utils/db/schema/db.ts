@@ -27,7 +27,7 @@ export const merchants = sqliteTable("merchants", {
     onDelete: "cascade",
   }),
   greeting: text().notNull(),
-  primery_color: text().default("fuel-yellow"),
+  primery_color: text(),
   image_background: text(),
   logo: text(),
   ...dafaultField,

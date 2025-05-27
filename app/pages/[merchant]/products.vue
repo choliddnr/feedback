@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import type { Product } from "~~/shared/types";
 
-const route = useRoute();
-const merchant_id = route.params.merchant;
+// const route = useRoute();
+// const merchant_id = route.params.merchant;
+const { merchant } = storeToRefs(useResponseStore());
 
 const { data: _products } = await useFetch<Product[]>(
-  "/api/products/" + merchant_id
+  "/api/public/products/" + merchant.value?.id
 );
-const { merchant } = storeToRefs(useResponseStore());
 import type { CheckboxGroupValue } from "@nuxt/ui";
 const { respondent, selected_product, products } = storeToRefs(
   useResponseStore()
@@ -15,17 +15,17 @@ const { respondent, selected_product, products } = storeToRefs(
 const onSubmit = () => {
   if (selected_product.value.length > 0 && _products.value) {
     localStorage.setItem(
-      merchant_id + "_selected_product",
+      merchant.value?.id + "_selected_product",
       JSON.stringify(selected_product.value)
     );
     products.value = _products.value?.filter((p) =>
       selected_product.value?.includes(p.id)
     );
     localStorage.setItem(
-      merchant_id + "_products",
+      merchant.value?.id + "_products",
       JSON.stringify(products.value)
     );
-    navigateTo(`/${merchant_id}/questions`);
+    navigateTo(`/${merchant.value?.slug}/questions`);
   }
 };
 </script>
@@ -47,11 +47,7 @@ const onSubmit = () => {
         size="xl"
       >
         <template #label="{ item }">
-          <NuxtImg
-            :src="`/product/${item.image}`"
-            height="auto"
-            width="200px"
-          />
+          <NuxtImg :src="getImg(item.image)" height="auto" width="200px" />
         </template>
       </UCheckboxGroup>
     </div>

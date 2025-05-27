@@ -62,6 +62,7 @@ CREATE TABLE `merchant_categories` (
 --> statement-breakpoint
 CREATE TABLE `merchants` (
 	`title` text NOT NULL,
+	`slug` text NOT NULL,
 	`description` text,
 	`category` integer,
 	`owner` integer,
@@ -130,9 +131,11 @@ CREATE TABLE `response_answers` (
 );
 --> statement-breakpoint
 CREATE TABLE `responses` (
+	`merchant` integer NOT NULL,
 	`respondent` integer,
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
 	`created_at` integer DEFAULT (strftime('%s','now')),
 	`updated_at` integer DEFAULT (strftime('%s','now') ),
+	FOREIGN KEY (`merchant`) REFERENCES `merchants`(`id`) ON UPDATE no action ON DELETE cascade,
 	FOREIGN KEY (`respondent`) REFERENCES `respondents`(`id`) ON UPDATE no action ON DELETE set default
 );

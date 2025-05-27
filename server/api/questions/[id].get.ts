@@ -33,7 +33,7 @@ export default defineEventHandler(async (e) => {
   //     });
   //   }
   // }
-  return await db
+  return await db(e)
     .select()
     .from(questions)
     .where(eq(questions.product, Number(product_id)));

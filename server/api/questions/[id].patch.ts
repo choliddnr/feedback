@@ -12,7 +12,7 @@ export default defineEventHandler(async (e) => {
       })
     );
   }
-  return await db
+  return await db(e)
     .update(questions)
     .set(res.data)
     .where(eq(questions.id, questions_id))

@@ -12,7 +12,7 @@ const merchant_list = computed<DropdownMenuItem[]>(() => {
     items.push({
       label: m.title,
       avatar: {
-        src: "/merchant/logo/" + m.logo,
+        src: m.logo ? getImg(m.logo) : "",
         alt: m.title,
       },
       onSelect: () => (active_merchant.value = m.id),
@@ -77,7 +77,7 @@ const selected_merchant = computed<Merchant | undefined>(() => {
 
 <template>
   <UDropdownMenu
-    v-if="merchant_list"
+    v-if="merchant_list && merchant_list.length > 0"
     :items="merchant_list"
     :content="{ align: 'center', collisionPadding: 12 }"
     :ui="{
@@ -93,15 +93,13 @@ const selected_merchant = computed<Merchant | undefined>(() => {
       color="neutral"
       variant="ghost"
       :avatar="{
-        src: '/merchant/logo/' + selected_merchant?.logo,
+        src: selected_merchant?.logo ? getImg(selected_merchant?.logo) : '',
       }"
       block
       :square="collapsed"
       class="data-[state=open]:bg-elevated"
       :class="[!collapsed && 'py-2']"
-      :ui="{
-        trailingIcon: 'text-dimmed',
-      }"
+      :ui="{ trailingIcon: 'text-dimmed' }"
     />
   </UDropdownMenu>
 </template>
