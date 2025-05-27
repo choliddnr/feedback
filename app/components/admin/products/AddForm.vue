@@ -1,4 +1,8 @@
 <script lang="ts" setup>
+import {
+  LazyAdminProductsEditForm,
+  LazyAdminProductsEditImage,
+} from "#components";
 import { z } from "zod";
 import type { NewProduct } from "~~/shared/types";
 
@@ -51,33 +55,57 @@ const imageSchema = z
 const changeImage = () => {
   imageRef.value?.click();
 };
-const onImageChange = () => {
-  if (!imageRef.value?.files?.length) return;
-  const validate = imageSchema.safeParse(imageRef.value.files[0]);
-  if (validate.success) {
-    state.image = URL.createObjectURL(imageRef.value.files[0]!);
-    imageError.value.isError = false;
-  } else {
+
+const overlay = useOverlay();
+const modal_edit_image = overlay.create(LazyAdminProductsEditImage);
+const imageBlob = ref<Blob>();
+
+const onImageChange = (e: Event) => {
+  // if (!imageRef.value?.files?.length) return;
+  // const validate = imageSchema.safeParse(imageRef.value.files[0]);
+  // if (validate.success) {
+  //   state.image = URL.createObjectURL(imageRef.value.files[0]!);
+  //   imageError.value.isError = false;
+  // } else {
+  //   imageError.value = {
+  //     isError: true,
+  //     message: validate.error.errors[0]?.message!,
+  //   };
+  // }
+
+  const input = e.target as HTMLInputElement;
+  if (!input.files?.length) {
     imageError.value = {
       isError: true,
-      message: validate.error.errors[0]?.message!,
+      message: "Image product is required.",
     };
+    return;
+  } else {
+    imageError.value.isError = false;
   }
+  modal_edit_image.open({
+    image: URL.createObjectURL(input.files[0]!),
+    "onUpdate:imageBlob": (value) => {
+      imageBlob.value = value;
+      state.image = URL.createObjectURL(value!);
+      modal_edit_image.close();
+    },
+    onCancel: () => {
+      modal_edit_image.close();
+    },
+  });
 };
+
 const onSubmit = async () => {
   const formData = new FormData();
   formData.append("title", state.title!);
   formData.append("description", state.description!);
   formData.append("merchant", state.merchant.toString());
-  if (imageRef.value?.files?.length) {
-    formData.append("image", imageRef.value!.files![0]!);
-  } else {
-    imageError.value = {
-      isError: true,
-      message: "Image is required",
-    };
-    return;
+
+  if (imageBlob.value) {
+    formData.append("image", imageBlob.value);
   }
+
   const res = await $fetch<Response>("/api/products", {
     method: "post",
     body: formData,

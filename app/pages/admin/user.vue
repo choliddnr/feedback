@@ -29,7 +29,7 @@ const state = reactive({
   name: user.value?.name as string,
   email: user.value?.email as string,
   username: user.value?.username as string,
-  image: "/user_picture/" + user.value?.image,
+  image: user.value?.image ? getImg(user.value?.image) : "",
   defaultMerchant: Number(user.value?.defaultMerchant) as number,
 });
 
@@ -74,7 +74,7 @@ const onFileClick = () => {
   fileRef.value?.click();
 };
 
-const submit = () => formRef.value?.submit();
+// const submit = () => formRef.value?.submit();W
 const onSubmit = async () => {
   const formData = new FormData();
   formData.append("username", state.username as string);
@@ -84,6 +84,7 @@ const onSubmit = async () => {
     state.defaultMerchant?.toString() as string
   );
   if (isAvatarChanged.value) {
+    formData.append("image_filename", user.value?.image || null);
     formData.append("image", imageBlob.value!);
   }
   await $fetch(`/api/user/${user.value?.id}`, {

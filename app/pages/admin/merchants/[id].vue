@@ -8,6 +8,7 @@ const { merchants, active_merchant } = storeToRefs(useMerchantsStore());
 const { fetch } = useMerchantsStore();
 const merchantId = useRoute().params.id as string;
 const merchant = ref<Merchant>();
+
 const state = reactive({
   title: "",
   slug: "",
@@ -21,12 +22,14 @@ const state = reactive({
 definePageMeta({
   layout: "dashboard",
 });
-
 const { merchant_categories } = storeToRefs(useMerchantCategoriesStore());
-if (merchant_categories.value === undefined) {
-  await useMerchantCategoriesStore().fetch();
-}
-
+const { fetch: fetchCategories } = useMerchantsStore();
+// if (
+//   merchant_categories.value === undefined ||
+//   merchant_categories.value.length === 0
+// ) {
+//   await fetchCategories();
+// }
 const overlay = useOverlay();
 
 const modal_edit_logo = overlay.create(LazyAdminMerchantEditLogo);
@@ -92,16 +95,16 @@ const imageSchema = z
 type Schema = z.output<typeof schema>;
 
 const logoRef = ref<HTMLInputElement>();
-const imageBackgroundRef = ref<HTMLInputElement>();
+// const imageBackgroundRef = ref<HTMLInputElement>();
 const toast = useToast();
 const logoBlob = ref<Blob>();
 const isEdit = ref<boolean>(false);
 const changeLogo = (e: Event) => {
   logoRef.value!.click();
 };
-const changeImageBackground = (e: Event) => {
-  imageBackgroundRef.value!.click();
-};
+// const changeImageBackground = (e: Event) => {
+//   imageBackgroundRef.value!.click();
+// };
 
 const onLogoChange = (e: Event) => {
   const input = e.target as HTMLInputElement;
@@ -121,23 +124,23 @@ const onLogoChange = (e: Event) => {
   });
 };
 
-const onImageBackgroundChange = (e: Event) => {
-  const input = e.target as HTMLInputElement;
-  if (!input.files?.length) return;
-  const res = imageSchema.safeParse(input.files[0]);
-  if (!res.success) {
-    backgroudImageError.value = {
-      isError: !res.success,
-      message: res.error.errors[0]?.message!,
-    };
-  } else {
-    state.image_background = URL.createObjectURL(input.files[0]!);
-    backgroudImageError.value = {
-      isError: !res.success,
-      message: "",
-    };
-  }
-};
+// const onImageBackgroundChange = (e: Event) => {
+//   const input = e.target as HTMLInputElement;
+//   if (!input.files?.length) return;
+//   const res = imageSchema.safeParse(input.files[0]);
+//   if (!res.success) {
+//     backgroudImageError.value = {
+//       isError: !res.success,
+//       message: res.error.errors[0]?.message!,
+//     };
+//   } else {
+//     state.image_background = URL.createObjectURL(input.files[0]!);
+//     backgroudImageError.value = {
+//       isError: !res.success,
+//       message: "",
+//     };
+//   }
+// };
 const onSubmit = async (event: FormSubmitEvent<Schema>) => {
   const formData = new FormData();
 
@@ -158,11 +161,12 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {
 
   if (logoBlob.value) {
     formData.append("logo", logoBlob.value);
+    formData.append("logo_filename", merchant.value?.logo!);
   }
 
-  if (imageBackgroundRef.value!.files?.length! > 0) {
-    formData.append("image_background", imageBackgroundRef.value!.files![0]!);
-  }
+  // if (imageBackgroundRef.value!.files?.length! > 0) {
+  //   formData.append("image_background", imageBackgroundRef.value!.files![0]!);
+  // }
 
   await $fetch("/api/merchants/" + merchantId, {
     method: "patch",
@@ -176,7 +180,50 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {
   toast.add({ title: "Merchant updated", icon: "i-heroicons-check-circle" });
 };
 
-onMounted(() => {
+const on_delete = ref<boolean>(false);
+const processDelete = async () => {
+  on_delete.value = true;
+  await $fetch("/api/merchants/" + merchantId, {
+    method: "DELETE",
+    onResponse: async ({ response }) => {
+      if (response.ok) {
+        const index = merchants.value?.findIndex(
+          (m) => m.id === Number(merchantId)
+        );
+        if (index) merchants.value?.splice(index!, 1);
+        if (active_merchant.value === Number(merchantId)) {
+          active_merchant.value = merchants.value![0]?.id || 0;
+        }
+        on_delete.value = false;
+        navigateTo("/admin/merchants");
+      }
+    },
+  });
+};
+const deleteMerchant = async () => {
+  modal_delete_merchant.open({
+    message: "Are you sure you want to delete this merchant?",
+    action: {
+      cancel: { color: "neutral" },
+      continue: { color: "error", label: "Delete" },
+    },
+    onCancel: () => modal_delete_merchant.close(),
+    onContinue: () => {
+      processDelete();
+      modal_delete_merchant.close();
+    },
+  });
+  //
+};
+
+onMounted(async () => {
+  if (
+    merchant_categories.value === undefined ||
+    merchant_categories.value.length === 0
+  ) {
+    console.log("fetching categories");
+    await fetchCategories();
+  }
   if (merchants.value) {
     for (let i = 0, len = merchants.value.length; i < len; i++) {
       if (merchants.value[i]?.id === Number(merchantId)) {
@@ -201,45 +248,10 @@ onMounted(() => {
   state.description = merchant.value?.description! + " people said";
   state.category = merchant.value?.category!;
   state.primary_color = "blue";
-  state.logo = "/merchant/logo/" + merchant.value?.logo!;
-  state.image_background =
-    "/merchant/image_background/" + merchant.value?.image_background!;
+  state.logo = getImg(merchant.value?.logo!);
+  // state.image_background =
+  //   "/merchant/image_background/" + merchant.value?.image_background!;
 });
-const on_delete = ref<boolean>(false);
-const processDelete = async () => {
-  on_delete.value = true;
-  await $fetch("/api/merchants/" + merchantId, {
-    method: "DELETE",
-    onResponse: async ({ response }) => {
-      if (response.ok) {
-        const index = merchants.value?.findIndex(
-          (m) => m.id === Number(merchantId)
-        );
-        if (index) merchants.value?.splice(index!, 1);
-        if (active_merchant.value === Number(merchantId)) {
-          active_merchant.value = merchants.value![0]?.id || 0;
-        }
-        on_delete.value = false;
-        navigateTo("/admin/merchants");
-      }
-    },
-  });
-};
-const deleteMerchant = async () => {
-  modal_delete_merchant.open({
-    message: "Are you sure?",
-    action: {
-      cancel: { color: "neutral" },
-      continue: { color: "error", label: "Delete" },
-    },
-    onCancel: () => modal_delete_merchant.close(),
-    onContinue: () => {
-      processDelete();
-      modal_delete_merchant.close();
-    },
-  });
-  //
-};
 </script>
 
 <template>
@@ -409,7 +421,7 @@ const deleteMerchant = async () => {
             />
           </UFormField>
 
-          <UFormField
+          <!-- <UFormField
             name="image_background"
             label="Background"
             description="Gambar sebagai background pada halaman feedback form."
@@ -441,11 +453,11 @@ const deleteMerchant = async () => {
               @click="changeImageBackground"
               :disabled="!isEdit"
             />
-          </UFormField>
+          </UFormField> -->
         </UPageCard>
       </UForm>
 
-      <USeparator class="mb-4" />
+      <USeparator class="mb-4" v-if="merchants?.length! > 1" />
       <UPageCard
         v-if="merchants?.length! > 1"
         spotlight

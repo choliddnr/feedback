@@ -36,15 +36,17 @@ const stats = computed<Stat[]>(() => [
     variation: 10,
   },
 ]);
+// console.log("stats", data.value);
 </script>
 
 <template>
   <UPageGrid class="lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-px">
+    <!-- v-for="(stat, index) in stats" -->
     <UPageCard
       v-for="(stat, index) in stats"
       :key="index"
       :icon="stat.icon"
-      :title="stat.title"
+      title="stat.title"
       orientation="horizontal"
       variant="subtle"
       :ui="{

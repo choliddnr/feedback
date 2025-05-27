@@ -1,10 +1,9 @@
 <script setup lang="ts">
 import type { Product, Question } from "~~/shared/types";
 
-const route = useRoute();
-const { selected_product, products, answers, all_questions } = storeToRefs(
-  useResponseStore()
-);
+// const route = useRoute();
+const { selected_product, products, answers, all_questions, merchant } =
+  storeToRefs(useResponseStore());
 const { data: all_questions_data } = await useFetch<Question[]>(
   "/api/public/questions",
   {
@@ -135,7 +134,7 @@ const isAllValid = () => {
 const submitFeedback = () => {
   saveState();
   if (!isAllValid) return;
-  navigateTo(`/${route.params.merchant}/review`);
+  navigateTo(`/${merchant.value?.slug}/review`);
 };
 const answer_as_number = ref<number>(0);
 watch(answer_as_number, () => {

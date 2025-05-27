@@ -51,7 +51,7 @@ const deleteProduct = async (id: string | number) => {
 onMounted(() => {
   active_merchant.value = Number(active_merchant.value);
   if (!active_merchant.value && merchants.value?.length! > 0) {
-    active_merchant.value = merchants.value![0]?.id;
+    active_merchant.value = merchants.value![0]?.id as number;
   }
 });
 </script>
@@ -111,7 +111,7 @@ onMounted(() => {
         >
           <template #default>
             <NuxtImg
-              :src="`/product/` + product.image"
+              :src="product.image ? getImg(product.image) : ''"
               :alt="product.title"
               class="w-full"
             />

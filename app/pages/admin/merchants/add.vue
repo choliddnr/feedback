@@ -11,6 +11,12 @@ definePageMeta({
 
 const { merchant_categories } = storeToRefs(useMerchantCategoriesStore());
 const { fetch } = useMerchantsStore();
+if (
+  merchant_categories.value === undefined ||
+  merchant_categories.value.length === 0
+) {
+  await fetch();
+}
 
 const overlay = useOverlay();
 
@@ -31,10 +37,10 @@ const logoError = ref<ImageError>({
   message: "",
 });
 
-const backgroudImageError = ref<ImageError>({
-  isError: false,
-  message: "",
-});
+// const backgroudImageError = ref<ImageError>({
+//   isError: false,
+//   message: "",
+// });
 
 const schema = z.object({
   title: z.string().min(4),
@@ -57,14 +63,14 @@ const schema = z.object({
   primary_color: z.string(),
 });
 
-const imageSchema = z
-  .instanceof(Blob)
-  .refine((file) => ACCEPTED_FILE_TYPES.includes(file.type), {
-    message: "Invalid file type. Only JPEG and PNG files are allowed.",
-  })
-  .refine((file) => file.size <= MAX_FILE_SIZE, {
-    message: "File size should be less than 2MB.",
-  });
+// const imageSchema = z
+//   .instanceof(Blob)
+//   .refine((file) => ACCEPTED_FILE_TYPES.includes(file.type), {
+//     message: "Invalid file type. Only JPEG and PNG files are allowed.",
+//   })
+//   .refine((file) => file.size <= MAX_FILE_SIZE, {
+//     message: "File size should be less than 2MB.",
+//   });
 
 type Schema = z.output<typeof schema>;
 const state = reactive({
@@ -78,7 +84,7 @@ const state = reactive({
 });
 
 const logoRef = ref<HTMLInputElement>();
-const imageBackgroundRef = ref<HTMLInputElement>();
+// const imageBackgroundRef = ref<HTMLInputElement>();
 const toast = useToast();
 
 const logoBlob = ref<Blob>();
@@ -86,9 +92,9 @@ const logoBlob = ref<Blob>();
 const changeLogo = (e: Event) => {
   logoRef.value!.click();
 };
-const changeImageBackground = (e: Event) => {
-  imageBackgroundRef.value!.click();
-};
+// const changeImageBackground = (e: Event) => {
+//   imageBackgroundRef.value!.click();
+// };
 
 const onLogoChange = (e: Event) => {
   const input = e.target as HTMLInputElement;
@@ -108,23 +114,23 @@ const onLogoChange = (e: Event) => {
   });
 };
 
-const onImageBackgroundChange = (e: Event) => {
-  const input = e.target as HTMLInputElement;
-  if (!input.files?.length) return;
-  const res = imageSchema.safeParse(input.files[0]);
-  if (!res.success) {
-    backgroudImageError.value = {
-      isError: !res.success,
-      message: res.error.errors[0]?.message!,
-    };
-  } else {
-    state.image_background = URL.createObjectURL(input.files[0]!);
-    backgroudImageError.value = {
-      isError: !res.success,
-      message: "",
-    };
-  }
-};
+// const onImageBackgroundChange = (e: Event) => {
+//   const input = e.target as HTMLInputElement;
+//   if (!input.files?.length) return;
+//   const res = imageSchema.safeParse(input.files[0]);
+//   if (!res.success) {
+//     backgroudImageError.value = {
+//       isError: !res.success,
+//       message: res.error.errors[0]?.message!,
+//     };
+//   } else {
+//     state.image_background = URL.createObjectURL(input.files[0]!);
+//     backgroudImageError.value = {
+//       isError: !res.success,
+//       message: "",
+//     };
+//   }
+// };
 const onSubmit = async (event: FormSubmitEvent<Schema>) => {
   const formData = new FormData();
   formData.append("title", state.title);
@@ -141,9 +147,9 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {
     formData.append("logo", logoBlob.value);
   }
 
-  if (imageBackgroundRef.value!.files?.length! > 0) {
-    formData.append("image_background", imageBackgroundRef.value!.files![0]!);
-  }
+  // if (imageBackgroundRef.value!.files?.length! > 0) {
+  //   formData.append("image_background", imageBackgroundRef.value!.files![0]!);
+  // }
 
   await $fetch("/api/merchants", {
     method: "post",
@@ -314,7 +320,7 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {
             />
           </UFormField>
 
-          <UFormField
+          <!-- <UFormField
             name="image_background"
             label="Background"
             description="Gambar sebagai background pada halaman feedback form."
@@ -345,7 +351,7 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {
               size="md"
               @click="changeImageBackground"
             />
-          </UFormField>
+          </UFormField> -->
         </UPageCard>
       </UForm>
     </template>

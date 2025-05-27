@@ -11,6 +11,7 @@ export default defineEventHandler(async (e) => {
   const body = (await readBody(e)) as {
     respondent: any;
     answers: { [key: string]: string };
+    merchant: string;
   };
   // const b = await readValidatedBody(e, );
   const respondent_validation = InsertRespondentsSchema.safeParse(
@@ -54,7 +55,7 @@ export default defineEventHandler(async (e) => {
 
   const runTransactionAsync = async () => {
     return await Promise.resolve(
-      db.transaction(
+      db(e).transaction(
         (tx) => {
           const answers = [] as {
             response: number;
@@ -69,7 +70,10 @@ export default defineEventHandler(async (e) => {
 
           const response_id = tx
             .insert(responses)
-            .values({ respondent: respondent_id.inserted_id })
+            .values({
+              respondent: respondent_id.inserted_id,
+              merchant: Number(body.merchant),
+            })
             .returning({ inserted_id: responses.id })
             .get();
 

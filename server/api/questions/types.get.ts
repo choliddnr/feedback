@@ -1,3 +1,3 @@
 export default defineEventHandler(async (e) => {
-  return db.select().from(question_types);
+  return db(e).select().from(question_types);
 });

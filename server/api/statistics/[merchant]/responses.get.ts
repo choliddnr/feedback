@@ -3,10 +3,10 @@ import { avg } from "drizzle-orm";
 export default defineEventHandler(async (e) => {
   const merchant = Number(getRouterParam(e, "merchant"));
 
-  const sq = db
+  const sq = db(e)
     .$with("sq")
-    .as(db.select().from(responses).where(eq(responses.merchant, merchant)));
-  const respondent = await db
+    .as(db(e).select().from(responses).where(eq(responses.merchant, merchant)));
+  const respondent = await db(e)
     .with(sq)
     .select({
       name: respondents.name,
@@ -22,13 +22,13 @@ export default defineEventHandler(async (e) => {
   // .groupBy(sq.id);
   return respondent;
   //   return {
-  //     questions: await db.select().from(questions),
-  //     products: await db.select().from(products),
-  //     merchants: await db.select().from(merchants),
-  //     merchant_categories: await db.select().from(merchant_categories),
-  //     question_types: await db.select().from(question_types),
-  //     respondents: await db.select().from(respondents),
-  //     responses: await db.select().from(responses),
-  //     response_answers: await db.select().from(response_answers),
+  //     questions: await db(e).select().from(questions),
+  //     products: await db(e).select().from(products),
+  //     merchants: await db(e).select().from(merchants),
+  //     merchant_categories: await db(e).select().from(merchant_categories),
+  //     question_types: await db(e).select().from(question_types),
+  //     respondents: await db(e).select().from(respondents),
+  //     responses: await db(e).select().from(responses),
+  //     response_answers: await db(e).select().from(response_answers),
   //   };
 });

@@ -1,82 +1,68 @@
-import { merchants, eq } from "~~/server/utils/db/schema";
-import { H3Event, type MultiPartData } from "h3";
+import { merchants } from "~~/server/utils/db/schema";
 import { Merchant } from "~~/shared/types";
-import { stringToSlug } from "~~/server/utils";
-import type { Storage } from "unstorage";
+import {
+  generateNewFilename,
+  parseMultipartData,
+  stringToSlug,
+} from "~~/server/utils";
+import { saveImg } from "~~/server/utils/image";
 
 /**
  *
  * Future improvement
  * 1. Server side validation
- * 2. split these func into lib/module
  */
 
-const FILE_KEYS = ["name", "filename", "type", "data"];
-const isFIle = (data: MultiPartData) => {
-  const dataKeysSet = new Set(Object.keys(data));
-  return FILE_KEYS.every((key) => dataKeysSet.has(key));
-};
-const parseMultipartData = (data?: MultiPartData[]) => {
-  const arr = (Array.isArray(data) ? data : []) as MultiPartData[];
-  const result = arr.reduce((prev: Record<string, any>, curr) => {
-    prev[String(curr.name)] = isFIle(curr) ? curr : curr.data.toString("utf8");
-    return prev;
-  }, {});
-  return result;
-};
-
-const saveFile = async (
-  name: string,
-  file: MultiPartData,
-  storage: Storage
-) => {
-  const [_mime, ext] = String(file.type).split("/");
-  const filename = `${name}.${ext}`;
-  await storage.setItemRaw(filename, file.data);
-  return filename;
-};
-
 export default defineEventHandler(async (e) => {
-  const session = await auth.api.getSession({
+  const session = await auth(e).api.getSession({
     headers: e.headers,
   });
-  if (!session?.user)
-    throw createError({ statusCode: 401, statusMessage: "Unauthorized" });
-  // return await db.select().from(merchants).where(eq(merchants.owner, user.id!));
 
   const body = parseMultipartData(await readMultipartFormData(e));
   let newData = {} as Omit<Merchant, "id">;
-  newData["owner"] = Number(session.user.id);
+  newData["owner"] = Number(session!.user.id);
   newData["title"] = body.title || "no title";
   newData["slug"] = body.slug || "no slug";
   newData["description"] = body.description;
   newData["category"] = body.category;
   newData["greeting"] = "kjdsghksdjg ";
 
-  // const body =
-  // return await db.insert(merchants).values({ name: "Dan" }).returning();});
-
   try {
     if (body.logo) {
-      newData["logo"] = await saveFile(
-        stringToSlug(body.title),
-        body.logo,
-        merchantLogoStorage
-      );
-    }
-    if (body.image_background) {
-      newData["image_background"] = await saveFile(
-        stringToSlug(body.title),
-        body.image_background,
-        merchantImageBackgroundStorage
-      );
+      /**
+       * If you are using fs storage, you can use the following code
+       * to save the file in the local storage
+       */
+      // newData["logo"] = await saveFile(
+      //   stringToSlug(body.title),
+      //   body.logo,
+      //   merchantLogoStorage
+      // );
+
+      /**
+       * Since we are using bunny.net storage that require raw File data,
+       * we used readFormData to get the file data
+       * and then upload it to the storage
+       */
+      const logo_file = (await readFormData(e)).get("logo") as File;
+      const filename = "merchant/" + generateNewFilename("_.webp"); // modify the filename to avoid conflicts and load cache
+      await saveImg(e, logo_file, filename); // all uploaded images are saved as webp format
+      newData["logo"] = filename;
     }
 
-    // newData["updatedAt"] = Date.now();
-    return await db.insert(merchants).values(newData).returning();
-    // await setUserSession(e, { user: newuser[0], loggedInAt: new Date() });
-    // return await getUserSession(e);
-    // return anew;
+    /**
+     * Image background is not used in the current version,
+     */
+
+    // if (body.image_background) {
+    //   newData["image_background"] = await saveFile(
+    //     stringToSlug(body.title),
+    //     body.image_background,
+    //     merchantImageBackgroundStorage
+    //   );
+    // }
+
+    return await db(e).insert(merchants).values(newData).returning();
   } catch (e) {
     throw createError(
       e instanceof Error ? e.message : "Unknown usr/id/patch error"

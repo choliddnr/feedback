@@ -2,13 +2,11 @@ import { merchants, eq, and } from "~~/server/utils/db/schema";
 
 export default defineEventHandler(async (e) => {
   const id = Number(getRouterParam(e, "id"));
-  const session = await auth.api.getSession({
+  const session = await auth(e).api.getSession({
     headers: e.headers,
   });
-  if (!session?.user)
-    throw createError({ statusCode: 401, statusMessage: "Unauthorized" });
 
-  return await db
+  return await db(e)
     .select()
     .from(merchants)
     .where(

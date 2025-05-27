@@ -10,5 +10,5 @@ export default defineEventHandler(async (e) => {
   if (key === "username") query = eq(user.username, toNumber(value));
   if (key === "email") query = eq(user.email, toNumber(value));
 
-  return await db.select().from(user).where(query).limit(1);
+  return await db(e).select().from(user).where(query).limit(1);
 });

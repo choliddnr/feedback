@@ -5,7 +5,12 @@ export default defineNuxtConfig({
   future: {
     compatibilityVersion: 4,
   },
-  modules: ["@nuxt/ui-pro", "@pinia/nuxt", "@nuxt/image"],
+  modules: [
+    "@nuxt/ui-pro",
+    "@pinia/nuxt",
+    "@nuxt/image",
+    "@nuxt/test-utils/module",
+  ],
   css: ["~/assets/css/main.css"],
   ui: {
     fonts: true,
@@ -26,13 +31,18 @@ export default defineNuxtConfig({
     },
   },
   runtimeConfig: {
-    DB_PATH: process.env.NUXT_DB_PATH, // private
-    BETTER_AUTH_SECRET: process.env.NUXT_BETTER_AUTH_SECRET, // private
-    BETTER_AUTH_URL: process.env.NUXT_BETTER_AUTH_SECRET, // private
-    GOOGLE_CLIENT_ID: process.env.NUXT_GOOGLE_CLIENT_ID, // public
-    GOOGLE_CLIENT_SECRET: process.env.NUXT_GOOGLE_CLIENT_ID, // public
+    DB: process.env.NUXT_DB,
+    DB_PATH: process.env.NUXT_DB_PATH,
+    BETTER_AUTH_SECRET: process.env.NUXT_BETTER_AUTH_SECRET,
+    BETTER_AUTH_URL: process.env.NUXT_BETTER_AUTH_SECRET,
+    GOOGLE_CLIENT_ID: process.env.NUXT_GOOGLE_CLIENT_ID,
+    GOOGLE_CLIENT_SECRET: process.env.NUXT_GOOGLE_CLIENT_ID,
+    BUNNY_ACCESS_KEY: process.env.NUXT_BUNNY_ACCESS_KEY,
+    public: {
+      BASE_URL: process.env.NUXT_BASE_URL,
+    },
   },
-  ssr: true,
+  // ssr: true,
   nitro: {
     preset: "cloudflare-pages",
   },

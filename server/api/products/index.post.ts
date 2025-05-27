@@ -1,7 +1,7 @@
 import { merchants, eq } from "~~/server/utils/db/schema";
 import { H3Event, type MultiPartData } from "h3";
 import { Merchant, NewProduct, Product } from "~~/shared/types";
-import { stringToSlug } from "~~/server/utils";
+import { generateNewFilename, stringToSlug } from "~~/server/utils";
 import type { Storage } from "unstorage";
 import { productImageStorage } from "~~/server/utils/storage";
 import { record } from "better-auth";
@@ -10,42 +10,9 @@ import { record } from "better-auth";
  *
  * Future improvement
  * 1. Server side validation
- * 2. split these func into lib/module
  */
 
-const FILE_KEYS = ["name", "filename", "type", "data"];
-const isFIle = (data: MultiPartData) => {
-  const dataKeysSet = new Set(Object.keys(data));
-  return FILE_KEYS.every((key) => dataKeysSet.has(key));
-};
-const parseMultipartData = (data?: MultiPartData[]) => {
-  const arr = (Array.isArray(data) ? data : []) as MultiPartData[];
-  const result = arr.reduce((prev: Record<string, any>, curr) => {
-    prev[String(curr.name)] = isFIle(curr) ? curr : curr.data.toString("utf8");
-    return prev;
-  }, {});
-  return result;
-};
-
-const saveFile = async (
-  name: string,
-  file: MultiPartData,
-  storage: Storage
-) => {
-  const [_mime, ext] = String(file.type).split("/");
-  const filename = `${name}.${ext}`;
-  await storage.setItemRaw(filename, file.data);
-  return filename;
-};
-
 export default defineEventHandler(async (e) => {
-  // const session = await auth.api.getSession({
-  //   headers: e.headers,
-  // });
-  // if (!session?.user)
-  //   throw createError({ statusCode: 401, statusMessage: "Unauthorized" });
-  // return await db.select().from(merchants).where(eq(merchants.owner, user.id!));
-
   const body = parseMultipartData(await readMultipartFormData(e)) as Record<
     keyof NewProduct,
     any
@@ -63,21 +30,32 @@ export default defineEventHandler(async (e) => {
   newData["description"] = body.description;
 
   // const body =
-  // return await db.insert(merchants).values({ name: "Dan" }).returning();});
+  // return await db(e).insert(merchants).values({ name: "Dan" }).returning();});
 
   try {
     if (body.image) {
-      newData["image"] = await saveFile(
-        Date.now().toString(),
-        body.image,
-        productImageStorage
-      );
+      /**
+       *  handle image upload when using fs storage
+       */
+      // newData["image"] = await saveFile(
+      //   Date.now().toString(),
+      //   body.image,
+      //   productImageStorage
+      // );
+
+      /**
+       * logic to add product image when using bunny.net storage
+       * Since we are using bunny.net storage that require raw File data,
+       * we used readFormData to get the file data
+       * and then upload it to the storage
+       */
+
+      const image_file = (await readFormData(e)).get("image") as File;
+      let filename = "product/" + generateNewFilename("_.webp"); // modify the filename to avoid conflicts and load cache
+      await saveImg(e, image_file, filename); // all uploaded images are saved as webp format
+      newData["image"] = filename;
     }
-    // newData["updatedAt"] = Date.now();
-    return await db.insert(products).values(newData).returning();
-    // await setUserSession(e, { user: newuser[0], loggedInAt: new Date() });
-    // return await getUserSession(e);
-    // return anew;
+    return await db(e).insert(products).values(newData).returning();
   } catch (e) {
     throw createError(
       e instanceof Error ? e.message : "Unknown usr/id/patch error"

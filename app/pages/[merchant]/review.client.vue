@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { Product, Question } from "~~/shared/types";
-const { answers, products, all_questions, respondent } = storeToRefs(
+const { answers, products, all_questions, respondent, merchant } = storeToRefs(
   useResponseStore()
 );
 const route = useRoute();
@@ -14,7 +14,7 @@ const submitFeedback = async () => {
         ...respondent.value,
         gender: respondent.value?.gender === "male" ? true : false,
       },
-      // respondent: respondent.value,
+      merchant: merchant.value?.id,
       answers: Object.fromEntries(answers.value),
     },
     onResponse: ({ response }) => {
@@ -23,7 +23,7 @@ const submitFeedback = async () => {
           title: "Thanks",
           description: "Feedback anda berhasil kami terima!.",
         });
-        navigateTo(`/${route.params.merchant}/thankyou`);
+        navigateTo(`/${merchant.value?.slug}/thankyou`);
       }
     },
     onResponseError: ({ response, error }) => {
@@ -90,7 +90,7 @@ const submitFeedback = async () => {
           block
           label="Back"
           color="neutral"
-          @click="navigateTo(`/${route.params.merchant}/questions`)"
+          @click="navigateTo(`/${merchant?.slug}/questions`)"
         />
         <UButton block label="Submit" @click="submitFeedback" />
       </UButtonGroup>

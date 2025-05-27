@@ -36,7 +36,7 @@ const neutrals = ["slate", "gray", "zinc", "neutral", "stone"];
 const user_info = ref({
   name: user.value?.username || user.value?.name,
   avatar: {
-    src: "/user_picture/" + user.value?.image,
+    src: user.value?.image ? getImg(user.value?.image) : undefined,
     alt: user.value?.name,
   },
 });

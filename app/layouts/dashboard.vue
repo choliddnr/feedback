@@ -1,9 +1,13 @@
 <script setup lang="ts">
 const { fetch } = useUserStore();
 callOnce("user", async () => await fetch());
-const { merchants } = storeToRefs(useMerchantsStore());
+const { user } = storeToRefs(useUserStore());
+
+const { merchants, active_merchant } = storeToRefs(useMerchantsStore());
 const { products } = storeToRefs(useProductsStore());
 const { questions } = storeToRefs(useQuestionsStore());
+
+console.log("user", user.value, active_merchant.value);
 
 const route = useRoute();
 const toast = useToast();
@@ -178,7 +182,5 @@ const links = computed(() => [
     <!-- <UDashboardSearch :groups="groups" /> -->
 
     <slot />
-
-    <NotificationsSlideover />
   </UDashboardGroup>
 </template>
