@@ -75,7 +75,9 @@ const onFileClick = () => {
 };
 
 // const submit = () => formRef.value?.submit();W
+const submit_loading = ref<boolean>(false);
 const onSubmit = async () => {
+  submit_loading.value = true;
   const formData = new FormData();
   formData.append("username", state.username as string);
   formData.append("name", state.name as string);
@@ -84,8 +86,20 @@ const onSubmit = async () => {
     state.defaultMerchant?.toString() as string
   );
   if (isAvatarChanged.value) {
-    formData.append("image_filename", user.value?.image || null);
+    formData.append(
+      "image_filename",
+      !user.value?.image || isValidURL(user.value?.image)
+        ? null
+        : user.value?.image
+    );
     formData.append("image", imageBlob.value!);
+
+    console.log(
+      "userimg====>",
+      !user.value?.image || isValidURL(user.value?.image)
+        ? null
+        : user.value?.image
+    );
   }
   await $fetch(`/api/user/${user.value?.id}`, {
     method: "PATCH" as any,
@@ -98,7 +112,6 @@ const onSubmit = async () => {
           title: "Profile updated",
           icon: "i-heroicons-check-circle",
         });
-        isEdit.value = false;
       }
     },
     onResponseError: ({ response }) => {
@@ -112,6 +125,8 @@ const onSubmit = async () => {
       }
     },
   });
+  submit_loading.value = false;
+  isEdit.value = false;
 };
 
 /**
@@ -144,6 +159,7 @@ const deleteAccount = () => {
                   color="neutral"
                   leading-icon="i-heroicons-document-check-16-solid"
                   @click="formRef!.submit"
+                  :loading="submit_loading"
                 />
                 <UButton
                   label="Cancel"

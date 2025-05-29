@@ -5,10 +5,8 @@ const merchant_slug = route.params.merchant;
 const { data } = await useFetch("/api/public/merchants/" + merchant_slug, {
   transform: (data: Merchant[]) => data[0],
 });
-console.log("merchant on setup", data.value, merchant_slug);
 onMounted(() => {
   if (import.meta.client) {
-    console.log("merchant onMounted", data.value);
     const { merchant, respondent, selected_product, products } = storeToRefs(
       useResponseStore()
     );

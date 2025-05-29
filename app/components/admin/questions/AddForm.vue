@@ -82,7 +82,11 @@ const onSubmit = async () => {
             <UTextarea v-model="state.question" class="w-full" />
           </UFormField>
 
-          <UFormField label="Answer options" name="answer_options">
+          <UFormField
+            label="Answer options"
+            name="answer_options"
+            v-if="state.type !== 2"
+          >
             <UButtonGroup class="mt-2 w-full">
               <UInput
                 block
@@ -99,6 +103,7 @@ const onSubmit = async () => {
             </UButtonGroup>
           </UFormField>
           <UInputMenu
+            v-if="state.type !== 2 && state.answer_options!.length > 0"
             v-model="state.answer_options as string[]"
             multiple
             aria-readonly="true"
@@ -151,20 +156,3 @@ const onSubmit = async () => {
     </template>
   </USlideover>
 </template>
-
-<style>
-.slide-right-enter-active,
-.slide-right-leave-active {
-  transition: all 0.25s ease-out;
-}
-
-.slide-right-enter-from {
-  opacity: 0;
-  transform: translateX(30px);
-}
-
-.slide-right-leave-to {
-  opacity: 0;
-  transform: translateX(30px);
-}
-</style>

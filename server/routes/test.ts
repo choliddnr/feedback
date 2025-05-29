@@ -1,35 +1,45 @@
+import type { D1Database } from "@cloudflare/workers-types";
+import { SQLiteTableWithColumns } from "drizzle-orm/sqlite-core";
 export default defineEventHandler(async (e) => {
-  //
-  // const tablesResult = await db(e).run(
-  //   sql`SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%';`
-  // );
-  // const tableNames = tablesResult.results.map(
-  //   (row: { [key: string]: string }) => row.name
-  // ) as string[];
-  //   return tableNames;
-  // Step 2: Get columns for each table
-  // const schema = {} as any;
-  // console.log("TABLES", tableNames);
+  const insertedData: {
+    inserted_id: number;
+    table: SQLiteTableWithColumns<any>;
+  }[] = [];
 
-  //   for (const tableName of tableNames) {
-  //     console.log("TABLE", tableName);
-  //     if (tableName !== "merchants") continue;
+  try {
+    const respondent = await db(e)
+      .insert(respondents)
+      .values({
+        name: "Test Respondent",
+        gender: true,
+        whatsapp: 8123456789,
+        age: 22,
+      })
+      .returning()
+      .get();
+    insertedData.push({ inserted_id: respondent.id, table: respondents });
 
-  //     const columnsResult = await db(e).run(
-  //       sql.raw(`PRAGMA table_info(${tableName});`)
-  //     );
-  //     return columnsResult;
+    // const response = await db(e)
+    //   .insert(responses)
+    //   .values({
+    //     name: "Test Respondent",
+    //     gender: true,
+    //     whatsapp: 8123456789,
+    //     age: 22,
+    //   })
+    //   .returning()
+    //   .get();
 
-  //     schema[tableName] = columnsResult.results.map((col: any) => ({
-  //       name: col.name,
-  //       type: col.type,
-  //       notNull: col.notnull,
-  //       defaultValue: col.dflt_value,
-  //       primaryKey: col.pk,
-  //     }));
-  //   }
+    // insertedData.push({ inserted_id: response.id, table: responses });
+  } catch (error) {
+    // rollback logic
+    for (const data of insertedData) {
+      await db(e)
+        .delete(data.table)
+        .where(eq(data.table.id, data.inserted_id))
+        .run();
+    }
+  }
 
-  //   return schema;
-
-  return await db(e).select().from(merchant_categories);
+  // return await db(e).select().from(questions);
 });

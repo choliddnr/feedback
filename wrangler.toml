@@ -7,5 +7,5 @@ compatibility_date = "2024-09-23"
 [[d1_databases]]
 binding = "NUXT_DB"
 database_name = "feedback-demo"
-database_id = "b8aae717-1c37-4077-9ea8-92ebf1280eb0"
+database_id = "95200c41-c2dd-40dc-811a-86e684640555"
 migrations_dir = "./server/utils/db/migrations"

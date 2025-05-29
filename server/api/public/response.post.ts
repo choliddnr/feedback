@@ -1,3 +1,5 @@
+import { D1Database } from "@cloudflare/workers-types";
+import { SQLiteTableWithColumns } from "drizzle-orm/sqlite-core";
 import {
   InsertRespondentsSchema,
   InsertResponseAnswerSchema,
@@ -53,50 +55,107 @@ export default defineEventHandler(async (e) => {
     }
   });
 
-  const runTransactionAsync = async () => {
-    return await Promise.resolve(
-      db(e).transaction(
-        (tx) => {
-          const answers = [] as {
-            response: number;
-            question: number;
-            answer: string;
-          }[];
-          const respondent_id = tx
-            .insert(respondents)
-            .values(body.respondent)
-            .returning({ inserted_id: respondents.id })
-            .get();
-
-          const response_id = tx
-            .insert(responses)
-            .values({
-              respondent: respondent_id.inserted_id,
-              merchant: Number(body.merchant),
-            })
-            .returning({ inserted_id: responses.id })
-            .get();
-
-          Object.keys(body.answers).forEach((key) => {
-            const ids = parseKey(key);
-            answers.push({
-              response: response_id.inserted_id,
-              question: ids[1],
-              answer: body.answers[key],
+  if (import.meta.dev) {
+    const runTransactionAsync = async () => {
+      return await Promise.resolve(
+        db(e).transaction(
+          (tx) => {
+            const answers = [] as {
+              response: number;
+              question: number;
+              answer: string;
+            }[];
+            const respondent_id = tx
+              .insert(respondents)
+              .values(body.respondent)
+              .returning({ inserted_id: respondents.id })
+              .get();
+            const response_id = tx
+              .insert(responses)
+              .values({
+                respondent: respondent_id.inserted_id,
+                merchant: Number(body.merchant),
+              })
+              .returning({ inserted_id: responses.id })
+              .get();
+            Object.keys(body.answers).forEach((key) => {
+              const ids = parseKey(key);
+              answers.push({
+                response: response_id.inserted_id,
+                question: ids[1],
+                answer: body.answers[key],
+              });
             });
-          });
-          tx.insert(response_answers).values(answers).run();
-        },
-        {
-          behavior: "deferred",
-        }
-      )
-    );
-  };
+            tx.insert(response_answers).values(answers).run();
+          },
+          {
+            behavior: "deferred",
+          }
+        )
+      );
+    };
+    await runTransactionAsync();
+  } else {
+    /**
+     * Since D1 does'nt support transactions, to ensure ACID properties,
+     * we will perform the operations sequentially. and save each successfull state into array.
+     * If any operation fails, we will rollback the changes by deleting the inserted data saved in the array.
+     */
+    const insertedData: {
+      inserted_id: number;
+      table: SQLiteTableWithColumns<any>;
+    }[] = [];
 
-  // const parse = () => {
-  // state;
-  // };
-  await runTransactionAsync();
+    try {
+      const respondent = await db(e)
+        .insert(respondents)
+        .values(body.respondent)
+        .returning()
+        .get();
+      insertedData.push({ inserted_id: respondent.id, table: respondents });
+
+      const response = await db(e)
+        .insert(responses)
+        .values({
+          respondent: respondent.id,
+          merchant: Number(body.merchant),
+        })
+        .returning()
+        .get();
+      insertedData.push({ inserted_id: response.id, table: responses });
+
+      const answers = [] as {
+        response: number;
+        question: number;
+        answer: string;
+      }[];
+
+      Object.keys(body.answers).forEach((key) => {
+        const ids = parseKey(key);
+        answers.push({
+          response: response.id,
+          question: ids[1],
+          answer: body.answers[key],
+        });
+      });
+
+      await db(e).insert(response_answers).values(answers).run();
+    } catch (error) {
+      // rollback logic
+      for (const data of insertedData) {
+        await db(e)
+          .delete(data.table)
+          .where(eq(data.table.id, data.inserted_id))
+          .run();
+      }
+      return sendError(
+        e,
+        createError({
+          statusCode: 500,
+          statusMessage: "Failed to process response!",
+        })
+      );
+    }
+  }
   return { success: true, message: "Response procecced successfully." };
 });

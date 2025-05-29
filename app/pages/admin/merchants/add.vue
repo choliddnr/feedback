@@ -207,7 +207,7 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {
         <UPageCard>
           <UFormField
             name="title"
-            label="Nama"
+            label="Title"
             required
             class="grid grid-cols-2 gap-2 items-center"
             :ui="{ container: '' }"
@@ -222,6 +222,7 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {
           <UFormField
             name="slug"
             label="Slug"
+            description="The slug is used on the URL for the respondent to open the feedback form; it must be unique and lowercase."
             required
             class="grid grid-cols-2 gap-2 items-center"
             :ui="{ container: '' }"
@@ -236,8 +237,8 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {
 
           <UFormField
             name="description"
-            label="Deskripsi"
-            description="Deskripsikan mengenai merchant anda"
+            label="Description"
+            description="Describe about your merchant"
             required
             class="grid grid-cols-2 gap-2"
             :ui="{ container: '' }"
@@ -252,8 +253,7 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {
 
           <UFormField
             name="category"
-            label="Kategori"
-            description="Apakah jenis merchant anda ini? misalkan cafe, warung padang, dll."
+            label="Category"
             required
             class="grid grid-cols-2 gap-2"
             :ui="{ container: '' }"

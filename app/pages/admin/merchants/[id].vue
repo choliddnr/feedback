@@ -37,23 +37,23 @@ const modal_delete_merchant = overlay.create(LazyModalConfirm);
 
 const form = useTemplateRef<HTMLFormElement>("form");
 
-const MAX_FILE_SIZE = 1 * 1024 * 1024; // 1MB
-const ACCEPTED_FILE_TYPES = [
-  "image/jpeg",
-  "image/jpeg",
-  "image/png",
-  "image/webp",
-];
+// const MAX_FILE_SIZE = 1 * 1024 * 1024; // 1MB
+// const ACCEPTED_FILE_TYPES = [
+//   "image/jpeg",
+//   "image/jpeg",
+//   "image/png",
+//   "image/webp",
+// ];
 
 const logoError = ref<ImageError>({
   isError: false,
   message: "",
 });
 
-const backgroudImageError = ref<ImageError>({
-  isError: false,
-  message: "",
-});
+// const backgroudImageError = ref<ImageError>({
+//   isError: false,
+//   message: "",
+// });
 
 const schema = z.object({
   title: z.string().min(4),
@@ -83,14 +83,14 @@ const schema = z.object({
   primary_color: z.string(),
 });
 
-const imageSchema = z
-  .instanceof(Blob)
-  .refine((file) => ACCEPTED_FILE_TYPES.includes(file.type), {
-    message: "Invalid file type. Only JPEG and PNG files are allowed.",
-  })
-  .refine((file) => file.size <= MAX_FILE_SIZE, {
-    message: "File size should be less than 2MB.",
-  });
+// const imageSchema = z
+//   .instanceof(Blob)
+//   .refine((file) => ACCEPTED_FILE_TYPES.includes(file.type), {
+//     message: "Invalid file type. Only JPEG and PNG files are allowed.",
+//   })
+//   .refine((file) => file.size <= MAX_FILE_SIZE, {
+//     message: "File size should be less than 2MB.",
+//   });
 
 type Schema = z.output<typeof schema>;
 
@@ -221,7 +221,6 @@ onMounted(async () => {
     merchant_categories.value === undefined ||
     merchant_categories.value.length === 0
   ) {
-    console.log("fetching categories");
     await fetchCategories();
   }
   if (merchants.value) {
@@ -302,7 +301,7 @@ onMounted(async () => {
         <UPageCard>
           <UFormField
             name="title"
-            label="Nama"
+            label="Title"
             required
             class="grid grid-cols-2 gap-2 items-center"
             :ui="{ container: '' }"
@@ -319,6 +318,7 @@ onMounted(async () => {
           <UFormField
             name="slug"
             label="Slug"
+            description="The slug is used on the URL for the respondent to open the feedback form; it must be unique and lowercase."
             required
             class="grid grid-cols-2 gap-2 items-center"
             :ui="{ container: '' }"
@@ -334,8 +334,8 @@ onMounted(async () => {
 
           <UFormField
             name="description"
-            label="Deskripsi"
-            description="Deskripsikan mengenai merchant anda"
+            label="Description"
+            description="Describe about your merchant"
             required
             class="grid grid-cols-2 gap-2"
             :ui="{ container: '' }"
@@ -351,8 +351,7 @@ onMounted(async () => {
 
           <UFormField
             name="category"
-            label="Kategori"
-            description="Apakah jenis merchant anda ini? misalkan cafe, warung padang, dll."
+            label="Category"
             required
             class="grid grid-cols-2 gap-2"
             :ui="{ container: '' }"

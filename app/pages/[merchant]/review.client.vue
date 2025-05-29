@@ -49,7 +49,7 @@ const submitFeedback = async () => {
     >
       <div class="text-center">
         <h1 class="font-bold text-xl">Review</h1>
-        <p>please, review your answer before submitting</p>
+        <p>Please, review your answer before submitting</p>
       </div>
       <uSeparator class="my-4" />
       <UPageCard v-for="p in products">
@@ -59,7 +59,9 @@ const submitFeedback = async () => {
           </h1>
         </template>
         <USeparator />
-        <div v-for="q in all_questions?.filter((q) => q.product === p.id)">
+        <div
+          v-for="q in all_questions?.filter((q:Question) => q.product === p.id)"
+        >
           <p class="text-lg">Q: {{ q.question }}</p>
           <p v-if="q.type === 1" class="font-bold text-lg">
             A: {{ answers.get(`${p.id}_${q.id}`) }}

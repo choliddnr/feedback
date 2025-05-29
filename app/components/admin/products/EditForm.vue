@@ -204,7 +204,7 @@ const onSubmit = async () => {
           </UFormField>
           <UFormField
             name="image"
-            label="Gambar"
+            label="Product Image"
             class="grid grid-cols-2 gap-2"
             help="JPG, GIF or PNG. 1MB Max."
             :error="imageError.isError && imageError.message"

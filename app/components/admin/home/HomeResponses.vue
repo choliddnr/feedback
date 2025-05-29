@@ -4,49 +4,12 @@ import type { TableColumn } from "@nuxt/ui";
 import type { Period, Range, ResponseTable } from "~~/shared/types";
 import { LazyAdminHomeResponsesAnswers } from "#components";
 
-const props = defineProps<{
-  period: Period;
-  range: Range;
-}>();
-
 const UBadge = resolveComponent("UBadge");
 const UDropdownMenu = resolveComponent("UDropdownMenu");
 const UButton = resolveComponent("UButton");
 const toast = useToast();
 
 const { active_merchant } = storeToRefs(useMerchantsStore());
-
-// const sampleEmails = [
-//   "james.anderson@example.com",
-//   "mia.white@example.com",
-//   "william.brown@example.com",
-//   "emma.davis@example.com",
-//   "ethan.harris@example.com",
-// ];
-
-// const { data } = await useAsyncData('sales', async () => {
-//   const sales: Sale[] = []
-//   const currentDate = new Date()
-
-//   for (let i = 0; i < 5; i++) {
-//     const hoursAgo = randomInt(0, 48)
-//     const date = new Date(currentDate.getTime() - hoursAgo * 3600000)
-
-//     sales.push({
-//       id: (4600 - i).toString(),
-//       date: date.toISOString(),
-//       status: randomFrom(['paid', 'failed', 'refunded']),
-//       email: randomFrom(sampleEmails),
-//       amount: randomInt(100, 1000)
-//     })
-//   }
-
-//   return sales.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
-// }, {
-//   watch: [() => props.period, () => props.range],
-//   default: () => []
-// })
-
 const overlay = useOverlay();
 const modal = overlay.create(LazyAdminHomeResponsesAnswers);
 
@@ -60,8 +23,13 @@ const { data } = await useFetch<ResponseTable[]>(
 const columns: TableColumn<ResponseTable>[] = [
   {
     accessorKey: "respondent_id",
-    header: "Respondent ID",
+    header: "ID",
     cell: ({ row }) => `#${row.getValue("respondent_id")}`,
+  },
+  {
+    accessorKey: "name",
+    header: "Name",
+    cell: ({ row }) => `${row.getValue("name")}`,
   },
   {
     accessorKey: "created_at",

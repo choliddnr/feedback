@@ -11,7 +11,6 @@ export const useUserStore = defineStore("user", () => {
       user.value.defaultMerchant !== "null"
         ? (Number(user.value.defaultMerchant) as number)
         : 0;
-    console.log("user store", user.value, active_merchant.value);
   };
 
   return { user, fetch };

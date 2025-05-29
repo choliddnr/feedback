@@ -35,7 +35,8 @@ const schema = z.object({
   age: z.number().gt(14).lt(90),
   whatsapp: z
     .number()
-    .min(8000000000, "minimal 10 angka dan diawali dengan angka 8.")
+    .min(100000000, "min 9 digit.")
+    .max(10000000000000, "max 14 digit.")
     .optional(),
 });
 
@@ -73,7 +74,6 @@ onMounted(() => {
       const localRespondent = localStorage.getItem(
         `${merchant.value?.id}_respondent`
       );
-      console.log("localRespondent", merchant.value, localRespondent);
       if (localRespondent) {
         respondent.value = JSON.parse(localRespondent);
       }
@@ -92,27 +92,27 @@ onMounted(() => {
   <UCard class="max-w-lg">
     <div class="justify-center text-center">
       <span class="font-bold text-2xl mb-4"
-        >Sebelum melanjutkan, mohon isi data diri anda pada form dibawah</span
+        >Before continuing, please fill out the form below.</span
       >
     </div>
 
     <UForm :state="state" :schema="schema" @submit="onsubmit">
       <UFormField
-        label="Nama:"
+        label="Name:"
         size="xl"
-        description="Bisa nama lengkap atau pangilan. Pilih apa yang membuat anda nyaman saja."
+        description="A fullname or nickname is allowed, so choose which you feel comfortable."
         :ui="{ wrapper: 'my-4' }"
         name="name"
       >
         <UInput
           v-model="state.name"
-          placeholder="Isikan nama anda disini"
+          placeholder="Fill out your name here"
           class="w-full"
         />
       </UFormField>
 
       <UFormField
-        label="Jenis Kelamin:"
+        label="Gender:"
         size="xl"
         :ui="{ wrapper: 'my-4' }"
         name="gender"
@@ -125,30 +125,30 @@ onMounted(() => {
         />
       </UFormField>
 
-      <UFormField label="Umur:" size="xl" :ui="{ wrapper: 'my-4' }" name="age">
+      <UFormField label="Age:" size="xl" :ui="{ wrapper: 'my-4' }" name="age">
         <UInput
           v-model="state.age"
           type="number"
-          placeholder="Isikan umur anda sekarang disini"
+          placeholder="Fill out your age here"
           :ui="{ base: 'pr-24' }"
           class="w-full"
         >
           <template #trailing>
-            <UBadge>Tahun</UBadge>
+            <UBadge>Years old</UBadge>
           </template>
         </UInput>
       </UFormField>
 
       <UFormField
         label="Whatsapp:"
-        description="kode voucher diskon akan dikirimkan ke nomer whatsapp ini."
+        description="We wll contact you through thid whatsapp number."
         size="xl"
         :ui="{ wrapper: 'my-4' }"
         name="whatsapp"
       >
         <UInput
           v-model="state.whatsapp"
-          placeholder="Isikan nama anda disini"
+          placeholder="Whatsapp number (e.g. 81234567890)"
           type="number"
           :ui="{ base: 'pl-15', leading: 'ml-0' }"
           class="w-full"
@@ -158,7 +158,7 @@ onMounted(() => {
           </template>
         </UInput>
       </UFormField>
-      <UButton class="mt-5" type="submit" label="Selanjutnya" size="xl" block />
+      <UButton class="mt-5" type="submit" label="Next" size="xl" block />
     </UForm>
   </UCard>
 </template>

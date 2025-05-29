@@ -34,9 +34,9 @@ export default defineNuxtConfig({
     DB: process.env.NUXT_DB,
     DB_PATH: process.env.NUXT_DB_PATH,
     BETTER_AUTH_SECRET: process.env.NUXT_BETTER_AUTH_SECRET,
-    BETTER_AUTH_URL: process.env.NUXT_BETTER_AUTH_SECRET,
+    BETTER_AUTH_URL: process.env.NUXT_BETTER_AUTH_URL,
     GOOGLE_CLIENT_ID: process.env.NUXT_GOOGLE_CLIENT_ID,
-    GOOGLE_CLIENT_SECRET: process.env.NUXT_GOOGLE_CLIENT_ID,
+    GOOGLE_CLIENT_SECRET: process.env.NUXT_GOOGLE_CLIENT_SECRET,
     BUNNY_ACCESS_KEY: process.env.NUXT_BUNNY_ACCESS_KEY,
     public: {
       BASE_URL: process.env.NUXT_BASE_URL,
