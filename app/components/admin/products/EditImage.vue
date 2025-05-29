@@ -74,14 +74,14 @@ const onSave = async () => {
               @click="onSave"
               class="w-full justify-center"
               leading-icon="i-heroicons-document-check-16-solid"
-              >Simpan</UButton
+              >Save</UButton
             >
             <UButton
               @click="emit('cancel')"
               color="error"
               class="w-full justify-center"
               leading-icon="i-heroicons-x-mark-16-solid"
-              >Batal</UButton
+              >Cancel</UButton
             >
           </UButtonGroup>
         </div>

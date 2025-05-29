@@ -32,12 +32,7 @@ export default defineEventHandler(async (e: H3Event) => {
        * Add delete old image logic
        * If the logo is updated, we need to delete the old logo image
        */
-      console.log(
-        "body.image_filename",
-        body.image_filename === undefined,
-        body.image_filename === "null",
-        body.image_filename === null
-      );
+
       if (body.image_filename !== "null")
         await deleteImg(e, body.image_filename); // user image could be null, delete it if exists
 

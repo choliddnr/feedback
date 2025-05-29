@@ -105,7 +105,7 @@ export const InsertRespondentsSchema = createInsertSchema(respondents, {
   name: (field) => field.min(3),
   age: (field) => field.gte(20).lte(90),
   gender: (field) => field,
-  whatsapp: (field) => field.gt(80000000000).lt(8000000000000).nullable(),
+  whatsapp: (field) => field.gt(100000000).lt(10000000000000).nullable(),
 }).omit({
   id: true,
   createdAt: true,

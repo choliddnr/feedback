@@ -7,8 +7,6 @@ const { merchants, active_merchant } = storeToRefs(useMerchantsStore());
 const { products } = storeToRefs(useProductsStore());
 const { questions } = storeToRefs(useQuestionsStore());
 
-console.log("user", user.value, active_merchant.value);
-
 const route = useRoute();
 const toast = useToast();
 
@@ -28,7 +26,7 @@ const links = computed(() => [
     },
     {
       id: "user",
-      label: "Pengguna",
+      label: "User",
       icon: "i-heroicons-user",
       to: "/admin/user",
       tooltip: {
@@ -38,7 +36,7 @@ const links = computed(() => [
     },
     {
       id: "merchant",
-      label: "Merchant",
+      label: "Merchants",
       icon: "i-heroicons-building-storefront",
       to: "/admin/merchants",
       badge: merchants.value?.length,
@@ -49,7 +47,7 @@ const links = computed(() => [
     },
     {
       id: "products",
-      label: "Produk",
+      label: "Products",
       icon: "i-heroicons-cube-20-solid",
       to: "/admin/products",
       badge: products.value?.length,
@@ -60,7 +58,7 @@ const links = computed(() => [
     },
     {
       id: "questions",
-      label: "Pertanyaan",
+      label: "Questions",
       icon: "i-heroicons-question-mark-circle-16-solid",
       to: "/admin/questions",
       badge: questions.value.length,

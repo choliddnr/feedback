@@ -10,6 +10,7 @@ export const toKebabCase = (str: string) => {
  * @returns :string
  */
 export const getImg = (src: string) => {
+  if (isValidURL(src)) return src;
   const config = useRuntimeConfig();
   return config.public.BASE_URL + "/api/image/" + src;
 };
@@ -27,3 +28,17 @@ export const getImg = (src: string) => {
 //   });
 //   return getImg(src); // Return the URL of the uploaded image
 // };
+
+/**
+ * is the string a valid URL?
+ * @param str - The string to validate as a URL.
+ * @returns boolean
+ */
+export const isValidURL = (str: string): boolean => {
+  try {
+    new URL(str);
+    return true;
+  } catch (e) {
+    return false;
+  }
+};

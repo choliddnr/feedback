@@ -7,9 +7,7 @@ export const useMerchantCategoriesStore = defineStore(
     const { data: merchant_categories, refresh: fetch } = useFetch<
       MerchantCategory[]
     >("/api/merchants/categories", {
-      onRequest: ({ request }) => {
-        console.log("Fetching merchant categories", request);
-      },
+      onRequest: ({ request }) => {},
     });
     return { merchant_categories, fetch };
   }

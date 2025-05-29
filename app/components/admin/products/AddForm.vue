@@ -182,7 +182,7 @@ const onSubmit = async () => {
           </UFormField>
           <UFormField
             name="images"
-            label="Gambar"
+            label="Product Image"
             class="grid grid-cols-2 gap-2"
             help="JPG, GIF or PNG. 1MB Max."
             :error="imageError.isError && imageError.message"
@@ -235,20 +235,3 @@ const onSubmit = async () => {
     </template>
   </USlideover>
 </template>
-
-<style>
-.slide-right-enter-active,
-.slide-right-leave-active {
-  transition: all 0.25s ease-out;
-}
-
-.slide-right-enter-from {
-  opacity: 0;
-  transform: translateX(30px);
-}
-
-.slide-right-leave-to {
-  opacity: 0;
-  transform: translateX(30px);
-}
-</style>

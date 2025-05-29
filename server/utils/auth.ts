@@ -112,7 +112,7 @@ export const _auth = betterAuth({
       mapProfileToUser: (profile) => {
         return {
           username: toKebabCase(profile.given_name + " " + profile.family_name),
-          image: profile.picture,
+          image: undefined, // profile.picture is not used in this case
         };
       },
     },

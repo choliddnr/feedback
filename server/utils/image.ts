@@ -12,9 +12,6 @@ export const saveImg = async (e: H3Event, file: File, src: string) => {
         AccessKey: config.BUNNY_ACCESS_KEY,
         "Content-Type": "application/octet-stream",
       },
-      onResponse: ({ response }) => {
-        console.log("Response :", response.status, response._data);
-      },
     }
   );
   return response;

@@ -2,8 +2,6 @@ import { getImg } from "~~/server/utils/image";
 
 export default defineEventHandler(async (e) => {
   const src = e.context.params!.src; //getRouterParam(e, "src");
-
-  console.log("Image source:", src);
   if (!src) {
     throw createError({
       statusCode: 400,

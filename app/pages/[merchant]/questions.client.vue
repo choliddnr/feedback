@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { Product, Question } from "~~/shared/types";
+import { watchDebounced } from "@vueuse/core";
 
-// const route = useRoute();
 const { selected_product, products, answers, all_questions, merchant } =
   storeToRefs(useResponseStore());
 const { data: all_questions_data } = await useFetch<Question[]>(
@@ -47,11 +47,6 @@ const keyid = computed<string>(() => {
   }
 });
 const answer = ref<string>("");
-import { watchDebounced } from "@vueuse/core";
-import { router } from "better-auth/api";
-
-const toast = useToast();
-
 const saveState = () => {
   answers.value.set(keyid.value, answer.value);
   localStorage.setItem(keyid.value, answer.value);
@@ -76,6 +71,7 @@ const prevProduct = () => {
   if (state.product_index !== 0) {
     saveState();
     state.product_index--;
+    state.question_index = 0; // reset question index to 0 when moving to previous product
     loadState();
   }
 };
@@ -83,6 +79,7 @@ const nextProduct = () => {
   if (state.product_index !== products_length.value - 1) {
     saveState();
     state.product_index++;
+    state.question_index = 0; // reset question index to 0 when moving to next product
     loadState();
   }
 };

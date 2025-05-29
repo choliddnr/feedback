@@ -46,7 +46,7 @@ const stats = computed<Stat[]>(() => [
       v-for="(stat, index) in stats"
       :key="index"
       :icon="stat.icon"
-      title="stat.title"
+      :title="stat.title"
       orientation="horizontal"
       variant="subtle"
       :ui="{
