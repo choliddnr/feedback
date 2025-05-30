@@ -37,22 +37,24 @@ export const merchants = sqliteTable("merchants", {
 
 export const InsertMerchantSchema = createInsertSchema(merchants, {
   title: (field) => field.min(4),
-  slug: (field) =>
-    field
-      .min(4)
-      .refine((value) => /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(value), {
-        message:
-          "Slug must be lowercase and can only contain letters, numbers, and dashes.",
-      })
-      .refine(
-        async (value) => {
-          const data = await $fetch<Merchant>("/api/merchants/slug/" + value);
-          return !data ? true : false;
-        },
-        {
-          message: "Slug must be unique.",
-        }
-      ),
+  // slug: (field) =>
+  //   field
+  //     .min(4)
+  //     .refine((value) => /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(value), {
+  //       message:
+  //         "Slug must be lowercase and can only contain letters, numbers, and dashes.",
+  //     })
+  //     .refine(
+  //       async (value) => {
+  //         const data = await $fetch<Merchant>("/api/merchants/slug/" + value, {
+  //           headers: e.headers,
+  //         });
+  //         return !data ? true : false;
+  //       },
+  //       {
+  //         message: "Slug must be unique.",
+  //       }
+  //     ),
   description: (field) => field.optional(),
   category: (field) => field.gt(0),
   owner: (field) => field.gt(0),
@@ -68,22 +70,22 @@ export const InsertMerchantSchema = createInsertSchema(merchants, {
 
 export const UpdateMerchantSchema = createUpdateSchema(merchants, {
   title: (field) => field.min(4),
-  slug: (field) =>
-    field
-      .min(4)
-      .refine((value) => /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(value), {
-        message:
-          "Slug must be lowercase and can only contain letters, numbers, and dashes.",
-      })
-      .refine(
-        async (value) => {
-          const data = await $fetch<Merchant>("/api/merchants/slug/" + value);
-          return !data ? true : false;
-        },
-        {
-          message: "Slug must be unique.",
-        }
-      ),
+  // slug: (field) =>
+  //   field
+  //     .min(4)
+  //     .refine((value) => /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(value), {
+  //       message:
+  //         "Slug must be lowercase and can only contain letters, numbers, and dashes.",
+  //     })
+  //     .refine(
+  //       async (value) => {
+  //         const data = await $fetch<Merchant>("/api/merchants/slug/" + value);
+  //         return !data ? true : false;
+  //       },
+  //       {
+  //         message: "Slug must be unique.",
+  //       }
+  //     ),
   description: (field) => field.optional(),
   category: (field) => field.gt(0),
   owner: (field) => field.gt(0),
