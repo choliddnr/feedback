@@ -1,75 +1,13 @@
-# Nuxt Minimal Starter
+# Feedback Application
 
-Look at the [Nuxt documentation](https://nuxt.com/docs/getting-started/introduction) to learn more.
+This is a feedback application to collect customer opinion about the product.
 
-## Setup
+## Features
 
-Make sure to install dependencies:
-
-```bash
-# npm
-npm install
-
-# pnpm
-pnpm install
-
-# yarn
-yarn install
-
-# bun
-bun install
-```
-
-## Development Server
-
-Start the development server on `http://localhost:3000`:
-
-```bash
-# npm
-npm run dev
-
-# pnpm
-pnpm dev
-
-# yarn
-yarn dev
-
-# bun
-bun run dev
-```
-
-## Production
-
-Build the application for production:
-
-```bash
-# npm
-npm run build
-
-# pnpm
-pnpm build
-
-# yarn
-yarn build
-
-# bun
-bun run build
-```
-
-Locally preview production build:
-
-```bash
-# npm
-npm run preview
-
-# pnpm
-pnpm preview
-
-# yarn
-yarn preview
-
-# bun
-bun run preview
-```
-
-Check out the [deployment documentation](https://nuxt.com/docs/getting-started/deployment) for more information.
+- **Nuxt.js Framework**: A powerful Vue.js framework for building modern web applications.
+- **Drizzle ORM**: Simplified database interactions.
+- **Bunny.net Storage**: Efficient file storage and delivery.
+- **Nuxt UI**: Component library for nuxt and vue.
+- **Cloudflare D1**: cloud Sqlite database.
+- **Cloudflare-Pages**: Deployment platform.
+- **Vitest**: Unit testing framework for robust code quality.

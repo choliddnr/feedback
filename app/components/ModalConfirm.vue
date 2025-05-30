@@ -60,12 +60,7 @@ const props = withDefaults(
     },
   }
 );
-// () => {
-//       return {
-//         cancel: "Batal",
-//         continue: "Lanjut",
-//       };
-//     },
+
 const emit = defineEmits(["continue", "cancel"]);
 const onloading = ref<boolean>(false);
 

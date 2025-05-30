@@ -15,7 +15,6 @@ export default defineEventHandler(async (e) => {
     answers: { [key: string]: string };
     merchant: string;
   };
-  // const b = await readValidatedBody(e, );
   const respondent_validation = InsertRespondentsSchema.safeParse(
     body.respondent
   );
@@ -56,6 +55,10 @@ export default defineEventHandler(async (e) => {
   });
 
   if (import.meta.dev) {
+    /**
+     * Running on development
+     * @returns
+     */
     const runTransactionAsync = async () => {
       return await Promise.resolve(
         db(e).transaction(

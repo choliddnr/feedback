@@ -21,7 +21,6 @@ const convertCanvasToWebp = async (
     canvas.toBlob(
       (blob) => {
         if (blob) {
-          // resolve(URL.createObjectURL(blob));
           resolve(blob);
         } else {
           reject("Converting failed");
@@ -87,12 +86,5 @@ const onSave = async () => {
         </div>
       </UCard>
     </template>
-
-    <!-- <template #footer>
-      <div class="flex gap-2">
-        <UButton color="neutral" label="Dismiss" @click="emit('cancel')" />
-        <UButton label="Success" @click="emit('cancel')" />
-      </div>
-    </template> -->
   </UModal>
 </template>

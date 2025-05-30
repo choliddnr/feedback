@@ -1,8 +1,4 @@
 <script setup lang="ts">
-import { h, resolveComponent } from "vue";
-import type { TableColumn } from "@nuxt/ui";
-import type { Period, Range, ResponseTable } from "~~/shared/types";
-import { LazyAdminHomeResponsesAnswers } from "#components";
 type ResponseData = {
   product: string;
   question: string;

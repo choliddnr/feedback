@@ -26,7 +26,6 @@ const processDelete = async (id: string | number) => {
         products.value.splice(index, 1);
         active_product.value = products.value[0]?.id || undefined;
         product_to_delete.value = undefined;
-        // navigateTo("/admin/prodcts");
       }
     },
   });

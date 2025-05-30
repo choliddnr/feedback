@@ -1,7 +1,6 @@
 <script setup lang="ts"></script>
 
 <template>
-  <!--  :style="{ backgroundImage: `url(${bgUrl})` }" -->
   <div class="bg-cover bg-center">
     <UContainer
       :ui="{

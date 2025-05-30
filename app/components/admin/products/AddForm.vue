@@ -1,4 +1,5 @@
 <script lang="ts" setup>
+import { error } from "#build/ui-pro";
 import {
   LazyAdminProductsEditForm,
   LazyAdminProductsEditImage,
@@ -10,7 +11,7 @@ const { merchants, active_merchant } = storeToRefs(useMerchantsStore());
 const { fetch } = useProductsStore();
 
 const toast = useToast();
-
+const onSubmitting = ref<boolean>(false);
 const Schema = z.object({
   title: z.string().min(5).max(25),
   description: z.string().optional(),
@@ -35,23 +36,6 @@ const imageError = ref<{ isError: boolean; message: string }>({
   message: "",
 });
 
-const MAX_FILE_SIZE = 1 * 1024 * 1024; // 1MB
-const ACCEPTED_FILE_TYPES = [
-  "image/jpeg",
-  "image/jpeg",
-  "image/png",
-  "image/webp",
-];
-
-const imageSchema = z
-  .instanceof(Blob)
-  .refine((file) => ACCEPTED_FILE_TYPES.includes(file.type), {
-    message: "Invalid file type. Only JPEG and PNG files are allowed.",
-  })
-  .refine((file) => file.size <= MAX_FILE_SIZE, {
-    message: "File size should be less than 1MB.",
-  });
-
 const changeImage = () => {
   imageRef.value?.click();
 };
@@ -61,18 +45,6 @@ const modal_edit_image = overlay.create(LazyAdminProductsEditImage);
 const imageBlob = ref<Blob>();
 
 const onImageChange = (e: Event) => {
-  // if (!imageRef.value?.files?.length) return;
-  // const validate = imageSchema.safeParse(imageRef.value.files[0]);
-  // if (validate.success) {
-  //   state.image = URL.createObjectURL(imageRef.value.files[0]!);
-  //   imageError.value.isError = false;
-  // } else {
-  //   imageError.value = {
-  //     isError: true,
-  //     message: validate.error.errors[0]?.message!,
-  //   };
-  // }
-
   const input = e.target as HTMLInputElement;
   if (!input.files?.length) {
     imageError.value = {
@@ -97,6 +69,7 @@ const onImageChange = (e: Event) => {
 };
 
 const onSubmit = async () => {
+  onSubmitting.value = true;
   const formData = new FormData();
   formData.append("title", state.title!);
   formData.append("description", state.description!);
@@ -112,15 +85,23 @@ const onSubmit = async () => {
     onResponse: async ({ response }) => {
       if (response.ok) {
         await fetch();
+        emits("close");
+        toast.add({ title: "Product added", icon: "i-heroicons-check-circle" });
+
+        onSubmitting.value = false;
+      }
+    },
+    onResponseError: ({ response, error }) => {
+      if (!response.ok) {
+        toast.add({
+          title: "Failed to add product",
+          icon: "i-heroicons-x-circle",
+          color: "error",
+        });
+        onSubmitting.value = false;
       }
     },
   });
-
-  // const updatedProduct = await $pb.collection("products").create(formData);
-  // products.value!.push(updatedProduct as unknown as Product); // ;
-
-  emits("close");
-  toast.add({ title: "Product added", icon: "i-heroicons-check-circle" });
 };
 </script>
 
@@ -134,30 +115,6 @@ const onSubmit = async () => {
           root: 'ring-0 divide-y divide-gray-100 dark:divide-gray-800',
         }"
       >
-        <!-- <template #header>
-          <div class="flex items-center justify-between">
-            <h3
-              class="text-base font-semibold leading-6 text-gray-900 dark:text-white"
-            >
-              Add new Product
-            </h3>
-            <div class="flex gap-1">
-              <UButton
-                color="primary"
-                variant="solid"
-                icon="i-heroicons-document-check-16-solid"
-                label="Save"
-                @click="submitBtnRef!.click()"
-              />
-              <UButton
-                color="error"
-                icon="i-heroicons-x-mark-20-solid"
-                @click="emits('close')"
-              />
-            </div>
-          </div>
-        </template> -->
-
         <UForm
           :schema="Schema"
           :state="state"
@@ -178,7 +135,6 @@ const onSubmit = async () => {
               label-key="title"
               value-key="id"
             />
-            <!-- <UTextarea v-model="state.merchant" class="w-full" /> -->
           </UFormField>
           <UFormField
             name="images"
@@ -209,9 +165,6 @@ const onSubmit = async () => {
               @click="changeImage"
             />
           </UFormField>
-
-          <!-- <button @click="onSubmit" hidden ref="submitBtnRef">Submit</button> -->
-          <!-- <div class="flex flex-row gap-1 w-full"> -->
           <UButtonGroup class="w-full">
             <UButton
               block
@@ -220,6 +173,7 @@ const onSubmit = async () => {
               icon="i-heroicons-document-check-16-solid"
               label="Save"
               type="submit"
+              :loading="onSubmitting"
             />
             <UButton
               block
@@ -229,7 +183,6 @@ const onSubmit = async () => {
               @click="emits('close')"
             />
           </UButtonGroup>
-          <!-- </div> -->
         </UForm>
       </UCard>
     </template>
