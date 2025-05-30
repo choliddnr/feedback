@@ -13,7 +13,6 @@ const fields = [
     label: "Full Name",
     placeholder: "Enter your full name",
     required: true,
-    defaultValue: "M.Cholid Din Nur Rahman",
   },
   {
     name: "username",
@@ -21,7 +20,6 @@ const fields = [
     label: "Username",
     placeholder: "Username must be unique",
     required: true,
-    defaultValue: "cholid.dnr",
   },
   {
     name: "email",
@@ -29,19 +27,12 @@ const fields = [
     label: "Email",
     placeholder: "Enter your email",
     required: true,
-    defaultValue: "cholid.dnr@gmail.com",
   },
   {
     name: "password",
     label: "Password",
     type: "password" as const,
     placeholder: "Enter your password",
-    defaultValue: "Password123",
-  },
-  {
-    name: "remember",
-    label: "Remember me",
-    type: "checkbox" as const,
   },
 ];
 

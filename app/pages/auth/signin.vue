@@ -13,14 +13,12 @@ const fields = [
     label: "Email",
     placeholder: "Enter your email",
     required: true,
-    defaultValue: "cholid.dnr@gmail.com",
   },
   {
     name: "password",
     label: "Password",
     type: "password" as const,
     placeholder: "Enter your password",
-    defaultValue: "Password123",
   },
   {
     name: "remember",
