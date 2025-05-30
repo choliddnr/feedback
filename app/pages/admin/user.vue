@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import type { FormError, FormSubmitEvent } from "#ui/types";
+
+import type { User } from "better-auth";
 import z from "zod";
 import { useUserStore } from "@/stores/user";
 import {
@@ -20,7 +22,6 @@ const { merchants, active_merchant } = storeToRefs(useMerchantsStore());
 // const { data: session } = await authClient.useSe
 const { user } = storeToRefs(useUserStore());
 const fileRef = ref<HTMLInputElement>();
-const isAvatarChanged = ref<boolean>(false);
 const isEdit = ref<boolean>(false);
 const imageBlob = ref<Blob>();
 const formRef = useTemplateRef<HTMLFormElement>("formRef");
@@ -36,7 +37,23 @@ const state = reactive({
 const schema = z.object({
   name: z.string().min(4),
   email: z.string().email(),
-  username: z.string().min(4),
+  username: z
+    .string()
+    .min(4)
+    .refine((value) => /^[a-z0-9]+(?:[-.][a-z0-9]+)*$/.test(value), {
+      message:
+        "username must be lowercase and can only contain letters, numbers, dot, and dashes.",
+    })
+    .refine(
+      async (value) => {
+        if (value === user.value.username) return true;
+        const data = await $fetch<User>("/api/user/username/" + value);
+        return !data ? true : false;
+      },
+      {
+        message: "username must be unique.",
+      }
+    ),
   defaultMerchant: z.number().gt(0, "select one of this merchents"),
 });
 
@@ -54,7 +71,6 @@ const onFileChange = (e: Event) => {
     return;
   }
 
-  isAvatarChanged.value = true;
   modal_edit_user.open({
     image: URL.createObjectURL(input.files[0]!),
     "onUpdate:imageBlob": (value) => {
@@ -64,7 +80,6 @@ const onFileChange = (e: Event) => {
     },
     onCancel: () => {
       state.image = user.value?.image || "";
-      isAvatarChanged.value = false;
       modal_edit_user.close();
     },
   });
@@ -79,27 +94,19 @@ const submit_loading = ref<boolean>(false);
 const onSubmit = async () => {
   submit_loading.value = true;
   const formData = new FormData();
-  formData.append("username", state.username as string);
-  formData.append("name", state.name as string);
-  formData.append(
-    "defaultMerchant",
-    state.defaultMerchant?.toString() as string
-  );
-  if (isAvatarChanged.value) {
-    formData.append(
-      "image_filename",
-      !user.value?.image || isValidURL(user.value?.image)
-        ? null
-        : user.value?.image
-    );
-    formData.append("image", imageBlob.value!);
+  if (state.username !== user.value.username)
+    formData.append("username", state.username as string);
 
-    console.log(
-      "userimg====>",
-      !user.value?.image || isValidURL(user.value?.image)
-        ? null
-        : user.value?.image
+  if (state.name !== user.value.name)
+    formData.append("name", state.name as string);
+  if (state.defaultMerchant !== user.value.defaultMerchant)
+    formData.append(
+      "defaultMerchant",
+      state.defaultMerchant?.toString() as string
     );
+
+  if (imageBlob.value) {
+    formData.append("image", imageBlob.value!);
   }
   await $fetch(`/api/user/${user.value?.id}`, {
     method: "PATCH" as any,
@@ -207,12 +214,12 @@ const deleteAccount = () => {
         <UPageCard
           :variant="isEdit ? 'subtle' : 'outline'"
           title="Profile"
-          description="Berikut ini adalah informasi mengenai diri anda. Silahkan dilengkapi."
+          description="Below is your account information"
         >
           <UFormField
             name="name"
             label="Name"
-            description="Berisi nama panggilan atau nama lengkap. Pilih mana yang membuat anda nyaman."
+            description="A fullname or nickname is allowed. Choose which you feel comfortable."
             required
             class="grid grid-cols-2 gap-2 items-center"
             :ui="{ container: '' }"
@@ -230,7 +237,7 @@ const deleteAccount = () => {
           <UFormField
             name="email"
             label="Email"
-            description="Email tidak dapat dirubah."
+            description="Email is not changeable."
             required
             class="grid grid-cols-2 gap-2"
             :ui="{ container: '' }"
@@ -249,7 +256,7 @@ const deleteAccount = () => {
           <UFormField
             name="username"
             label="Username"
-            description="bagaimana sistem kami mengenali anda."
+            description="Used by the system to recognise your account."
             required
             class="grid grid-cols-2 gap-2"
             :ui="{ container: '' }"
@@ -288,7 +295,7 @@ const deleteAccount = () => {
             name="avatar"
             label="Avatar"
             class="grid grid-cols-2 gap-2"
-            help="JPG, GIF or PNG. 1MB Max."
+            help="choose any image you like."
             :ui="{
               container: 'flex flex-wrap items-center gap-3',
               help: 'mt-0',
@@ -319,7 +326,7 @@ const deleteAccount = () => {
         </UPageCard>
       </UForm>
 
-      <USeparator class="mb-4" v-if="false" />
+      <!-- <USeparator class="mb-4" v-if="false" />
 
       <UPageCard
         v-if="false"
@@ -336,7 +343,7 @@ const deleteAccount = () => {
             @click="deleteAccount"
           />
         </div>
-      </UPageCard>
+      </UPageCard> -->
     </template>
   </UDashboardPanel>
 </template>

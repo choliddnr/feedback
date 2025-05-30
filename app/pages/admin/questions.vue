@@ -52,15 +52,6 @@ const columns: TableColumn<Question>[] = [
         { class: "capitalize", variant: "subtle", color },
         () => data
       );
-
-      // const color = {
-      //   text: "secondary" as const,
-      //   rating: "warning" as const,
-      // }[q_type.get(row.getValue("type")) as string];
-
-      // return h(UBadge, { class: "capitalize", variant: "subtle", color }, () =>
-      //   q_type.get(row.getValue("type"))
-      // );
     },
   },
   {

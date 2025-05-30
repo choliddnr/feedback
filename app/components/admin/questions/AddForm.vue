@@ -12,6 +12,7 @@ const { products, active_product } = storeToRefs(useProductsStore());
 
 const toast = useToast();
 
+const onSubmitting = ref<boolean>(false);
 const Schema = z.object({
   question: z.string().min(10),
   answer_options: z.array(z.string()),
@@ -43,22 +44,33 @@ watch(
     active_product.value = state.product;
   }
 );
-const on_post = ref<boolean>(false);
 const onSubmit = async () => {
+  onSubmitting.value = true;
   const res = await $fetch<Response>("/api/questions", {
     method: "post",
     body: state,
-    onRequest: () => {
-      on_post.value = true;
-    },
     onResponse: async ({ response }) => {
       if (response.ok) {
         questions.value.push(response._data[0]);
-        toast.add({ title: "Product added", icon: "i-heroicons-check-circle" });
+        toast.add({
+          title: "Question added",
+          icon: "i-heroicons-check-circle",
+        });
+        onSubmitting.value = false;
+        emits("close");
+      }
+    },
+    onResponseError: ({ response, error }) => {
+      if (!response.ok) {
+        toast.add({
+          title: "Failed to add question",
+          icon: "i-heroicons-x-circle",
+          color: "error",
+        });
+        onSubmitting.value = false;
       }
     },
   });
-  emits("close");
 };
 </script>
 
@@ -112,7 +124,7 @@ const onSubmit = async () => {
             trailing-icon=""
             :ui="{ base: 'px-0 h-auto' }"
             readonly
-            :disabled="on_post"
+            :disabled="onSubmitting"
           />
 
           <UFormField label="Type" name="type">
@@ -142,6 +154,7 @@ const onSubmit = async () => {
               icon="i-heroicons-document-check-16-solid"
               label="Save"
               type="submit"
+              :loading="onSubmitting"
             />
             <UButton
               block

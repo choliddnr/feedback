@@ -37,11 +37,6 @@ const logoError = ref<ImageError>({
   message: "",
 });
 
-// const backgroudImageError = ref<ImageError>({
-//   isError: false,
-//   message: "",
-// });
-
 const schema = z.object({
   title: z.string().min(4),
   slug: z
@@ -58,19 +53,10 @@ const schema = z.object({
       });
       return !data ? true : false;
     }, "Slug already exists"),
-  description: z.string().min(5),
+  description: z.string(),
   category: z.number(),
   primary_color: z.string(),
 });
-
-// const imageSchema = z
-//   .instanceof(Blob)
-//   .refine((file) => ACCEPTED_FILE_TYPES.includes(file.type), {
-//     message: "Invalid file type. Only JPEG and PNG files are allowed.",
-//   })
-//   .refine((file) => file.size <= MAX_FILE_SIZE, {
-//     message: "File size should be less than 2MB.",
-//   });
 
 type Schema = z.output<typeof schema>;
 const state = reactive({
@@ -84,7 +70,6 @@ const state = reactive({
 });
 
 const logoRef = ref<HTMLInputElement>();
-// const imageBackgroundRef = ref<HTMLInputElement>();
 const toast = useToast();
 
 const logoBlob = ref<Blob>();
@@ -92,10 +77,6 @@ const logoBlob = ref<Blob>();
 const changeLogo = (e: Event) => {
   logoRef.value!.click();
 };
-// const changeImageBackground = (e: Event) => {
-//   imageBackgroundRef.value!.click();
-// };
-
 const onLogoChange = (e: Event) => {
   const input = e.target as HTMLInputElement;
   if (!input.files?.length) return;
@@ -106,6 +87,10 @@ const onLogoChange = (e: Event) => {
       logoBlob.value = value;
       state.logo = URL.createObjectURL(value!);
       modal_edit_logo.close();
+      logoError.value = {
+        isError: false,
+        message: "",
+      };
     },
     onCancel: () => {
       state.logo = "";
@@ -114,24 +99,9 @@ const onLogoChange = (e: Event) => {
   });
 };
 
-// const onImageBackgroundChange = (e: Event) => {
-//   const input = e.target as HTMLInputElement;
-//   if (!input.files?.length) return;
-//   const res = imageSchema.safeParse(input.files[0]);
-//   if (!res.success) {
-//     backgroudImageError.value = {
-//       isError: !res.success,
-//       message: res.error.errors[0]?.message!,
-//     };
-//   } else {
-//     state.image_background = URL.createObjectURL(input.files[0]!);
-//     backgroudImageError.value = {
-//       isError: !res.success,
-//       message: "",
-//     };
-//   }
-// };
+const on_submit = ref<boolean>(false);
 const onSubmit = async (event: FormSubmitEvent<Schema>) => {
+  on_submit.value = true;
   const formData = new FormData();
   formData.append("title", state.title);
 
@@ -139,28 +109,43 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {
   formData.append("description", state.description);
   formData.append("category", String(state.category));
   formData.append("primary_color", state.primary_color);
-  // if (logoRef.value!.files?.length! > 0) {
-  //   formData.append("logo", logoRef.value!.files![0]!);
-  // }
 
   if (logoBlob.value) {
     formData.append("logo", logoBlob.value);
+  } else {
+    logoError.value = {
+      isError: true,
+      message: "Merchant logo is required.",
+    };
+    return;
   }
-
-  // if (imageBackgroundRef.value!.files?.length! > 0) {
-  //   formData.append("image_background", imageBackgroundRef.value!.files![0]!);
-  // }
 
   await $fetch("/api/merchants", {
     method: "post",
     body: formData,
     onResponse: async ({ response }) => {
-      await fetch();
-      navigateTo("/admin/merchants");
+      if (response.status === 200) {
+        await fetch();
+        on_submit.value = false;
+        navigateTo("/admin/merchants");
+        toast.add({
+          title: "Merchant created",
+          icon: "i-heroicons-check-circle",
+        });
+      }
+    },
+    onResponseError: ({ response, error }) => {
+      if (response.status !== 200) {
+        on_submit.value = false;
+        toast.add({
+          title: "Failed to create merchant",
+          description: error?.message,
+          icon: "i-heroicons-x-circle",
+          color: "error",
+        });
+      }
     },
   });
-
-  toast.add({ title: "Merchant created", icon: "i-heroicons-check-circle" });
 };
 </script>
 
@@ -180,6 +165,7 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {
                 color="neutral"
                 leading-icon="i-heroicons-document-check-16-solid"
                 @click="form?.submit()"
+                :loading="on_submit"
               />
               <UButton
                 label="Cancel"
@@ -193,7 +179,6 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {
       </UDashboardNavbar>
     </template>
     <template #body>
-      <!-- :validate="validate" -->
       <UForm
         :state="state"
         :schema="schema"
@@ -202,8 +187,6 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {
         :validate-on="['blur']"
         :validate-on-input-delay="500"
       >
-        <!-- :title="merchant?.title"
-          :description="merchant?.description" -->
         <UPageCard>
           <UFormField
             name="title"
@@ -267,35 +250,13 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {
             />
           </UFormField>
 
-          <!-- <UFormField
-          name="primary_color"
-          label="Warna Primer"
-          description="Digunakan pada form feedback sebagai warna primer"
-          required
-          class="grid grid-cols-2 gap-2 items-center"
-          :ui="{ container: '' }"
-        >
-          <USelectMenu v-model="state.primary_color" :options="colors">
-            <template #label>
-              <span
-                :class="`flex-shrink-0 w-5 h-3.5 mt-px rounded-none bg-${state.primary_color}-500`"
-              />
-              <span class="truncate">{{ state.primary_color }}</span>
-            </template>
-            <template #option="{ option }">
-              <span
-                :class="`flex-shrink-0 w-5 h-3.5 mt-px rounded-none bg-${option}-500`"
-              />
-              <span class="truncate">{{ option }}</span>
-            </template>
-          </USelectMenu>
-        </UFormField> -->
-
           <UFormField
             name="logo"
             label="Logo"
             class="grid grid-cols-2 gap-2"
-            help="JPG, JPEG or PNG. 1MB Max."
+            help="JPG, JPEG, PNG, or WEBP. 1MB Max."
+            description="A logo or any image that represent your merchant."
+            required
             :error="logoError.isError && logoError.message"
             :ui="{
               container: 'flex flex-wrap items-center gap-3',
@@ -319,39 +280,6 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {
               @click="changeLogo"
             />
           </UFormField>
-
-          <!-- <UFormField
-            name="image_background"
-            label="Background"
-            description="Gambar sebagai background pada halaman feedback form."
-            class="grid grid-cols-2 gap-2"
-            help="JPG, GIF or PNG. 1MB Max."
-            :error="backgroudImageError.isError && backgroudImageError.message"
-            :ui="{
-              container: 'flex flex-wrap items-center gap-3',
-              help: 'mt-0',
-            }"
-          >
-            <input
-              ref="imageBackgroundRef"
-              type="file"
-              class="hidden"
-              accept=".jpg, .jpeg, .png,"
-              @change="onImageBackgroundChange"
-            />
-            <NuxtImg
-              :src="state.image_background"
-              alt="New Image Background"
-              size="lg"
-            />
-
-            <UButton
-              label="Choose"
-              color="neutral"
-              size="md"
-              @click="changeImageBackground"
-            />
-          </UFormField> -->
         </UPageCard>
       </UForm>
     </template>

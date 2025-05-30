@@ -2,25 +2,47 @@ import { H3Event, type MultiPartData } from "h3";
 import { user, eq } from "~~/server/utils/db/schema";
 import { User } from "~~/shared/types";
 import { generateNewFilename } from "~~/server/utils";
+import { isValidURL } from "~/utils";
 
 export default defineEventHandler(async (e: H3Event) => {
   const id = Number(getRouterParam(e, "id"));
   const body = parseMultipartData(await readMultipartFormData(e));
 
   let newData = {} as Partial<User>;
-  if (body.username) newData["username"] = body.username;
-  if (body.name) newData["name"] = body.name;
-  if (body.defaultMerchant) newData["defaultMerchant"] = body.defaultMerchant;
+  newData["username"] = body.username;
+  newData["name"] = body.name;
+  newData["defaultMerchant"] = Number(body.defaultMerchant);
+  const validate = await UpdateUserSchema.safeParseAsync(newData);
+  if (!validate.success) {
+    return sendError(
+      e,
+      createError({
+        statusCode: 422,
+        statusMessage: "Invalid Request",
+        data: validate.error,
+      })
+    );
+  }
 
   try {
+    const oldData = await db(e)
+      .select()
+      .from(user)
+      .where(eq(user.id, id))
+      .limit(1)
+      .get();
+    if (!oldData) {
+      return sendError(
+        e,
+        createError({
+          statusCode: 404,
+          statusMessage: "Missing data to update",
+          data: validate.error,
+        })
+      );
+    }
+
     if (body.image) {
-      /**
-       * update user image when using fs storage
-       */
-
-      // deleteFile(e, id);
-      // newData["image"] = await saveFile(`user_pic_${id}`, body.image);
-
       /**
        * logic to update user image when using bunny.net storage
        * Since we are using bunny.net storage that require raw File data,
@@ -32,9 +54,8 @@ export default defineEventHandler(async (e: H3Event) => {
        * Add delete old image logic
        * If the logo is updated, we need to delete the old logo image
        */
-
-      if (body.image_filename !== "null")
-        await deleteImg(e, body.image_filename); // user image could be null, delete it if exists
+      if (oldData.image && !isValidURL(oldData.image))
+        await deleteImg(e, oldData.image); // user image could be null, delete it if exists
 
       const image_file = (await readFormData(e)).get("image") as File;
       let filename = "user/" + generateNewFilename("_.webp"); // modify the filename to avoid conflicts and load cache
@@ -42,16 +63,11 @@ export default defineEventHandler(async (e: H3Event) => {
       newData["image"] = filename;
     }
 
-    const newuser = await db(e)
-      .update(user)
-      .set(newData)
-      .where(eq(user.id, id));
+    await db(e).update(user).set(newData).where(eq(user.id, id));
     return auth(e).api.getSession({
       headers: e.headers,
     });
   } catch (e) {
-    throw createError(
-      e instanceof Error ? e.message : "Unknown usr/id/patch error"
-    );
+    throw createError(e instanceof Error ? e.message : "Unknown  error");
   }
 });

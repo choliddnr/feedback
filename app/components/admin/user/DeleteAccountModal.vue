@@ -3,7 +3,6 @@
 // const model = defineModel({
 //   type: Boolean,
 // });
-// const { $pb } = useNuxtApp();
 // const { user } = storeToRefs(useUserStore());
 const toast = useToast();
 

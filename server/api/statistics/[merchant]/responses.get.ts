@@ -21,14 +21,4 @@ export default defineEventHandler(async (e) => {
     .innerJoin(respondents, eq(respondents.id, sq.respondent));
   // .groupBy(sq.id);
   return respondent;
-  //   return {
-  //     questions: await db(e).select().from(questions),
-  //     products: await db(e).select().from(products),
-  //     merchants: await db(e).select().from(merchants),
-  //     merchant_categories: await db(e).select().from(merchant_categories),
-  //     question_types: await db(e).select().from(question_types),
-  //     respondents: await db(e).select().from(respondents),
-  //     responses: await db(e).select().from(responses),
-  //     response_answers: await db(e).select().from(response_answers),
-  //   };
 });

@@ -6,6 +6,8 @@ export { sql, eq, and, or } from "drizzle-orm";
 import dafaultField from "./default_field";
 import { user } from "./better-auth";
 import { createInsertSchema, createUpdateSchema } from "drizzle-zod";
+import { Merchant } from "~~/shared/types";
+import { ZodString } from "better-auth";
 
 // export const users = sqliteTable("users", {
 //   name: text().notNull(),
@@ -29,8 +31,70 @@ export const merchants = sqliteTable("merchants", {
   greeting: text().notNull(),
   primery_color: text(),
   image_background: text(),
-  logo: text(),
+  logo: text().notNull(),
   ...dafaultField,
+});
+
+export const InsertMerchantSchema = createInsertSchema(merchants, {
+  title: (field) => field.min(4),
+  slug: (field) =>
+    field
+      .min(4)
+      .refine((value) => /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(value), {
+        message:
+          "Slug must be lowercase and can only contain letters, numbers, and dashes.",
+      })
+      .refine(
+        async (value) => {
+          const data = await $fetch<Merchant>("/api/merchants/slug/" + value);
+          return !data ? true : false;
+        },
+        {
+          message: "Slug must be unique.",
+        }
+      ),
+  description: (field) => field.optional(),
+  category: (field) => field.gt(0),
+  owner: (field) => field.gt(0),
+  greeting: (field) => field.optional(),
+  primery_color: (field) => field.min(4).max(20).optional(),
+  image_background: (field) => field.min(4).max(200).optional(),
+  logo: (field) => field.min(4).max(200),
+}).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const UpdateMerchantSchema = createUpdateSchema(merchants, {
+  title: (field) => field.min(4),
+  slug: (field) =>
+    field
+      .min(4)
+      .refine((value) => /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(value), {
+        message:
+          "Slug must be lowercase and can only contain letters, numbers, and dashes.",
+      })
+      .refine(
+        async (value) => {
+          const data = await $fetch<Merchant>("/api/merchants/slug/" + value);
+          return !data ? true : false;
+        },
+        {
+          message: "Slug must be unique.",
+        }
+      ),
+  description: (field) => field.optional(),
+  category: (field) => field.gt(0),
+  owner: (field) => field.gt(0),
+  greeting: (field) => field.optional(),
+  primery_color: (field) => field.min(4).max(20).optional(),
+  image_background: (field) => field.min(4).max(200).optional(),
+  logo: (field) => field.min(4).max(200),
+}).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
 });
 
 export const merchant_categories = sqliteTable("merchant_categories", {
@@ -47,6 +111,28 @@ export const products = sqliteTable("products", {
     .notNull()
     .references((): AnySQLiteColumn => merchants.id, { onDelete: "cascade" }),
   ...dafaultField,
+});
+
+export const InsertProductSchema = createInsertSchema(products, {
+  title: (field) => field.min(5).max(25),
+  merchant: (field) => field.gt(0),
+}).omit({
+  id: true,
+  description: true,
+  image: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const UpdateProductSchema = createUpdateSchema(products, {
+  title: (field) => field.min(5).max(25),
+  merchant: (field) => field.gt(0),
+}).omit({
+  id: true,
+  description: true,
+  image: true,
+  createdAt: true,
+  updatedAt: true,
 });
 
 export const questions = sqliteTable("questions", {

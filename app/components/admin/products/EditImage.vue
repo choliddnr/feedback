@@ -21,7 +21,6 @@ const convertCanvasToWebp = async (
     canvas.toBlob(
       (blob) => {
         if (blob) {
-          // resolve(URL.createObjectURL(blob));
           resolve(blob);
         } else {
           reject("Converting failed");

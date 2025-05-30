@@ -1,12 +1,7 @@
 <script lang="ts" setup>
 import { UInput } from "#components";
 import { z } from "zod";
-import type {
-  NewProduct,
-  NewQuestion,
-  Product,
-  Question,
-} from "~~/shared/types";
+import type { NewQuestion, Question } from "~~/shared/types";
 import { useQuestionTypesStore } from "~/stores/question_types";
 
 const { question } = defineProps<{ question: Partial<Question> }>();
@@ -20,7 +15,7 @@ const { question_types } = storeToRefs(useQuestionTypesStore());
 const { products, active_product } = storeToRefs(useProductsStore());
 
 const toast = useToast();
-
+const onSubmitting = ref<boolean>(false);
 const Schema = z.object({
   question: z.string().min(10),
   answer_options: z.array(z.string()),
@@ -48,14 +43,11 @@ watch(
     active_product.value = state.product;
   }
 );
-const on_post = ref<boolean>(false);
 const onSubmit = async () => {
+  onSubmitting.value = true;
   await $fetch<Response>("/api/questions/" + question.id, {
     method: "patch",
     body: state,
-    onRequest: () => {
-      on_post.value = true;
-    },
     onResponse: async ({ response }) => {
       if (response.ok) {
         const index = questions.value.findIndex((q) => q.id === question.id);
@@ -64,10 +56,22 @@ const onSubmit = async () => {
           title: "Question updated",
           icon: "i-heroicons-check-circle",
         });
+
+        onSubmitting.value = false;
+        emits("close");
+      }
+    },
+    onResponseError: ({ response, error }) => {
+      if (!response.ok) {
+        toast.add({
+          title: "Failed to update question",
+          icon: "i-heroicons-x-circle",
+          color: "error",
+        });
+        onSubmitting.value = false;
       }
     },
   });
-  emits("close");
 };
 </script>
 
@@ -110,7 +114,6 @@ const onSubmit = async () => {
                 @click="pushNewOption"
               />
             </UButtonGroup>
-            <!-- :items="answer_options" -->
           </UFormField>
           <UInputMenu
             v-if="state.type !== 2 && state.answer_options!.length > 0"
@@ -122,7 +125,7 @@ const onSubmit = async () => {
             trailing-icon=""
             :ui="{ base: 'px-0 h-auto' }"
             readonly
-            :disabled="on_post"
+            :disabled="onSubmitting"
           />
 
           <UFormField label="Type" name="type">
@@ -144,8 +147,6 @@ const onSubmit = async () => {
             />
           </UFormField>
 
-          <!-- <button @click="onSubmit" hidden ref="submitBtnRef">Submit</button> -->
-          <!-- <div class="flex flex-row gap-1 w-full"> -->
           <UButtonGroup class="w-full">
             <UButton
               block
@@ -154,6 +155,7 @@ const onSubmit = async () => {
               icon="i-heroicons-document-check-16-solid"
               label="Save"
               type="submit"
+              :loading="onSubmitting"
             />
             <UButton
               block
@@ -163,7 +165,6 @@ const onSubmit = async () => {
               @click="emits('close')"
             />
           </UButtonGroup>
-          <!-- </div> -->
         </UForm>
       </UCard>
     </template>

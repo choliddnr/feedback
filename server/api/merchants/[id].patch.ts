@@ -1,13 +1,8 @@
-import { merchants, eq } from "~~/server/utils/db/schema";
+import { merchants, eq, UpdateMerchantSchema } from "~~/server/utils/db/schema";
 import { Merchant } from "~~/shared/types";
 import { generateNewFilename } from "~~/server/utils";
 import { saveImg } from "~~/server/utils/image";
-
-/**
- *
- * Future improvement
- * 1. Server side validation
- */
+import { isValidURL } from "~/utils";
 
 export default defineEventHandler(async (e) => {
   const session = await auth(e).api.getSession({
@@ -21,21 +16,25 @@ export default defineEventHandler(async (e) => {
   if (body.title) newData["title"] = body.title;
   if (body.slug) newData["slug"] = body.slug;
   if (body.description) newData["description"] = body.description;
-  if (body.category) newData["category"] = body.category;
-  if (body.greeting) newData["greeting"] = body.category;
+  if (body.category) newData["category"] = Number(body.category);
 
   try {
+    const oldData = await db(e)
+      .select()
+      .from(merchants)
+      .where(eq(merchants.id, id))
+      .limit(1)
+      .get();
+    if (!oldData) {
+      return sendError(
+        e,
+        createError({
+          statusCode: 404,
+          statusMessage: "Missing data to update",
+        })
+      );
+    }
     if (body.logo) {
-      /**
-       * If you are using fs storage, you can use the following code
-       * to save the file in the local storage
-       */
-      // newData["logo"] = await saveFile(
-      //   stringToSlug(body.title),
-      //   body.logo,
-      //   merchantLogoStorage
-      // );
-
       /**
        * Since we are using bunny.net storage that require raw File data,
        * we used readFormData to get the file data
@@ -46,7 +45,9 @@ export default defineEventHandler(async (e) => {
        * Add delete old image logic
        * If the logo is updated, we need to delete the old logo image
        */
-      await deleteImg(e, body.logo_filename);
+
+      if (oldData.logo && !isValidURL(oldData.logo))
+        await deleteImg(e, oldData.logo); // user image could be null, delete it if exists
 
       const logo_file = (await readFormData(e)).get("logo") as File;
       let filename = "merchant/" + generateNewFilename("_.webp"); // modify the filename to avoid conflicts and load cache
@@ -55,17 +56,19 @@ export default defineEventHandler(async (e) => {
     }
 
     /**
-     * Image background is not used in the current version,
+     * Validate the data before inserting it into the database
      */
-
-    // if (body.image_background) {
-    //   newData["image_background"] = await saveFile(
-    //     stringToSlug(body.title),
-    //     body.image_background,
-    //     merchantImageBackgroundStorage
-    //   );
-    // }
-
+    const validate = await UpdateMerchantSchema.safeParseAsync(newData);
+    if (!validate.success) {
+      return sendError(
+        e,
+        createError({
+          statusCode: 422,
+          statusMessage: JSON.stringify(validate.error),
+        })
+      );
+    }
+    // return { success: true };
     return await db(e)
       .update(merchants)
       .set(newData)

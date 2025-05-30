@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import type { Product } from "~~/shared/types";
 
-// const route = useRoute();
-// const merchant_id = route.params.merchant;
 const { merchant } = storeToRefs(useResponseStore());
 
 const { data: _products } = await useFetch<Product[]>(

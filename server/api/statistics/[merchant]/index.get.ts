@@ -4,9 +4,7 @@ export default defineEventHandler(async (e) => {
   const sq_response = db(e)
     .$with("sq_response")
     .as(db(e).select().from(responses).where(eq(responses.merchant, merchant)));
-  // {
-  //   id: questions.id;
-  // }
+
   const sq = db(e)
     .$with("sq")
     .as(
@@ -20,17 +18,6 @@ export default defineEventHandler(async (e) => {
         .where(and(eq(question_types.title, "rating")))
     );
 
-  // const avg_rating = await db(e)
-  //   .with(sq)
-  //   .select({
-  //     // questionId: sq.id,
-  //     avg: sql<number>`avg(${response_answers.answer})`,
-  //   })
-  //   .from(sq)
-  //   .innerJoin(response_answers, eq(response_answers.question, sq.id));
-  // .groupBy(sq.id);
-
-  // return avg_rating;
   return {
     respondent: (
       await db(e)

@@ -1,5 +1,7 @@
 import { sqliteTable, text, int } from "drizzle-orm/sqlite-core";
 import { merchants } from "./db";
+import { createUpdateSchema } from "drizzle-zod";
+import { User } from "better-auth";
 
 export const user = sqliteTable("user", {
   id: int().primaryKey({ autoIncrement: true }),
@@ -13,6 +15,34 @@ export const user = sqliteTable("user", {
   defaultMerchant: int().references(() => merchants.id, {
     onDelete: "set null",
   }),
+});
+
+export const UpdateUserSchema = createUpdateSchema(user, {
+  name: (field) => field.min(4),
+  username: (field) =>
+    field
+      .min(4)
+      .refine((value) => /^[a-z0-9]+(?:[-.][a-z0-9]+)*$/.test(value), {
+        message:
+          "username must be lowercase and can only contain letters, numbers, dot, and dashes.",
+      })
+      .refine(
+        async (value) => {
+          const data = await $fetch<User>("/api/user/username/" + value);
+          return !data ? true : false;
+        },
+        {
+          message: "username must be unique.",
+        }
+      ),
+  defaultMerchant: (field) => field.gt(0),
+}).omit({
+  id: true,
+  email: true,
+  emailVerified: true,
+  image: true,
+  createdAt: true,
+  updatedAt: true,
 });
 
 export const session = sqliteTable("session", {
