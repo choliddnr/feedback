@@ -3,6 +3,7 @@ import { Merchant } from "~~/shared/types";
 import { generateNewFilename } from "~~/server/utils";
 import { saveImg } from "~~/server/utils/image";
 import { isValidURL } from "~/utils";
+import { z } from "zod";
 
 export default defineEventHandler(async (e) => {
   const session = await auth(e).api.getSession({
@@ -58,7 +59,34 @@ export default defineEventHandler(async (e) => {
     /**
      * Validate the data before inserting it into the database
      */
-    const validate = await UpdateMerchantSchema.safeParseAsync(newData);
+    /**
+     * Extend the validation schema below to pass the header while calling the api to check if the slug is already taken or not.
+     */
+    const validate = await UpdateMerchantSchema.extend({
+      slug: z
+        .string()
+        .min(4)
+        .refine((value) => /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(value), {
+          message:
+            "Slug must be lowercase and can only contain letters, numbers, and dashes.",
+        })
+        .refine(
+          async (value) => {
+            console.log("validating slug");
+
+            const data = await $fetch<Merchant>(
+              "/api/merchants/slug/" + value,
+              {
+                headers: e.headers,
+              }
+            );
+            return !data ? true : false;
+          },
+          {
+            message: "Slug must be unique.",
+          }
+        ),
+    }).safeParseAsync(newData);
     if (!validate.success) {
       return sendError(
         e,

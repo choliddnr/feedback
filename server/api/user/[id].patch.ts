@@ -3,6 +3,7 @@ import { user, eq } from "~~/server/utils/db/schema";
 import { User } from "~~/shared/types";
 import { generateNewFilename } from "~~/server/utils";
 import { isValidURL } from "~/utils";
+import { z } from "zod";
 
 export default defineEventHandler(async (e: H3Event) => {
   const id = Number(getRouterParam(e, "id"));
@@ -12,7 +13,26 @@ export default defineEventHandler(async (e: H3Event) => {
   newData["username"] = body.username;
   newData["name"] = body.name;
   newData["defaultMerchant"] = Number(body.defaultMerchant);
-  const validate = await UpdateUserSchema.safeParseAsync(newData);
+  const validate = await UpdateUserSchema.extend({
+    username: z
+      .string()
+      .min(4)
+      .refine((value) => /^[a-z0-9]+(?:[-.][a-z0-9]+)*$/.test(value), {
+        message:
+          "username must be lowercase and can only contain letters, numbers, dot, and dashes.",
+      })
+      .refine(
+        async (value) => {
+          const data = await $fetch<User>("/api/user/username/" + value, {
+            headers: e.headers,
+          });
+          return !data ? true : false;
+        },
+        {
+          message: "username must be unique.",
+        }
+      ),
+  }).safeParseAsync(newData);
   if (!validate.success) {
     return sendError(
       e,
