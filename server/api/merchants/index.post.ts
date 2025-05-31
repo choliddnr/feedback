@@ -6,7 +6,6 @@ import {
   stringToSlug,
 } from "~~/server/utils";
 import { saveImg } from "~~/server/utils/image";
-import { z } from "zod";
 
 export default defineEventHandler(async (e) => {
   const session = await auth(e).api.getSession({
@@ -33,54 +32,41 @@ export default defineEventHandler(async (e) => {
   const filename = "merchant/" + generateNewFilename("_.webp"); // modify the filename to avoid conflicts and load cache
   newData["logo"] = filename;
 
+  /**
+   * Validate the data before inserting it into the database
+   */
+
+  const validate = InsertMerchantSchema.safeParse(newData);
+  if (!validate.success) {
+    return sendError(
+      e,
+      createError({
+        statusCode: 422,
+        statusMessage: JSON.stringify(validate.error),
+      })
+    );
+  }
   try {
-    await saveImg(e, logo_file, filename); // all uploaded images are saved as webp format
-
-    /**
-     * Validate the data before inserting it into the database
-     */
-    /**
-     * Extend the validation schema below to pass the header while calling the api to check if the slug is already taken or not.
-     */
-    const validate = await InsertMerchantSchema.extend({
-      slug: z
-        .string()
-        .min(4)
-        .refine((value) => /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(value), {
-          message:
-            "Slug must be lowercase and can only contain letters, numbers, and dashes.",
-        })
-        .refine(
-          async (value) => {
-            console.log("validating slug");
-
-            const data = await $fetch<Merchant>(
-              "/api/merchants/slug/" + value,
-              {
-                headers: e.headers,
-              }
-            );
-            return !data ? true : false;
-          },
-          {
-            message: "Slug must be unique.",
-          }
-        ),
-    }).safeParseAsync(newData);
-    if (!validate.success) {
+    const slug = await db(e)
+      .select()
+      .from(merchants)
+      .where(eq(merchants.slug, newData["slug"]))
+      .limit(1)
+      .get();
+    if (slug) {
       return sendError(
         e,
         createError({
           statusCode: 422,
-          statusMessage: JSON.stringify(validate.error),
+          statusMessage: "slug is already taken",
         })
       );
     }
-
+    await saveImg(e, logo_file, filename); // all uploaded images are saved as webp format
     return await db(e).insert(merchants).values(newData).returning();
-  } catch (e) {
+  } catch (err) {
     throw createError(
-      e instanceof Error ? e.message : "Unknown usr/id/patch error"
+      err instanceof Error ? err.message : "Unknown usr/id/patch error"
     );
   }
 });

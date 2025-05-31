@@ -3,7 +3,6 @@ import { Merchant } from "~~/shared/types";
 import { generateNewFilename } from "~~/server/utils";
 import { saveImg } from "~~/server/utils/image";
 import { isValidURL } from "~/utils";
-import { z } from "zod";
 
 export default defineEventHandler(async (e) => {
   const session = await auth(e).api.getSession({
@@ -19,7 +18,53 @@ export default defineEventHandler(async (e) => {
   if (body.description) newData["description"] = body.description;
   if (body.category) newData["category"] = Number(body.category);
 
+  let filename: string | undefined = undefined;
+  let logo_file: File | undefined = undefined;
+  if (body.logo) {
+    /**
+     * Since we are using bunny.net storage that require raw File data,
+     * we used readFormData to get the file data
+     * and then upload it to the storage
+     */
+
+    logo_file = (await readFormData(e)).get("logo") as File;
+    filename = "merchant/" + generateNewFilename("_.webp"); // modify the filename to avoid conflicts and load cache - all uploaded images are saved as webp format
+    newData["logo"] = filename;
+  }
+
+  /**
+   * Validate the data before inserting it into the database
+   */
+  const validate = UpdateMerchantSchema.safeParse(newData);
+  if (!validate.success) {
+    return sendError(
+      e,
+      createError({
+        statusCode: 422,
+        statusMessage: JSON.stringify(validate.error),
+      })
+    );
+  }
+
   try {
+    if (newData["slug"]) {
+      const slug = await db(e)
+        .select()
+        .from(merchants)
+        .where(eq(merchants.slug, newData["slug"]))
+        .limit(1)
+        .get();
+
+      if (slug) {
+        return sendError(
+          e,
+          createError({
+            statusCode: 422,
+            statusMessage: "slug is already taken",
+          })
+        );
+      }
+    }
     const oldData = await db(e)
       .select()
       .from(merchants)
@@ -35,68 +80,16 @@ export default defineEventHandler(async (e) => {
         })
       );
     }
-    if (body.logo) {
-      /**
-       * Since we are using bunny.net storage that require raw File data,
-       * we used readFormData to get the file data
-       * and then upload it to the storage
-       */
-
-      /**
-       * Add delete old image logic
-       * If the logo is updated, we need to delete the old logo image
-       */
-
-      if (oldData.logo && !isValidURL(oldData.logo))
-        await deleteImg(e, oldData.logo); // user image could be null, delete it if exists
-
-      const logo_file = (await readFormData(e)).get("logo") as File;
-      let filename = "merchant/" + generateNewFilename("_.webp"); // modify the filename to avoid conflicts and load cache
-      await saveImg(e, logo_file, filename); // all uploaded images are saved as webp format
-      newData["logo"] = filename;
-    }
 
     /**
-     * Validate the data before inserting it into the database
+     * delete old logo logic
+     * If the logo is updated, we need to delete the old logo image
      */
-    /**
-     * Extend the validation schema below to pass the header while calling the api to check if the slug is already taken or not.
-     */
-    const validate = await UpdateMerchantSchema.extend({
-      slug: z
-        .string()
-        .min(4)
-        .refine((value) => /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(value), {
-          message:
-            "Slug must be lowercase and can only contain letters, numbers, and dashes.",
-        })
-        .refine(
-          async (value) => {
-            console.log("validating slug");
 
-            const data = await $fetch<Merchant>(
-              "/api/merchants/slug/" + value,
-              {
-                headers: e.headers,
-              }
-            );
-            return !data ? true : false;
-          },
-          {
-            message: "Slug must be unique.",
-          }
-        ),
-    }).safeParseAsync(newData);
-    if (!validate.success) {
-      return sendError(
-        e,
-        createError({
-          statusCode: 422,
-          statusMessage: JSON.stringify(validate.error),
-        })
-      );
-    }
-    // return { success: true };
+    if (body.logo && oldData.logo && !isValidURL(oldData.logo))
+      await deleteImg(e, oldData.logo); // user image could be null, delete it if exists
+    if (logo_file && filename) await saveImg(e, logo_file, filename);
+
     return await db(e)
       .update(merchants)
       .set(newData)

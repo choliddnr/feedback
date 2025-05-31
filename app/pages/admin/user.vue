@@ -90,9 +90,9 @@ const onFileClick = () => {
 };
 
 // const submit = () => formRef.value?.submit();W
-const submit_loading = ref<boolean>(false);
+const onSubmitting = ref<boolean>(false);
 const onSubmit = async () => {
-  submit_loading.value = true;
+  onSubmitting.value = true;
   const formData = new FormData();
   if (state.username !== user.value.username)
     formData.append("username", state.username as string);
@@ -125,14 +125,14 @@ const onSubmit = async () => {
       if (response.status !== 200) {
         toast.add({
           description: response._data.statusMessage,
-          title: "Gagal!",
+          title: "Failed!",
           icon: "i-heroicons-x-circle",
-          color: "warning",
+          color: "error",
         });
       }
     },
   });
-  submit_loading.value = false;
+  onSubmitting.value = false;
   isEdit.value = false;
 };
 
@@ -166,7 +166,7 @@ const deleteAccount = () => {
                   color="neutral"
                   leading-icon="i-heroicons-document-check-16-solid"
                   @click="formRef!.submit"
-                  :loading="submit_loading"
+                  :loading="onSubmitting"
                 />
                 <UButton
                   label="Cancel"
