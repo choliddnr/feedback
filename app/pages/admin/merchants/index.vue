@@ -25,7 +25,7 @@ definePageMeta({
     </template>
 
     <template #body>
-      <div class="flex flex-row gap-3">
+      <div class="flex flex-row gap-3" v-if="merchants && merchants.length > 0">
         <UPageCard
           v-for="merchant in merchants"
           :title="merchant.title"
@@ -34,7 +34,7 @@ definePageMeta({
           orientation="vertical"
           spotlight
           spotlight-color="primary"
-          class="w-[25%]"
+          class="md:w-[25%] lg:w-[20%]"
           reverse
         >
           <template #default>
@@ -45,6 +45,17 @@ definePageMeta({
             />
           </template>
         </UPageCard>
+      </div>
+      <div class="w-auto mx-auto max-w-xs flex flex-col gap-5" v-else>
+        <NuxtImg src="/empty.png" />
+        <span class="mx-auto font-bold text-xl">No Merchant </span>
+        <UButton
+          label="Create Merchant"
+          trailing-icon="i-heroicons-plus"
+          color="neutral"
+          @click="navigateTo('/admin/merchants/add')"
+          class="mx-auto"
+        />
       </div>
     </template>
   </UDashboardPanel>

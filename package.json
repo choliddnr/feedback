@@ -40,5 +40,8 @@
     "happy-dom": "^17.4.7",
     "playwright-core": "^1.52.0",
     "wrangler": "^4.16.1"
+  },
+  "overrides": {
+    "vite": "npm:rolldown-vite@latest"
   }
 }

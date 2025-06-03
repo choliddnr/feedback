@@ -96,7 +96,7 @@ onMounted(() => {
     </template>
 
     <template #body>
-      <div class="flex flex-row gap-3">
+      <div class="flex flex-row gap-3" v-if="products && products.length > 0">
         <UPageCard
           v-for="product in products"
           :title="product.title"
@@ -104,7 +104,7 @@ onMounted(() => {
           orientation="vertical"
           spotlight
           spotlight-color="primary"
-          class="w-[25%]"
+          class="md:w-[25%] lg:w-[20%]"
           :ui="{ footer: 'w-full' }"
           reverse
         >
@@ -145,6 +145,26 @@ onMounted(() => {
             </UButtonGroup>
           </template>
         </UPageCard>
+      </div>
+      <div
+        class="w-auto mx-auto max-w-xs flex flex-col gap-5 justify-content-center"
+        v-else
+      >
+        <NuxtImg src="/empty.png" />
+        <span class="mx-auto font-bold text-xl">No Product </span>
+        <UButton
+          class="mx-auto"
+          label="Add Product"
+          trailing-icon="i-heroicons-plus"
+          color="neutral"
+          @click="
+            () => {
+              slideover_add.open({
+                onClose: slideover_add.close,
+              });
+            }
+          "
+        />
       </div>
     </template>
   </UDashboardPanel>
