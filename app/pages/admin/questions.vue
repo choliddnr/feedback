@@ -247,6 +247,28 @@ const deleteQuestion = async (id: string | number) => {
             >
           </div>
         </template>
+
+        <template #empty>
+          <div
+            class="w-auto mx-auto max-w-xs flex flex-col gap-5 justify-content-center"
+          >
+            <NuxtImg src="/empty.png" />
+            <span class="mx-auto font-bold text-xl">No Question </span>
+            <UButton
+              class="mx-auto"
+              label="Add a question"
+              trailing-icon="i-heroicons-plus"
+              color="neutral"
+              @click="
+                () => {
+                  slideover_add.open({
+                    onClose: slideover_add.close,
+                  });
+                }
+              "
+            />
+          </div>
+        </template>
       </UTable>
 
       <div class="px-4 py-3.5 text-sm text-muted">
