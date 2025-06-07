@@ -24,17 +24,13 @@ definePageMeta({
 });
 const { merchant_categories } = storeToRefs(useMerchantCategoriesStore());
 const { fetch: fetchCategories } = useMerchantsStore();
-// if (
-//   merchant_categories.value === undefined ||
-//   merchant_categories.value.length === 0
-// ) {
-//   await fetchCategories();
-// }
+
+const toast = useToast();
 const overlay = useOverlay();
 
 const modal_edit_logo = overlay.create(LazyAdminMerchantEditLogo);
 const modal_delete_merchant = overlay.create(LazyModalConfirm);
-
+const base_url = useRuntimeConfig().public.BASE_URL;
 const form = useTemplateRef<HTMLFormElement>("form");
 
 const logoError = ref<ImageError>({
@@ -73,7 +69,6 @@ const schema = z.object({
 type Schema = z.output<typeof schema>;
 
 const logoRef = ref<HTMLInputElement>();
-const toast = useToast();
 const logoBlob = ref<Blob>();
 const isEdit = ref<boolean>(false);
 const changeLogo = (e: Event) => {
@@ -214,6 +209,15 @@ onMounted(async () => {
   state.primary_color = "blue";
   state.logo = getImg(merchant.value?.logo!);
 });
+const copyLink = async () => {
+  await navigator.clipboard.writeText(
+    String("https://feedback-demo.pages.dev/" + merchant.value!.slug)
+  );
+  toast.add({
+    title: "Form link copied!",
+    icon: "i-heroicons-check-circle",
+  });
+};
 </script>
 
 <template>
@@ -255,6 +259,23 @@ onMounted(async () => {
       </UDashboardNavbar>
     </template>
     <template #body>
+      <UPageCard spotlight>
+        <template #body>
+          <div class="flex flex-col">
+            <span>Form Link</span>
+            <span class="text-neutral-400"
+              >{{ base_url }}/{{ merchant ? merchant!.slug : "" }}
+
+              <UButton
+                icon="i-heroicons-square-2-stack-solid"
+                variant="ghost"
+                @click="copyLink"
+                v-if="merchant"
+              />
+            </span>
+          </div>
+        </template>
+      </UPageCard>
       <UForm
         :state="state"
         :schema="schema"
@@ -262,7 +283,7 @@ onMounted(async () => {
         ref="form"
         :validate-on="['blur']"
       >
-        <UPageCard>
+        <UPageCard :variant="isEdit ? 'subtle' : 'outline'">
           <UFormField
             name="title"
             label="Title"
@@ -275,7 +296,7 @@ onMounted(async () => {
               autocomplete="off"
               class="w-full"
               size="md"
-              :readonly="!isEdit"
+              :disabled="!isEdit"
             />
           </UFormField>
 
@@ -292,7 +313,7 @@ onMounted(async () => {
               autocomplete="off"
               class="w-full"
               size="md"
-              :readonly="!isEdit"
+              :disabled="!isEdit"
             />
           </UFormField>
 
@@ -309,7 +330,7 @@ onMounted(async () => {
               class="w-full"
               autocomplete="off"
               size="md"
-              :readonly="!isEdit"
+              :disabled="!isEdit"
             />
           </UFormField>
 
@@ -344,10 +365,10 @@ onMounted(async () => {
             <input
               type="file"
               class="hidden"
-              accept=".jpg, .jpeg, .png"
               @change="onLogoChange"
               ref="logoRef"
             />
+            <!-- accept=".jpg, .jpeg, .png, .webp" -->
 
             <UAvatar :src="state.logo" :alt="state.title" size="lg" />
 

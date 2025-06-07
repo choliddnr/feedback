@@ -31,17 +31,18 @@ definePageMeta({
           :title="merchant.title"
           :description="merchant.description!"
           :to="`/admin/merchants/${merchant.id}`"
-          orientation="vertical"
+          orientation="horizontal"
           spotlight
           spotlight-color="primary"
-          class="md:w-[25%] lg:w-[20%]"
+          class="w-full xl:w-[50%] max-h-96"
           reverse
         >
+          <!-- class="md:w-[25%] lg:w-[20%]" -->
           <template #default>
             <NuxtImg
               :src="merchant.logo ? getImg(merchant.logo) : ''"
               :alt="merchant.title"
-              class="w-full"
+              class="h-auto"
             />
           </template>
         </UPageCard>
