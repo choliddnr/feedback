@@ -1,6 +1,5 @@
 export default defineEventHandler(async (e) => {
   const slug = getRouterParam(e, "slug") as string;
-  console.log("slug validate", slug);
 
   return db(e)
     .select()

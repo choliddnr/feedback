@@ -8,5 +8,25 @@ export default defineEventHandler(async (e) => {
       statusMessage: "Image source not provided",
     });
   }
-  return await getImg(e, src!);
+
+  try {
+    const response = await getImg(e, src);
+    setHeader(
+      e,
+      "Content-Type",
+      response!.ContentType || "application/octet-stream"
+    );
+    setHeader(e, "Content-Length", response!.ContentLength || 0);
+    return sendStream(e, response!.Body as ReadableStream);
+  } catch (error) {
+    console.error("get image error:", error);
+    return sendError(
+      e,
+      createError({
+        statusCode: 500,
+        statusMessage:
+          error instanceof Error ? error.message : "get image error",
+      })
+    );
+  }
 });

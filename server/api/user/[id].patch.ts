@@ -74,9 +74,8 @@ export default defineEventHandler(async (e: H3Event) => {
       if (oldData.image && !isValidURL(oldData.image))
         await deleteImg(e, oldData.image); // user image could be null, delete it if exists
 
-      const image_file = (await readFormData(e)).get("image") as File;
       let filename = "user/" + generateNewFilename("_.webp"); // modify the filename to avoid conflicts and load cache
-      await saveImg(e, image_file, filename); // all uploaded images are saved as webp format
+      await saveImg(e, body.image.data, filename); // all uploaded images are saved as webp format
       newData["image"] = filename;
     }
 

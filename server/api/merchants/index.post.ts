@@ -14,7 +14,6 @@ export default defineEventHandler(async (e) => {
 
   const body = parseMultipartData(await readMultipartFormData(e));
   let newData = {} as Omit<Merchant, "id">;
-  // newData["owner"] = Number(1);
 
   newData["owner"] = Number(session!.user.id);
   newData["title"] = body.title;
@@ -23,12 +22,6 @@ export default defineEventHandler(async (e) => {
   newData["category"] = Number(body.category);
   newData["greeting"] = "greeting "; //not used for now
 
-  /**
-   * Since we are using bunny.net storage that require raw File data,
-   * we used readFormData to get the file data
-   * and then upload it to the storage
-   */
-  const logo_file = (await readFormData(e)).get("logo") as File;
   const filename = "merchant/" + generateNewFilename("_.webp"); // modify the filename to avoid conflicts and load cache
   newData["logo"] = filename;
 
@@ -62,7 +55,7 @@ export default defineEventHandler(async (e) => {
         })
       );
     }
-    await saveImg(e, logo_file, filename); // all uploaded images are saved as webp format
+    await saveImg(e, body.logo.data, filename); // all uploaded images are saved as webp format
     return await db(e).insert(merchants).values(newData).returning();
   } catch (err) {
     throw createError(

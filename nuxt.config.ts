@@ -37,7 +37,10 @@ export default defineNuxtConfig({
     BETTER_AUTH_URL: process.env.NUXT_BETTER_AUTH_URL,
     GOOGLE_CLIENT_ID: process.env.NUXT_GOOGLE_CLIENT_ID,
     GOOGLE_CLIENT_SECRET: process.env.NUXT_GOOGLE_CLIENT_SECRET,
-    BUNNY_ACCESS_KEY: process.env.NUXT_BUNNY_ACCESS_KEY,
+    WASABI_KEY: process.env.NUXT_WASABI_KEY,
+    WASABI_SECRET: process.env.NUXT_WASABI_SECRET,
+    WASABI_BUCKET: process.env.NUXT_WASABI_BUCKET,
+
     public: {
       BASE_URL: process.env.NUXT_BASE_URL,
     },

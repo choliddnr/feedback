@@ -17,19 +17,8 @@ export default defineEventHandler(async (e) => {
   if (body.slug) newData["slug"] = body.slug;
   if (body.description) newData["description"] = body.description;
   if (body.category) newData["category"] = Number(body.category);
-
-  let filename: string | undefined = undefined;
-  let logo_file: File | undefined = undefined;
   if (body.logo) {
-    /**
-     * Since we are using bunny.net storage that require raw File data,
-     * we used readFormData to get the file data
-     * and then upload it to the storage
-     */
-
-    logo_file = (await readFormData(e)).get("logo") as File;
-    filename = "merchant/" + generateNewFilename("_.webp"); // modify the filename to avoid conflicts and load cache - all uploaded images are saved as webp format
-    newData["logo"] = filename;
+    newData["logo"] = "merchant/" + generateNewFilename("_.webp"); // modify the filename to avoid conflicts and load cache - all uploaded images are saved as webp format
   }
 
   /**
@@ -86,9 +75,11 @@ export default defineEventHandler(async (e) => {
      * If the logo is updated, we need to delete the old logo image
      */
 
-    if (body.logo && oldData.logo && !isValidURL(oldData.logo))
-      await deleteImg(e, oldData.logo); // user image could be null, delete it if exists
-    if (logo_file && filename) await saveImg(e, logo_file, filename);
+    if (body.logo) {
+      if (oldData.logo && !isValidURL(oldData.logo))
+        await deleteImg(e, oldData.logo); // user image could be null, delete it if exists
+      if (newData["logo"]) await saveImg(e, body.logo.data, newData["logo"]);
+    }
 
     return await db(e)
       .update(merchants)

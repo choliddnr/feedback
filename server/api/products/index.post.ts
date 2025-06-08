@@ -22,16 +22,7 @@ export default defineEventHandler(async (e) => {
     );
   }
 
-  /**
-   * logic to add product image when using bunny.net storage
-   * Since we are using bunny.net storage that require raw File data,
-   * we used readFormData to get the file data
-   * and then upload it to the storage
-   */
-
-  const image_file = (await readFormData(e)).get("image") as File;
-  let filename = "product/" + generateNewFilename("_.webp"); // modify the filename to avoid conflicts and load cache
-  newData["image"] = filename;
+  newData["image"] = "product/" + generateNewFilename("_.webp"); // modify the filename to avoid conflicts and load cache
 
   /**
    * Validate the data before inserting into the database
@@ -50,7 +41,7 @@ export default defineEventHandler(async (e) => {
   }
 
   try {
-    await saveImg(e, image_file, filename); // all uploaded images are saved as webp format
+    await saveImg(e, body.image.data, newData["image"]); // all uploaded images are saved as webp format
     return await db(e).insert(products).values(newData).returning();
   } catch (e) {
     throw createError(e instanceof Error ? e.message : "Unknown error");
