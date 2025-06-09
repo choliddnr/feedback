@@ -55,6 +55,7 @@ export default defineEventHandler(async (e) => {
         })
       );
     }
+    console.log("body.logo.data,", body.logo.data);
     await saveImg(e, body.logo.data, filename); // all uploaded images are saved as webp format
     return await db(e).insert(merchants).values(newData).returning();
   } catch (err) {
