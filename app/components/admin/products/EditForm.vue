@@ -139,7 +139,7 @@ const onSubmit = async () => {
             name="image"
             label="Product Image"
             class="grid grid-cols-2 gap-2"
-            help="JPG, GIF or PNG. 1MB Max."
+            help="Any image allowed"
             :error="imageError.isError && imageError.message"
             :ui="{
               container: 'flex flex-wrap items-center gap-3 content-center',
@@ -153,9 +153,9 @@ const onSubmit = async () => {
               ref="imageRef"
               type="file"
               class="hidden"
-              accept=".jpg, .jpeg, .png,"
               @change="onImageChange"
             />
+            <!-- accept=".jpg, .jpeg, .png," -->
 
             <UButton
               label="Choose"

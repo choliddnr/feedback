@@ -319,9 +319,9 @@ const deleteAccount = () => {
               ref="fileRef"
               type="file"
               class="hidden"
-              accept=".jpg, .jpeg, .png, .gif"
               @change="onFileChange"
             />
+            <!-- accept=".jpg, .jpeg, .png, .gif" -->
           </UFormField>
         </UPageCard>
       </UForm>

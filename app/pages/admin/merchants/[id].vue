@@ -355,7 +355,7 @@ const copyLink = async () => {
             name="logo"
             label="Logo"
             class="grid grid-cols-2 gap-2"
-            help="JPG, JPEG or PNG. 1MB Max."
+            help="Any image allowed"
             :error="logoError.isError && logoError.message"
             :ui="{
               container: 'flex flex-wrap items-center gap-3',
