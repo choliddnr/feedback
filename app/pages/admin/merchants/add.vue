@@ -254,7 +254,7 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {
             name="logo"
             label="Logo"
             class="grid grid-cols-2 gap-2"
-            help="JPG, JPEG, PNG, or WEBP. 1MB Max."
+            help="Any image allowed"
             description="A logo or any image that represent your merchant."
             required
             :error="logoError.isError && logoError.message"
@@ -266,10 +266,10 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {
             <input
               type="file"
               class="hidden"
-              accept=".jpg, .jpeg, .png"
               @change="onLogoChange"
               ref="logoRef"
             />
+            <!-- accept=".jpg, .jpeg, .png" -->
 
             <UAvatar :src="state.logo" :alt="state.title" size="lg" />
 
