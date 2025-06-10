@@ -10,14 +10,7 @@ export default defineEventHandler(async (e) => {
   }
 
   try {
-    const response = await getImg(e, src);
-    setHeader(
-      e,
-      "Content-Type",
-      response!.ContentType || "application/octet-stream"
-    );
-    setHeader(e, "Content-Length", response!.ContentLength || 0);
-    return sendStream(e, response!.Body as ReadableStream);
+    return await getImg(e, src);
   } catch (error) {
     console.error("get image error:", error);
     return sendError(
