@@ -1,3 +1,6 @@
+// import { db } from './db';
+// import { respondents, responses, response_answers, questions } from './schema';
+// import { eq } from 'drizzle-orm';
 export default defineEventHandler(async (e) => {
   const data_merchant_category = [
     {
@@ -66,28 +69,109 @@ export default defineEventHandler(async (e) => {
     },
   ];
 
-  try {
-    await db(e)
-      .insert(merchant_categories)
-      .values(data_merchant_category)
-      .returning();
 
-    return await db(e)
-      .insert(question_types)
-      .values([
-        {
-          title: "text",
-          description: "collect customers opinion",
-        },
-        {
-          title: "rating",
-          description: "collect the score given by customers",
-        },
-      ])
-      .returning();
-  } catch (error) {
-    console.error(error);
+
+const names = ['Alice', 'Bob', 'Cathy', 'David', 'Eva', 'Frank', 'Grace', 'Henry', 'Ivy', 'Jack'];
+const locations: [number, number][] = [
+  [106.8, -6.2], [107.6, -6.9], [106.7, -6.1], [107.5, -6.8], [106.9, -6.3],
+  [107.0, -6.5], [106.85, -6.25], [107.1, -6.6], [106.95, -6.15], [107.2, -6.7],
+];
+
+const answersMap: Record<number, string[]> = {
+  18: ['Too small', 'Just right', 'Too big'],
+  19: ['Not spicy enough', 'Perfect', 'Too spicy'],
+  20: ['Too soft', 'Just right', 'Too hard'],
+  21: ['Yes', 'No'],
+  22: ['Poor', 'Fair', 'Good', 'Excellent'],
+  23: ['Yes', 'No', 'Maybe'],
+  24: ['Great broth', 'Nice texture', 'Rich flavor'],
+  25: ['Add egg', 'Less salt', 'More meat'],
+  26: ['Loved it', 'No suggestions', 'Keep spicy level'],
+  27: ['1', '2', '3', '4', '5'],
+  28: ['Too small', 'Just right', 'Too big'],
+  29: ['Not spicy enough', 'Perfect', 'Too spicy'],
+  30: ['Too soft', 'Just right', 'Too hard'],
+  31: ['Yes', 'No'],
+  32: ['Poor', 'Fair', 'Good', 'Excellent'],
+  33: ['Yes', 'No', 'Maybe'],
+  34: ['Great broth', 'Nice texture', 'Rich flavor'],
+  35: ['Add egg', 'Less salt', 'More meat'],
+  36: ['Loved it', 'No suggestions', 'Keep spicy level'],
+  37: ['1', '2', '3', '4', '5'],
+};
+
+const getRandom = <T>(arr: T[]) => arr[Math.floor(Math.random() * arr.length)];
+try {
+  
+
+  const merchantId = 27;
+  const productQuestionMap: Record<number, number[]> = {
+    12: [18, 19, 20, 21, 22, 23, 24, 25, 26, 27],
+    13: [28, 29, 30, 31, 32, 33, 34, 35, 36, 37],
+  };
+
+  for (let i = 0; i < 10; i++) {
+    const respondent = await db(e).insert(respondents).values({
+      name: names[i],
+      gender: i % 2 === 0 ? 0 : 1,
+      age: 20 + Math.floor(Math.random() * 15),
+      whatsapp: 628100000000 + i,
+      location: locations[i],
+    }).returning({ id: respondents.id });
+
+    const respondentId = respondent[0].id;
+    
+    
+    const response = await db(e).insert(responses).values({
+      merchant: merchantId,
+      respondent: respondentId,
+    }).returning({ id: responses.id });
+    
+    console.log(`Seeding respondent ${i + 1}: ${response}`);
+    for (const productId of [12, 13]) {
+      const responseId = response[0].id;
+      const questionIds = productQuestionMap[productId];
+
+      for (const qid of questionIds) {
+        const answer = getRandom(answersMap[qid] || ['No answer']);
+        await db(e).insert(response_answers).values({
+          response: responseId,
+          question: qid,
+          answer,
+        });
+      }
+    }
   }
+
+  return '✅ Seeded 10 respondents with responses to 2 products each.';
+
+
+} catch (error) {
+  console.error('Error seeding data:', error);
+}
+
+  // try {
+  //   await db(e)
+  //     .insert(merchant_categories)
+  //     .values(data_merchant_category)
+  //     .returning();
+
+  //   return await db(e)
+  //     .insert(question_types)
+  //     .values([
+  //       {
+  //         title: "text",
+  //         description: "collect customers opinion",
+  //       },
+  //       {
+  //         title: "rating",
+  //         description: "collect the score given by customers",
+  //       },
+  //     ])
+  //     .returning();
+  // } catch (error) {
+  //   console.error(error);
+  // }
   // const merchant = [
   //   {
   //     title: "Tsurayya Food",

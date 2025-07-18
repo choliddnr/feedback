@@ -71,6 +71,7 @@ const period = ref<Period>("daily");
       <AdminHomeStats :period="period" :range="range" />
       <!-- <HomeChart :period="period" :range="range" /> -->
       <AdminHomeResponses :period="period" :range="range" />
+      <AdminHomeResponseAnalysis />
     </template>
   </UDashboardPanel>
 </template>

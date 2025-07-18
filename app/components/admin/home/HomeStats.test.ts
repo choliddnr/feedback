@@ -1,10 +1,14 @@
 import { mount } from '@vue/test-utils';
 import { describe, it, expect } from 'vitest';
-import HomeResponses from '~/components/admin/home/HomeResponses.vue';
+import HomeStats from '~/components/admin/home/HomeStats.vue';
 
-describe('HomeResponses.vue', () => {
+describe('HomeStats.vue', () => {
   it('mounts successfully', async () => {
-    const wrapper = mount(HomeResponses, {
+    const wrapper = mount(HomeStats, {
+      props: {
+        period: 'day',
+        range: 'last_7_days',
+      },
       global: {
         stubs: {
           // Stub any Nuxt-specific components or async components

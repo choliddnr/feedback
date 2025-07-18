@@ -208,3 +208,12 @@ export const InsertResponseAnswerSchema = createInsertSchema(response_answers, {
   response: true,
   question: true,
 });
+
+
+export const analysis = sqliteTable("analysis", {
+  merchant: int().references((): AnySQLiteColumn => responses.id, {
+    onDelete: "cascade",
+  }),
+  analysis: text().notNull(),
+  ...dafaultField,
+});

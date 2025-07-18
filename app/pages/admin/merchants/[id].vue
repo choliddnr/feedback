@@ -211,7 +211,7 @@ onMounted(async () => {
 });
 const copyLink = async () => {
   await navigator.clipboard.writeText(
-    String("https://feedback-demo.pages.dev/" + merchant.value!.slug)
+    String(base_url + "/" + merchant.value!.slug)
   );
   toast.add({
     title: "Form link copied!",
