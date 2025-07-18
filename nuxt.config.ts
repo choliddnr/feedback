@@ -41,6 +41,7 @@ export default defineNuxtConfig({
     WASABI_SECRET: process.env.NUXT_WASABI_SECRET,
     WASABI_BUCKET: process.env.NUXT_WASABI_BUCKET,
 
+    N8N_API: process.env.NUXT_N8N_API,
     public: {
       BASE_URL: process.env.NUXT_BASE_URL,
     },
