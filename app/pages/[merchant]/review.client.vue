@@ -1,18 +1,17 @@
 <script setup lang="ts">
-import type { Product, Question } from "~~/shared/types";
-const { answers, products, all_questions, respondent, merchant } = storeToRefs(
-  useResponseStore()
-);
+import type { Product, Question } from '~~/shared/types';
+const { answers, products, all_questions, respondent, merchant } =
+  storeToRefs(useResponseStore());
 const route = useRoute();
 const toast = useToast();
 
 const submitFeedback = async () => {
-  await $fetch("/api/public/response", {
-    method: "POST",
+  await $fetch('/api/public/response', {
+    method: 'POST',
     body: {
       respondent: {
         ...respondent.value,
-        gender: respondent.value?.gender === "male" ? true : false,
+        gender: respondent.value?.gender === 'male',
       },
       merchant: merchant.value?.id,
       answers: Object.fromEntries(answers.value),
@@ -20,8 +19,8 @@ const submitFeedback = async () => {
     onResponse: ({ response }) => {
       if (response.ok) {
         toast.add({
-          title: "Thanks",
-          description: "Feedback anda berhasil kami terima!.",
+          title: 'Thanks',
+          description: 'Feedback anda berhasil kami terima!.',
         });
         navigateTo(`/${merchant.value?.slug}/thankyou`);
       }
@@ -29,10 +28,10 @@ const submitFeedback = async () => {
     onResponseError: ({ response, error }) => {
       if (!response.ok) {
         toast.add({
-          title: "Failded",
+          title: 'Failded',
           description: response._data.statusMessage,
-          color: "error",
-          icon: "i-lucide-octagon-x",
+          color: 'error',
+          icon: 'i-lucide-octagon-x',
           duration: 100000,
         });
       }
@@ -60,7 +59,9 @@ const submitFeedback = async () => {
         </template>
         <USeparator />
         <div
-          v-for="q in all_questions?.filter((q:Question) => q.product === p.id)"
+          v-for="q in all_questions?.filter(
+            (q: Question) => q.product === p.id,
+          )"
         >
           <p class="text-lg">Q: {{ q.question }}</p>
           <p v-if="q.type === 1" class="font-bold text-lg">

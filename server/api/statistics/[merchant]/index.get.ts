@@ -1,12 +1,12 @@
 export default defineEventHandler(async (e) => {
-  const merchant = Number(getRouterParam(e, "merchant"));
+  const merchant = Number(getRouterParam(e, 'merchant'));
 
   const sq_response = db(e)
-    .$with("sq_response")
+    .$with('sq_response')
     .as(db(e).select().from(responses).where(eq(responses.merchant, merchant)));
 
   const sq = db(e)
-    .$with("sq")
+    .$with('sq')
     .as(
       db(e)
         .with(sq_response)
@@ -15,7 +15,7 @@ export default defineEventHandler(async (e) => {
         .innerJoin(sq_response, eq(sq_response.id, response_answers.response))
         .innerJoin(questions, eq(questions.id, response_answers.question))
         .innerJoin(question_types, eq(question_types.id, questions.type))
-        .where(and(eq(question_types.title, "rating")))
+        .where(and(eq(question_types.title, 'rating'))),
     );
 
   return {

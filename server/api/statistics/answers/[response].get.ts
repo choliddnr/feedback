@@ -1,5 +1,5 @@
 export default defineEventHandler(async (e) => {
-  const response = Number(getRouterParam(e, "response"));
+  const response = Number(getRouterParam(e, 'response'));
   const answers = await db(e)
     .select({
       product: products.title,

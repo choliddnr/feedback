@@ -1,10 +1,10 @@
-import { avg } from "drizzle-orm";
+import { avg } from 'drizzle-orm';
 
 export default defineEventHandler(async (e) => {
-  const merchant = Number(getRouterParam(e, "merchant"));
+  const merchant = Number(getRouterParam(e, 'merchant'));
 
   const sq = db(e)
-    .$with("sq")
+    .$with('sq')
     .as(db(e).select().from(responses).where(eq(responses.merchant, merchant)));
   const respondent = await db(e)
     .with(sq)

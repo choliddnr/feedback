@@ -1,4 +1,4 @@
-import { InsertQuestionSchema } from "~~/server/utils/db/schema";
+import { InsertQuestionSchema } from '~~/server/utils/db/schema';
 
 export default defineEventHandler(async (e) => {
   const res = await readValidatedBody(e, InsertQuestionSchema.safeParse);
@@ -8,8 +8,8 @@ export default defineEventHandler(async (e) => {
       e,
       createError({
         statusCode: 422,
-        statusMessage: "Invalid question",
-      })
+        statusMessage: 'Invalid question',
+      }),
     );
   }
   return await db(e).insert(questions).values(res.data).returning();

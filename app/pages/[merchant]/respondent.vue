@@ -19,13 +19,13 @@
  * - Additional functionality or data-fetching logic may be implemented to support the respondent view.
  */
 
-import { z } from "zod";
-import { useStorage } from "@vueuse/core";
-import type { RespondentForm } from "~~/shared/types";
+import { z } from 'zod';
+import { useStorage } from '@vueuse/core';
+import type { RespondentForm } from '~~/shared/types';
 
 const state = reactive<RespondentForm>({
-  name: "",
-  gender: "female",
+  name: '',
+  gender: 'female',
   age: 20,
   whatsapp: 8,
 });
@@ -35,23 +35,23 @@ const schema = z.object({
   age: z.number().gt(14).lt(90),
   whatsapp: z
     .number()
-    .min(100000000, "min 9 digit.")
-    .max(10000000000000, "max 14 digit.")
+    .min(100000000, 'min 9 digit.')
+    .max(10000000000000, 'max 14 digit.')
     .optional(),
 });
 
 const { merchant, respondent } = storeToRefs(useResponseStore());
 
 const onsubmit = () => {
-  useStorage("respondent", state);
+  useStorage('respondent', state);
   localStorage.setItem(
     `${merchant.value?.id}_respondent`,
-    JSON.stringify(state)
+    JSON.stringify(state),
   );
   respondent.value = {
-    name: state.name || "",
+    name: state.name || '',
     age: state.age || 20,
-    gender: state.gender || "female",
+    gender: state.gender || 'female',
     whatsapp: state.whatsapp || 0,
   };
   navigateTo(`/${merchant.value?.slug}/products`);
@@ -72,7 +72,7 @@ onMounted(() => {
     const unwatch = watch(merchant, () => {
       if (!merchant.value) return;
       const localRespondent = localStorage.getItem(
-        `${merchant.value?.id}_respondent`
+        `${merchant.value?.id}_respondent`,
       );
       if (localRespondent) {
         respondent.value = JSON.parse(localRespondent);

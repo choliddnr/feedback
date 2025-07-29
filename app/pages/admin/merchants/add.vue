@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import type { FormError, FormErrorEvent, FormSubmitEvent } from "#ui/types";
-import { z } from "zod";
-import type { ImageError, Merchant } from "~~/shared/types";
-import type { NavigationMenuItem } from "@nuxt/ui";
-import { LazyAdminMerchantEditLogo } from "#components";
+import type { FormError, FormErrorEvent, FormSubmitEvent } from '#ui/types';
+import { z } from 'zod';
+import type { NavigationMenuItem } from '@nuxt/ui';
+import type { ImageError, Merchant } from '~~/shared/types';
+import { LazyAdminMerchantEditLogo } from '#components';
 
 definePageMeta({
-  layout: "dashboard",
+  layout: 'dashboard',
 });
 
 const { merchant_categories } = storeToRefs(useMerchantCategoriesStore());
@@ -22,19 +22,19 @@ const overlay = useOverlay();
 
 const modal_edit_logo = overlay.create(LazyAdminMerchantEditLogo);
 
-const form = useTemplateRef("form");
+const form = useTemplateRef('form');
 
 const MAX_FILE_SIZE = 1 * 1024 * 1024; // 1MB
 const ACCEPTED_FILE_TYPES = [
-  "image/jpeg",
-  "image/jpeg",
-  "image/png",
-  "image/webp",
+  'image/jpeg',
+  'image/jpeg',
+  'image/png',
+  'image/webp',
 ];
 
 const logoError = ref<ImageError>({
   isError: false,
-  message: "",
+  message: '',
 });
 
 const schema = z.object({
@@ -45,14 +45,14 @@ const schema = z.object({
     .refine((val) => {
       const regex = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
       return regex.test(val);
-    }, "Slug must be lowercase and can only contain letters, numbers, and dashes.")
+    }, 'Slug must be lowercase and can only contain letters, numbers, and dashes.')
     .refine(async (val) => {
-      if (val === "") return true;
-      const data = await $fetch<Merchant>("/api/merchants/slug/" + val, {
-        method: "get",
+      if (val === '') return true;
+      const data = await $fetch<Merchant>('/api/merchants/slug/' + val, {
+        method: 'get',
       });
-      return !data ? true : false;
-    }, "Slug already exists"),
+      return !data;
+    }, 'Slug already exists'),
   description: z.string(),
   category: z.number(),
   primary_color: z.string(),
@@ -60,13 +60,13 @@ const schema = z.object({
 
 type Schema = z.output<typeof schema>;
 const state = reactive({
-  title: "",
-  slug: "",
-  description: "",
+  title: '',
+  slug: '',
+  description: '',
   category: 1,
-  primary_color: "blue",
-  image_background: "",
-  logo: "",
+  primary_color: 'blue',
+  image_background: '',
+  logo: '',
 });
 
 const logoRef = ref<HTMLInputElement>();
@@ -83,17 +83,17 @@ const onLogoChange = (e: Event) => {
 
   modal_edit_logo.open({
     image: URL.createObjectURL(input.files[0]!),
-    "onUpdate:imageBlob": (value) => {
+    'onUpdate:imageBlob': (value) => {
       logoBlob.value = value;
       state.logo = URL.createObjectURL(value!);
       modal_edit_logo.close();
       logoError.value = {
         isError: false,
-        message: "",
+        message: '',
       };
     },
     onCancel: () => {
-      state.logo = "";
+      state.logo = '';
       modal_edit_logo.close();
     },
   });
@@ -103,34 +103,34 @@ const on_submit = ref<boolean>(false);
 const onSubmit = async (event: FormSubmitEvent<Schema>) => {
   on_submit.value = true;
   const formData = new FormData();
-  formData.append("title", state.title);
+  formData.append('title', state.title);
 
-  formData.append("slug", state.slug);
-  formData.append("description", state.description);
-  formData.append("category", String(state.category));
-  formData.append("primary_color", state.primary_color);
+  formData.append('slug', state.slug);
+  formData.append('description', state.description);
+  formData.append('category', String(state.category));
+  formData.append('primary_color', state.primary_color);
 
   if (logoBlob.value) {
-    formData.append("logo", logoBlob.value);
+    formData.append('logo', logoBlob.value);
   } else {
     logoError.value = {
       isError: true,
-      message: "Merchant logo is required.",
+      message: 'Merchant logo is required.',
     };
     return;
   }
 
-  await $fetch("/api/merchants", {
-    method: "post",
+  await $fetch('/api/merchants', {
+    method: 'post',
     body: formData,
     onResponse: async ({ response }) => {
       if (response.status === 200) {
         await fetch();
         on_submit.value = false;
-        navigateTo("/admin/merchants");
+        navigateTo('/admin/merchants');
         toast.add({
-          title: "Merchant created",
-          icon: "i-heroicons-check-circle",
+          title: 'Merchant created',
+          icon: 'i-heroicons-check-circle',
         });
       }
     },
@@ -138,10 +138,10 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {
       if (response.status !== 200) {
         on_submit.value = false;
         toast.add({
-          title: "Failed to create merchant",
+          title: 'Failed to create merchant',
           description: error?.message,
-          icon: "i-heroicons-x-circle",
-          color: "error",
+          icon: 'i-heroicons-x-circle',
+          color: 'error',
         });
       }
     },
@@ -164,8 +164,8 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {
                 label="Save Changes"
                 color="neutral"
                 leading-icon="i-heroicons-document-check-16-solid"
-                @click="form?.submit()"
                 :loading="on_submit"
+                @click="form?.submit()"
               />
               <UButton
                 label="Cancel"
@@ -180,12 +180,12 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {
     </template>
     <template #body>
       <UForm
+        ref="form"
         :state="state"
         :schema="schema"
-        @submit="onSubmit"
-        ref="form"
         :validate-on="['blur']"
         :validate-on-input-delay="500"
+        @submit="onSubmit"
       >
         <UPageCard>
           <UFormField
@@ -242,9 +242,9 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {
             :ui="{ container: '' }"
           >
             <USelectMenu
+              v-model="state.category"
               class="w-full"
               :items="merchant_categories"
-              v-model="state.category"
               label-key="title"
               value-key="id"
             />
@@ -264,11 +264,11 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {
             }"
           >
             <input
+              ref="logoRef"
               type="file"
               class="hidden"
               @change="onLogoChange"
-              ref="logoRef"
-            />
+            >
             <!-- accept=".jpg, .jpeg, .png" -->
 
             <UAvatar :src="state.logo" :alt="state.title" size="lg" />

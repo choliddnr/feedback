@@ -1,5 +1,5 @@
 export default defineEventHandler(async (e) => {
-  const username = getRouterParam(e, "username") as string;
+  const username = getRouterParam(e, 'username') as string;
   return db(e)
     .select()
     .from(user)

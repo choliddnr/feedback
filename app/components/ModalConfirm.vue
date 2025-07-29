@@ -1,20 +1,20 @@
 <script lang="ts" setup>
-type OnDelete = { act: "delete"; id: string | number };
-type OnUpdate = {
-  act: "update";
-  id: string | number;
-  state: { title: string; description: string; updated: string | Date };
-};
-type OnCreate = {
-  act: "create";
-  state: {
-    title: string;
-    description: string;
-    unit: string;
-    category: string;
-    barcode: number;
-  };
-};
+// type OnDelete = { act: 'delete'; id: string | number };
+// type OnUpdate = {
+//   act: 'update';
+//   id: string | number;
+//   state: { title: string; description: string; updated: string | Date };
+// };
+// type OnCreate = {
+//   act: 'create';
+//   state: {
+//     title: string;
+//     description: string;
+//     unit: string;
+//     category: string;
+//     barcode: number;
+//   };
+// };
 
 const props = withDefaults(
   defineProps<{
@@ -23,45 +23,45 @@ const props = withDefaults(
       continue?: {
         label?: string;
         color?:
-          | "primary"
-          | "secondary"
-          | "neutral"
-          | "success"
-          | "info"
-          | "warning"
-          | "error";
+          | 'primary'
+          | 'secondary'
+          | 'neutral'
+          | 'success'
+          | 'info'
+          | 'warning'
+          | 'error';
       };
       cancel?: {
         label?: string;
         color?:
-          | "primary"
-          | "secondary"
-          | "neutral"
-          | "success"
-          | "info"
-          | "warning"
-          | "error";
+          | 'primary'
+          | 'secondary'
+          | 'neutral'
+          | 'success'
+          | 'info'
+          | 'warning'
+          | 'error';
       };
     };
   }>(),
   {
-    message: "Are you sure?",
+    message: 'Are you sure?',
     action: () => {
       return {
         continue: {
-          label: "Yes",
-          color: "primary",
+          label: 'Yes',
+          color: 'primary',
         },
         cancel: {
-          label: "Cancel",
-          color: "warning",
+          label: 'Cancel',
+          color: 'warning',
         },
       };
     },
-  }
+  },
 );
 
-const emit = defineEmits(["continue", "cancel"]);
+const emit = defineEmits(['continue', 'cancel']);
 const onloading = ref<boolean>(false);
 
 onBeforeUnmount(() => {
@@ -77,22 +77,22 @@ onBeforeUnmount(() => {
           <h6>{{ message }}</h6>
           <UButton
             :loading="onloading"
+            class="w-min-20 justify-center mr-3"
+            :color="action.continue?.color || 'primary'"
             @click="
               () => {
                 onloading = true;
                 emit('continue');
               }
             "
-            class="w-min-20 justify-center mr-3"
-            :color="action.continue?.color || 'primary'"
           >
             {{ action.continue?.label }} </UButton
           ><UButton
-            @click="emit('cancel')"
             class="w-min-20 justify-center"
             :color="action.cancel?.color || 'warning'"
+            @click="emit('cancel')"
           >
-            {{ action.cancel?.label || "Cancel" }}
+            {{ action.cancel?.label || 'Cancel' }}
           </UButton>
         </div>
       </UCard>

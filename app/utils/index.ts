@@ -1,6 +1,6 @@
 export const toKebabCase = (str: string) => {
   return str
-    .replace(/\s+/g, "-") // Replace spaces with hyphens
+    .replace(/\s+/g, '-') // Replace spaces with hyphens
     .toLowerCase(); // Convert to lowercase
 };
 
@@ -12,7 +12,7 @@ export const toKebabCase = (str: string) => {
 export const getImg = (src: string) => {
   if (isValidURL(src)) return src;
   const config = useRuntimeConfig();
-  return config.public.BASE_URL + "/api/image/" + src;
+  return config.public.BASE_URL + '/api/image/' + src;
 };
 
 /**
@@ -42,4 +42,3 @@ export const isValidURL = (str: string): boolean => {
     return false;
   }
 };
-

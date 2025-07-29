@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import type { DropdownMenuItem } from "@nuxt/ui";
-import type { Merchant } from "~~/shared/types";
+import type { DropdownMenuItem } from '@nuxt/ui';
+import type { Merchant } from '~~/shared/types';
 defineProps<{
   collapsed?: boolean;
 }>();
@@ -12,7 +12,7 @@ const merchant_list = computed<DropdownMenuItem[]>(() => {
     items.push({
       label: m.title,
       avatar: {
-        src: m.logo ? getImg(m.logo) : "",
+        src: m.logo ? getImg(m.logo) : '',
         alt: m.title,
       },
       onSelect: () => (active_merchant.value = m.id),

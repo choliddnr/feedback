@@ -1,5 +1,5 @@
 export default defineEventHandler(async (e) => {
-  const id = getRouterParam(e, "id");
+  const id = getRouterParam(e, 'id');
   const merchant = await db(e)
     .select()
     .from(merchants)
@@ -11,8 +11,8 @@ export default defineEventHandler(async (e) => {
       e,
       createError({
         statusCode: 404,
-        statusMessage: "Merchant not found",
-      })
+        statusMessage: 'Merchant not found',
+      }),
     );
   }
 

@@ -1,10 +1,10 @@
 <script lang="ts" setup>
-import type { FormSubmitEvent, InputMenuItem } from "#ui/types";
-import { ModalConfirm, UInput } from "#components";
-import { type output as zodOutput } from "zod";
-import { z } from "zod";
-import type { NewProduct, NewQuestion, Product } from "~~/shared/types";
-import { useQuestionTypesStore } from "~/stores/question_types";
+import type { FormSubmitEvent, InputMenuItem } from '#ui/types';
+import { type output as zodOutput } from 'zod';
+import { z } from 'zod';
+import { ModalConfirm, UInput } from '#components';
+import type { NewProduct, NewQuestion, Product } from '~~/shared/types';
+import { useQuestionTypesStore } from '~/stores/question_types';
 
 const { questions } = storeToRefs(useQuestionsStore());
 const { question_types } = storeToRefs(useQuestionTypesStore());
@@ -25,7 +25,7 @@ const emits = defineEmits<{
 }>();
 
 const state = reactive<NewQuestion>({
-  question: "",
+  question: '',
   answer_options: [],
   type: 0,
   product: active_product.value || 0,
@@ -42,30 +42,30 @@ watch(
   () => state.product,
   () => {
     active_product.value = state.product;
-  }
+  },
 );
 const onSubmit = async () => {
   onSubmitting.value = true;
-  const res = await $fetch<Response>("/api/questions", {
-    method: "post",
+  const res = await $fetch<Response>('/api/questions', {
+    method: 'post',
     body: state,
     onResponse: async ({ response }) => {
       if (response.ok) {
         questions.value.push(response._data[0]);
         toast.add({
-          title: "Question added",
-          icon: "i-heroicons-check-circle",
+          title: 'Question added',
+          icon: 'i-heroicons-check-circle',
         });
         onSubmitting.value = false;
-        emits("close");
+        emits('close');
       }
     },
     onResponseError: ({ response, error }) => {
       if (!response.ok) {
         toast.add({
-          title: "Failed to add question",
-          icon: "i-heroicons-x-circle",
-          color: "error",
+          title: 'Failed to add question',
+          icon: 'i-heroicons-x-circle',
+          color: 'error',
         });
         onSubmitting.value = false;
       }
@@ -95,14 +95,14 @@ const onSubmit = async () => {
           </UFormField>
 
           <UFormField
+            v-if="state.type !== 2"
             label="Answer options"
             name="answer_options"
-            v-if="state.type !== 2"
           >
             <UButtonGroup class="mt-2 w-full">
               <UInput
-                block
                 v-model="answer_option"
+                block
                 class="w-full"
                 placeholder="Add option"
               />

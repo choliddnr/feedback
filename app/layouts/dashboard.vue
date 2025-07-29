@@ -1,6 +1,6 @@
 <script setup lang="ts">
 const { fetch } = useUserStore();
-callOnce("user", async () => await fetch());
+callOnce('user', async () => await fetch());
 const { user } = storeToRefs(useUserStore());
 
 const { merchants, active_merchant } = storeToRefs(useMerchantsStore());
@@ -15,56 +15,56 @@ const open = ref(false);
 const links = computed(() => [
   [
     {
-      id: "home",
-      label: "Home",
-      icon: "i-heroicons-home",
-      to: "/admin",
+      id: 'home',
+      label: 'Home',
+      icon: 'i-heroicons-home',
+      to: '/admin',
       tooltip: {
-        text: "Home",
-        shortcuts: ["G", "H"],
+        text: 'Home',
+        shortcuts: ['G', 'H'],
       },
     },
     {
-      id: "user",
-      label: "User",
-      icon: "i-heroicons-user",
-      to: "/admin/user",
+      id: 'user',
+      label: 'User',
+      icon: 'i-heroicons-user',
+      to: '/admin/user',
       tooltip: {
-        text: "User",
-        shortcuts: ["G", "U"],
+        text: 'User',
+        shortcuts: ['G', 'U'],
       },
     },
     {
-      id: "merchant",
-      label: "Merchants",
-      icon: "i-heroicons-building-storefront",
-      to: "/admin/merchants",
+      id: 'merchant',
+      label: 'Merchants',
+      icon: 'i-heroicons-building-storefront',
+      to: '/admin/merchants',
       badge: merchants.value?.length,
       tooltip: {
-        text: "Merchant",
-        shortcuts: ["G", "M"],
+        text: 'Merchant',
+        shortcuts: ['G', 'M'],
       },
     },
     {
-      id: "products",
-      label: "Products",
-      icon: "i-heroicons-cube-20-solid",
-      to: "/admin/products",
+      id: 'products',
+      label: 'Products',
+      icon: 'i-heroicons-cube-20-solid',
+      to: '/admin/products',
       badge: products.value?.length,
       tooltip: {
-        text: "Products",
-        shortcuts: ["G", "P"],
+        text: 'Products',
+        shortcuts: ['G', 'P'],
       },
     },
     {
-      id: "questions",
-      label: "Questions",
-      icon: "i-heroicons-question-mark-circle-16-solid",
-      to: "/admin/questions",
+      id: 'questions',
+      label: 'Questions',
+      icon: 'i-heroicons-question-mark-circle-16-solid',
+      to: '/admin/questions',
       badge: questions.value.length,
       tooltip: {
-        text: "Item",
-        shortcuts: ["G", "Q"],
+        text: 'Item',
+        shortcuts: ['G', 'Q'],
       },
     },
   ],

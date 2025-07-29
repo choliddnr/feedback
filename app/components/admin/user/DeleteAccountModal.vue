@@ -8,7 +8,7 @@ const toast = useToast();
 
 const loading = ref(false);
 
-const emit = defineEmits(["cancel"]);
+const emit = defineEmits(['cancel']);
 
 const onDelete = async () => {
   // loading.value = true;
@@ -35,8 +35,8 @@ const onDelete = async () => {
     :close-button="null"
     :ui="{
       footer: {
-        base: 'ml-16'
-      } as any
+        base: 'ml-16',
+      } as any,
     }"
   >
     <template #footer>

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 const { merchants } = storeToRefs(useMerchantsStore());
 definePageMeta({
-  layout: "dashboard",
+  layout: 'dashboard',
 });
 </script>
 
@@ -25,7 +25,7 @@ definePageMeta({
     </template>
 
     <template #body>
-      <div class="flex flex-row gap-3" v-if="merchants && merchants.length > 0">
+      <div v-if="merchants && merchants.length > 0" class="flex flex-row gap-3">
         <UPageCard
           v-for="merchant in merchants"
           :title="merchant.title"
@@ -47,15 +47,15 @@ definePageMeta({
           </template>
         </UPageCard>
       </div>
-      <div class="w-auto mx-auto max-w-xs flex flex-col gap-5" v-else>
+      <div v-else class="w-auto mx-auto max-w-xs flex flex-col gap-5">
         <NuxtImg src="/empty.png" />
         <span class="mx-auto font-bold text-xl">No Merchant </span>
         <UButton
           label="Create Merchant"
           trailing-icon="i-heroicons-plus"
           color="neutral"
-          @click="navigateTo('/admin/merchants/add')"
           class="mx-auto"
+          @click="navigateTo('/admin/merchants/add')"
         />
       </div>
     </template>

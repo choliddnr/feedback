@@ -6,9 +6,9 @@ if (
   active_merchant.value !== undefined &&
   merchants.value.length > 0
 ) {
-  const index = merchants.value.findIndex(
-    (m) => m.id === active_merchant.value
-  );
+  // const index = merchants.value.findIndex(
+  //   (m) => m.id === active_merchant.value,
+  // );
   // const app_config = useAppConfig();
   // app_config.ui.colors.primary = merchants.value[index]!.primery_color
   //   ? merchants.value[index]!.primery_color

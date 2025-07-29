@@ -10,6 +10,7 @@ export default defineNuxtConfig({
     "@pinia/nuxt",
     "@nuxt/image",
     "@nuxt/test-utils/module",
+    "@nuxt/eslint",
   ],
   css: ["~/assets/css/main.css"],
   ui: {

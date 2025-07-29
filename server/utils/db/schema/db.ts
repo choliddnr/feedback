@@ -1,13 +1,13 @@
-import { sql } from "drizzle-orm";
-import { int, sqliteTable, text } from "drizzle-orm/sqlite-core";
-import type { AnySQLiteColumn } from "drizzle-orm/sqlite-core";
-export { sql, eq, and, or } from "drizzle-orm";
+import { sql } from 'drizzle-orm';
+import { int, sqliteTable, text } from 'drizzle-orm/sqlite-core';
+import type { AnySQLiteColumn } from 'drizzle-orm/sqlite-core';
 
-import dafaultField from "./default_field";
-import { user } from "./better-auth";
-import { createInsertSchema, createUpdateSchema } from "drizzle-zod";
-import { Merchant } from "~~/shared/types";
-import { ZodString } from "better-auth";
+import { createInsertSchema, createUpdateSchema } from 'drizzle-zod';
+import { ZodString } from 'better-auth';
+import dafaultField from './default_field';
+import { user } from './better-auth';
+import { Merchant } from '~~/shared/types';
+export { sql, eq, and, or } from 'drizzle-orm';
 
 // export const users = sqliteTable("users", {
 //   name: text().notNull(),
@@ -18,15 +18,15 @@ import { ZodString } from "better-auth";
 //   ...dafaultField,
 // });
 
-export const merchants = sqliteTable("merchants", {
+export const merchants = sqliteTable('merchants', {
   title: text().notNull(),
   slug: text().notNull(),
   description: text(),
   category: int().references((): AnySQLiteColumn => merchant_categories.id, {
-    onDelete: "set null",
+    onDelete: 'set null',
   }),
   owner: int().references((): AnySQLiteColumn => user.id, {
-    onDelete: "cascade",
+    onDelete: 'cascade',
   }),
   greeting: text().notNull(),
   primery_color: text(),
@@ -40,7 +40,7 @@ export const InsertMerchantSchema = createInsertSchema(merchants, {
   slug: (field) =>
     field.min(4).refine((value) => /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(value), {
       message:
-        "Slug must be lowercase and can only contain letters, numbers, and dashes.",
+        'Slug must be lowercase and can only contain letters, numbers, and dashes.',
     }),
   description: (field) => field.optional(),
   category: (field) => field.gt(0),
@@ -60,7 +60,7 @@ export const UpdateMerchantSchema = createUpdateSchema(merchants, {
   slug: (field) =>
     field.min(4).refine((value) => /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(value), {
       message:
-        "Slug must be lowercase and can only contain letters, numbers, and dashes.",
+        'Slug must be lowercase and can only contain letters, numbers, and dashes.',
     }),
   description: (field) => field.optional(),
   category: (field) => field.gt(0),
@@ -75,19 +75,19 @@ export const UpdateMerchantSchema = createUpdateSchema(merchants, {
   updatedAt: true,
 });
 
-export const merchant_categories = sqliteTable("merchant_categories", {
+export const merchant_categories = sqliteTable('merchant_categories', {
   title: text().notNull(),
   description: text(),
   ...dafaultField,
 });
 
-export const products = sqliteTable("products", {
+export const products = sqliteTable('products', {
   title: text().notNull(),
   description: text().notNull(),
   image: text().notNull(),
   merchant: int()
     .notNull()
-    .references((): AnySQLiteColumn => merchants.id, { onDelete: "cascade" }),
+    .references((): AnySQLiteColumn => merchants.id, { onDelete: 'cascade' }),
   ...dafaultField,
 });
 
@@ -113,17 +113,17 @@ export const UpdateProductSchema = createUpdateSchema(products, {
   updatedAt: true,
 });
 
-export const questions = sqliteTable("questions", {
+export const questions = sqliteTable('questions', {
   question: text().notNull(),
   type: int()
     .notNull()
     .references((): AnySQLiteColumn => question_types.id, {
-      onDelete: "set null",
+      onDelete: 'set null',
     }),
   product: int()
     .notNull()
-    .references((): AnySQLiteColumn => products.id, { onDelete: "cascade" }),
-  answer_options: text({ mode: "json" })
+    .references((): AnySQLiteColumn => products.id, { onDelete: 'cascade' }),
+  answer_options: text({ mode: 'json' })
     .notNull()
     .$type<string[]>()
     .default([]),
@@ -150,18 +150,18 @@ export const UpdateQuestionSchema = createUpdateSchema(questions, {
   updatedAt: true,
 });
 
-export const question_types = sqliteTable("question_types", {
+export const question_types = sqliteTable('question_types', {
   title: text().notNull(),
   description: text(),
   ...dafaultField,
 });
 
-export const respondents = sqliteTable("respondents", {
+export const respondents = sqliteTable('respondents', {
   name: text().notNull(),
-  gender: int({ mode: "boolean" }).notNull(),
+  gender: int({ mode: 'boolean' }).notNull(),
   age: int().notNull(),
   whatsapp: int(),
-  location: text({ mode: "json" }).$type<[number, number]>(),
+  location: text({ mode: 'json' }).$type<[number, number]>(),
   ...dafaultField,
 });
 
@@ -177,23 +177,23 @@ export const InsertRespondentsSchema = createInsertSchema(respondents, {
   location: true,
 });
 
-export const responses = sqliteTable("responses", {
+export const responses = sqliteTable('responses', {
   merchant: int()
     .notNull()
-    .references((): AnySQLiteColumn => merchants.id, { onDelete: "cascade" }),
+    .references((): AnySQLiteColumn => merchants.id, { onDelete: 'cascade' }),
   respondent: int()
     .references((): AnySQLiteColumn => respondents.id, {
-      onDelete: "set default",
+      onDelete: 'set default',
     })
     .$default(() => 0),
   ...dafaultField,
 });
-export const response_answers = sqliteTable("response_answers", {
+export const response_answers = sqliteTable('response_answers', {
   response: int().references((): AnySQLiteColumn => responses.id, {
-    onDelete: "cascade",
+    onDelete: 'cascade',
   }),
   question: int().references((): AnySQLiteColumn => questions.id, {
-    onDelete: "cascade",
+    onDelete: 'cascade',
   }),
   answer: text().notNull(),
   ...dafaultField,
@@ -209,10 +209,9 @@ export const InsertResponseAnswerSchema = createInsertSchema(response_answers, {
   question: true,
 });
 
-
-export const analysis = sqliteTable("analysis", {
+export const analysis = sqliteTable('analysis', {
   merchant: int().references((): AnySQLiteColumn => responses.id, {
-    onDelete: "cascade",
+    onDelete: 'cascade',
   }),
   analysis: text().notNull(),
   ...dafaultField,

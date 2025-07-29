@@ -1,5 +1,5 @@
 export default defineEventHandler(async (e) => {
-  const id = Number(getRouterParam(e, "id"));
+  const id = Number(getRouterParam(e, 'id'));
   return await db(e)
     .select()
     .from(products)

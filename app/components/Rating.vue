@@ -3,7 +3,7 @@ const model = defineModel<number>({ default: 0 });
 </script>
 <template>
   <div class="flex justify-center w-full mx-auto">
-    <div class="text-warning" @click="model = 1" role="button">
+    <div class="text-warning" role="button" @click="model = 1">
       <svg
         xmlns="http://www.w3.org/2000/svg"
         width="40"
@@ -21,7 +21,7 @@ const model = defineModel<number>({ default: 0 });
         />
       </svg>
     </div>
-    <div class="text-warning" @click="model = 2" role="button">
+    <div class="text-warning" role="button" @click="model = 2">
       <svg
         xmlns="http://www.w3.org/2000/svg"
         width="40"
@@ -39,7 +39,7 @@ const model = defineModel<number>({ default: 0 });
         />
       </svg>
     </div>
-    <div class="text-warning" @click="model = 3" role="button">
+    <div class="text-warning" role="button" @click="model = 3">
       <svg
         xmlns="http://www.w3.org/2000/svg"
         width="40"
@@ -57,7 +57,7 @@ const model = defineModel<number>({ default: 0 });
         />
       </svg>
     </div>
-    <div class="text-warning" @click="model = 4" role="button">
+    <div class="text-warning" role="button" @click="model = 4">
       <svg
         xmlns="http://www.w3.org/2000/svg"
         width="40"
@@ -75,7 +75,7 @@ const model = defineModel<number>({ default: 0 });
         />
       </svg>
     </div>
-    <div class="text-warning" @click="model = 5" role="button">
+    <div class="text-warning" role="button" @click="model = 5">
       <svg
         xmlns="http://www.w3.org/2000/svg"
         width="40"

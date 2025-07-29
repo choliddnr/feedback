@@ -1,56 +1,56 @@
 <script setup lang="ts">
-import * as z from "zod";
-import type { FormSubmitEvent } from "@nuxt/ui";
+import * as z from 'zod';
+import type { FormSubmitEvent } from '@nuxt/ui';
 
-import { authClient } from "@/utils/client"; //import the auth client
+import { authClient } from '@/utils/client'; // import the auth client
 
 const toast = useToast();
 
 const fields = [
   {
-    name: "name",
-    type: "text" as const,
-    label: "Full Name",
-    placeholder: "Enter your full name",
+    name: 'name',
+    type: 'text' as const,
+    label: 'Full Name',
+    placeholder: 'Enter your full name',
     required: true,
   },
   {
-    name: "username",
-    type: "text" as const,
-    label: "Username",
-    placeholder: "Username must be unique",
+    name: 'username',
+    type: 'text' as const,
+    label: 'Username',
+    placeholder: 'Username must be unique',
     required: true,
   },
   {
-    name: "email",
-    type: "text" as const,
-    label: "Email",
-    placeholder: "Enter your email",
+    name: 'email',
+    type: 'text' as const,
+    label: 'Email',
+    placeholder: 'Enter your email',
     required: true,
   },
   {
-    name: "password",
-    label: "Password",
-    type: "password" as const,
-    placeholder: "Enter your password",
+    name: 'password',
+    label: 'Password',
+    type: 'password' as const,
+    placeholder: 'Enter your password',
   },
 ];
 
 const providers = [
   {
-    label: "Google",
-    icon: "i-simple-icons-google",
+    label: 'Google',
+    icon: 'i-simple-icons-google',
     onClick: async () => {
       const data = await authClient.signIn.social(
         {
-          provider: "google",
+          provider: 'google',
         },
         {
           onResponse: () => {
-            toast.add({ title: "Google", description: "Login with Google" });
-            navigateTo("/admin");
+            toast.add({ title: 'Google', description: 'Login with Google' });
+            navigateTo('/admin');
           },
-        }
+        },
       );
     },
   },
@@ -59,8 +59,8 @@ const providers = [
 const schema = z.object({
   name: z.string().min(4),
   username: z.string().min(4),
-  email: z.string().email("Invalid email"),
-  password: z.string().min(8, "Must be at least 8 characters"),
+  email: z.string().email('Invalid email'),
+  password: z.string().min(8, 'Must be at least 8 characters'),
 });
 
 type Schema = z.output<typeof schema>;
@@ -79,17 +79,17 @@ const onSubmit = async (payload: FormSubmitEvent<Schema>) => {
     },
     {
       onRequest: (ctx) => {
-        //show loading
+        // show loading
       },
       onSuccess: (ctx) => {
-        //redirect to the dashboard or sign in page
-        navigateTo("/admin");
+        // redirect to the dashboard or sign in page
+        navigateTo('/admin');
       },
       onError: (ctx) => {
         // display the error message
         alert(ctx.error.message);
       },
-    }
+    },
   );
 };
 </script>

@@ -1,4 +1,4 @@
-import { createSharedComposable } from "@vueuse/core";
+import { createSharedComposable } from '@vueuse/core';
 
 const _useDashboard = () => {
   const route = useRoute();
@@ -17,7 +17,7 @@ const _useDashboard = () => {
     () => route.fullPath,
     () => {
       // isHelpSlideoverOpen.value = false;
-    }
+    },
   );
 
   return {

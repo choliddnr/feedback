@@ -1,6 +1,6 @@
 // server/utils/image.ts
-import { AwsClient } from "aws4fetch";
-import type { H3Event } from "h3";
+import { AwsClient } from 'aws4fetch';
+import type { H3Event } from 'h3';
 
 const endpoint = (e: H3Event, key: string) => {
   const config = useRuntimeConfig(e);
@@ -11,17 +11,17 @@ const aws = (e: H3Event) => {
   return new AwsClient({
     accessKeyId: config.WASABI_KEY!,
     secretAccessKey: config.WASABI_SECRET!,
-    service: "s3",
-    region: "ap-southeast-1", // Wasabi ignores this, so it can be anything
+    service: 's3',
+    region: 'ap-southeast-1', // Wasabi ignores this, so it can be anything
   });
 };
 
 export const saveImg = async (e: H3Event, file: Blob, key: string) => {
   const res = await aws(e).fetch(endpoint(e, key), {
-    method: "PUT",
+    method: 'PUT',
     body: file,
     headers: {
-      "Content-Type": "application/octet-stream",
+      'Content-Type': 'application/octet-stream',
     },
   });
 
@@ -47,16 +47,16 @@ export const getImg = async (e: H3Event, key: string) => {
   return new Response(res.body, {
     status: res.status,
     headers: {
-      "Content-Type":
-        res.headers.get("content-type") || "application/octet-stream",
-      "Cache-Control": "public, max-age=3600", // optional caching
+      'Content-Type':
+        res.headers.get('content-type') || 'application/octet-stream',
+      'Cache-Control': 'public, max-age=3600', // optional caching
     },
   });
 };
 
 export const deleteImg = async (e: H3Event, key: string) => {
   const res = await aws(e).fetch(endpoint(e, key), {
-    method: "DELETE",
+    method: 'DELETE',
   });
 
   if (!res.ok) {

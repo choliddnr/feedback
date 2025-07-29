@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { sub } from "date-fns";
-import type { Period, Range } from "~~/shared/types";
+import { sub } from 'date-fns';
+import type { Period, Range } from '~~/shared/types';
 
 definePageMeta({
-  layout: "dashboard",
+  layout: 'dashboard',
 });
 
 // const { isNotificationsSlideoverOpen } = useDashboard();
@@ -11,14 +11,14 @@ definePageMeta({
 const items = [
   [
     {
-      label: "New mail",
-      icon: "i-lucide-send",
-      to: "/inbox",
+      label: 'New mail',
+      icon: 'i-lucide-send',
+      to: '/inbox',
     },
     {
-      label: "New customer",
-      icon: "i-lucide-user-plus",
-      to: "/customers",
+      label: 'New customer',
+      icon: 'i-lucide-user-plus',
+      to: '/customers',
     },
   ],
 ];
@@ -27,7 +27,7 @@ const range = shallowRef<Range>({
   start: sub(new Date(), { days: 14 }),
   end: new Date(),
 });
-const period = ref<Period>("daily");
+const period = ref<Period>('daily');
 </script>
 
 <template>

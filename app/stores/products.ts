@@ -1,7 +1,7 @@
-import { defineStore, acceptHMRUpdate } from "pinia";
-import type { Product } from "~~/shared/types";
+import { defineStore, acceptHMRUpdate } from 'pinia';
+import type { Product } from '~~/shared/types';
 
-export const useProductsStore = defineStore("products", () => {
+export const useProductsStore = defineStore('products', () => {
   const { active_merchant } = storeToRefs(useMerchantsStore());
   const active_product = ref<number>();
   const products = ref<Product[]>([]);
@@ -31,7 +31,7 @@ export const useProductsStore = defineStore("products", () => {
           }
         }
       },
-    }
+    },
   );
 
   // fetch();

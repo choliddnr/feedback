@@ -1,22 +1,22 @@
-import { betterAuth } from "better-auth";
-import { drizzleAdapter } from "better-auth/adapters/drizzle";
-import * as schema from "./db/schema/";
-import { db } from "./db";
-import type { H3Event } from "h3";
+import { betterAuth } from 'better-auth';
+import { drizzleAdapter } from 'better-auth/adapters/drizzle';
+import type { H3Event } from 'h3';
+import { createAuthMiddleware, APIError } from 'better-auth/api';
+import * as schema from './db/schema/';
+import { db } from './db';
 // import { toKebabCase } from "~/utils";
-import { createAuthMiddleware, APIError } from "better-auth/api";
 // import { userAuth } from "~~/server/plugin/user_auth";
 
 const toKebabCase = (str: string) => {
   return str
-    .replace(/\s+/g, "-") // Replace spaces with hyphens
+    .replace(/\s+/g, '-') // Replace spaces with hyphens
     .toLowerCase(); // Convert to lowercase
 };
 
 export const auth = (e: H3Event) => {
   const _auth = betterAuth({
     database: drizzleAdapter(db(e), {
-      provider: "sqlite",
+      provider: 'sqlite',
       schema,
     }),
 
@@ -24,18 +24,18 @@ export const auth = (e: H3Event) => {
     user: {
       additionalFields: {
         username: {
-          type: "string",
+          type: 'string',
           required: true,
           unique: true,
           input: true,
         },
         defaultMerchant: {
-          type: "number",
+          type: 'number',
           required: false,
           references: {
-            model: "merchants",
-            field: "id",
-            onDelete: "set null",
+            model: 'merchants',
+            field: 'id',
+            onDelete: 'set null',
           },
           input: false, // don't allow user to set role
         },
@@ -56,7 +56,7 @@ export const auth = (e: H3Event) => {
         mapProfileToUser: (profile) => {
           return {
             username: toKebabCase(
-              profile.given_name + " " + profile.family_name
+              profile.given_name + ' ' + profile.family_name,
             ),
             image: profile.picture,
           };
@@ -72,7 +72,7 @@ export const auth = (e: H3Event) => {
 
 export const _auth = betterAuth({
   database: drizzleAdapter({} as any, {
-    provider: "sqlite",
+    provider: 'sqlite',
     schema,
   }),
 
@@ -80,18 +80,18 @@ export const _auth = betterAuth({
   user: {
     additionalFields: {
       username: {
-        type: "string",
+        type: 'string',
         required: true,
         unique: true,
         input: true,
       },
       defaultMerchant: {
-        type: "number",
+        type: 'number',
         required: false,
         references: {
-          model: "merchants",
-          field: "id",
-          onDelete: "set null",
+          model: 'merchants',
+          field: 'id',
+          onDelete: 'set null',
         },
         input: false, // don't allow user to set role
       },
@@ -111,7 +111,7 @@ export const _auth = betterAuth({
       clientSecret: useRuntimeConfig().GOOGLE_CLIENT_SECRET as string,
       mapProfileToUser: (profile) => {
         return {
-          username: toKebabCase(profile.given_name + " " + profile.family_name),
+          username: toKebabCase(profile.given_name + ' ' + profile.family_name),
           image: undefined, // profile.picture is not used in this case
         };
       },

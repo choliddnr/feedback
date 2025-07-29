@@ -1,12 +1,12 @@
 export default defineEventHandler(async (e) => {
-  const slug = getRouterParam(e, "slug");
+  const slug = getRouterParam(e, 'slug');
   if (!slug) {
     return sendError(
       e,
       createError({
         statusCode: 400,
-        statusMessage: "Slug is required",
-      })
+        statusMessage: 'Slug is required',
+      }),
     );
   }
 

@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import type { Period, Range } from "~~/shared/types";
-import type { Stat } from "~~/shared/types";
+import type { Period, Range, Stat } from '~~/shared/types';
 
 const props = defineProps<{
   period: Period;
@@ -11,26 +10,26 @@ const { data } = await useFetch<{
   respondent: number;
   response: number;
   avg_rating: number;
-}>(() => "/api/statistics/" + active_merchant.value, {
+}>(() => '/api/statistics/' + active_merchant.value, {
   watch: [active_merchant],
 });
 
 const stats = computed<Stat[]>(() => [
   {
-    title: "Respondents",
-    icon: "i-lucide-users",
+    title: 'Respondents',
+    icon: 'i-lucide-users',
     value: data.value!.respondent === undefined ? 0 : data.value!.respondent,
     variation: 10,
   },
   {
-    title: "Response",
-    icon: "i-lucide-clipboard-pen-line",
+    title: 'Response',
+    icon: 'i-lucide-clipboard-pen-line',
     value: data.value!.response,
     variation: 10,
   },
   {
-    title: "Rating",
-    icon: "i-lucide-star",
+    title: 'Rating',
+    icon: 'i-lucide-star',
     value:
       data.value!.avg_rating === null ? 0.0 : data.value!.avg_rating.toFixed(1),
     variation: 10,

@@ -1,5 +1,5 @@
 export default defineEventHandler(async (e) => {
-  const slug = getRouterParam(e, "slug") as string;
+  const slug = getRouterParam(e, 'slug') as string;
 
   return db(e)
     .select()

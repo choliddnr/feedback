@@ -3,10 +3,10 @@ import {
   LazyAdminProductsEditForm,
   LazyAdminProductsAddForm,
   LazyModalConfirm,
-} from "#components";
+} from '#components';
 const { merchants, active_merchant } = storeToRefs(useMerchantsStore());
 definePageMeta({
-  layout: "dashboard",
+  layout: 'dashboard',
 });
 const overlay = useOverlay();
 const slideover_add = overlay.create(LazyAdminProductsAddForm);
@@ -18,8 +18,8 @@ const { products, active_product } = storeToRefs(useProductsStore());
 const product_to_delete = ref<string | number>();
 const processDelete = async (id: string | number) => {
   product_to_delete.value = id;
-  await $fetch("/api/products/" + id, {
-    method: "DELETE",
+  await $fetch('/api/products/' + id, {
+    method: 'DELETE',
     onResponse: async ({ response }) => {
       if (response.ok) {
         const index = products.value.findIndex((p) => p.id === id);
@@ -33,10 +33,10 @@ const processDelete = async (id: string | number) => {
 
 const deleteProduct = async (id: string | number) => {
   modal_delete_product.open({
-    message: "Are you sure?",
+    message: 'Are you sure?',
     action: {
-      cancel: { color: "neutral" },
-      continue: { color: "error", label: "Delete" },
+      cancel: { color: 'neutral' },
+      continue: { color: 'error', label: 'Delete' },
     },
     onCancel: () => modal_delete_product.close(),
     onContinue: () => {
@@ -96,7 +96,7 @@ onMounted(() => {
     </template>
 
     <template #body>
-      <div class="flex flex-row gap-3" v-if="products && products.length > 0">
+      <div v-if="products && products.length > 0" class="flex flex-row gap-3">
         <UPageCard
           v-for="product in products"
           :title="product.title"
@@ -147,8 +147,8 @@ onMounted(() => {
         </UPageCard>
       </div>
       <div
-        class="w-auto mx-auto max-w-xs flex flex-col gap-5 justify-content-center"
         v-else
+        class="w-auto mx-auto max-w-xs flex flex-col gap-5 justify-content-center"
       >
         <NuxtImg src="/empty.png" />
         <span class="mx-auto font-bold text-xl">No Product </span>

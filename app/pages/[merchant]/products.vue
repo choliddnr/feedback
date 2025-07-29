@@ -1,27 +1,26 @@
 <script setup lang="ts">
-import type { Product } from "~~/shared/types";
+import type { CheckboxGroupValue } from '@nuxt/ui';
+import type { Product } from '~~/shared/types';
 
 const { merchant } = storeToRefs(useResponseStore());
 
 const { data: _products } = await useFetch<Product[]>(
-  "/api/public/products/" + merchant.value?.id
+  '/api/public/products/' + merchant.value?.id,
 );
-import type { CheckboxGroupValue } from "@nuxt/ui";
-const { respondent, selected_product, products } = storeToRefs(
-  useResponseStore()
-);
+const { respondent, selected_product, products } =
+  storeToRefs(useResponseStore());
 const onSubmit = () => {
   if (selected_product.value.length > 0 && _products.value) {
     localStorage.setItem(
-      merchant.value?.id + "_selected_product",
-      JSON.stringify(selected_product.value)
+      merchant.value?.id + '_selected_product',
+      JSON.stringify(selected_product.value),
     );
     products.value = _products.value?.filter((p) =>
-      selected_product.value?.includes(p.id)
+      selected_product.value?.includes(p.id),
     );
     localStorage.setItem(
-      merchant.value?.id + "_products",
-      JSON.stringify(products.value)
+      merchant.value?.id + '_products',
+      JSON.stringify(products.value),
     );
     navigateTo(`/${merchant.value?.slug}/questions`);
   }
@@ -54,9 +53,9 @@ const onSubmit = () => {
       size="xl"
       class="mt-4"
       block
-      @click="onSubmit"
       :color="selected_product?.length! > 0 ? 'primary' : 'neutral'"
       :disabled="selected_product?.length! === 0"
+      @click="onSubmit"
     />
   </UCard>
 </template>

@@ -1,4 +1,4 @@
-import { inArray } from "drizzle-orm";
+import { inArray } from 'drizzle-orm';
 
 export default defineEventHandler(async (e) => {
   const q = getQuery(e).q as number | number[];

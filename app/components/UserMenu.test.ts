@@ -1,16 +1,20 @@
 import { mount } from '@vue/test-utils';
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { createPinia, setActivePinia } from 'pinia';
+import { ref } from 'vue';
 import UserMenu from '~/components/UserMenu.vue';
 import { useUserStore } from '~/stores/user';
-import { ref } from 'vue';
 
 // Mock useFetch
 vi.mock('#app', async (importOriginal) => {
   const actual = await importOriginal();
   return {
     ...actual,
-    useFetch: vi.fn(() => ({ data: ref(null), pending: ref(false), error: ref(null) })),
+    useFetch: vi.fn(() => ({
+      data: ref(null),
+      pending: ref(false),
+      error: ref(null),
+    })),
   };
 });
 

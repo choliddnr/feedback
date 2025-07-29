@@ -1,15 +1,14 @@
 <script setup lang="ts">
-import type { Merchant } from "~~/shared/types";
+import type { Merchant } from '~~/shared/types';
 const route = useRoute();
 const merchant_slug = route.params.merchant;
-const { data } = await useFetch("/api/public/merchants/" + merchant_slug, {
+const { data } = await useFetch('/api/public/merchants/' + merchant_slug, {
   transform: (data: Merchant[]) => data[0],
 });
 onMounted(() => {
   if (import.meta.client) {
-    const { merchant, respondent, selected_product, products } = storeToRefs(
-      useResponseStore()
-    );
+    const { merchant, respondent, selected_product, products } =
+      storeToRefs(useResponseStore());
     merchant.value = data.value;
 
     respondent.value =
@@ -17,7 +16,7 @@ onMounted(() => {
       undefined;
     selected_product.value =
       JSON.parse(
-        localStorage.getItem(`${merchant.value?.id}_selected_product`)!
+        localStorage.getItem(`${merchant.value?.id}_selected_product`)!,
       ) || undefined;
     products.value =
       JSON.parse(localStorage.getItem(`${merchant.value?.id}_products`)!) ||

@@ -1,4 +1,4 @@
-import { merchants, eq } from "~~/server/utils/db/schema";
+import { merchants, eq } from '~~/server/utils/db/schema';
 
 export default defineEventHandler(async (e) => {
   const session = await auth(e).api.getSession({

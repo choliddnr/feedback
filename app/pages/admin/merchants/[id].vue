@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import type { FormError, FormErrorEvent, FormSubmitEvent } from "#ui/types";
-import { z } from "zod";
-import type { ImageError, Merchant } from "~~/shared/types";
-import { LazyAdminMerchantEditLogo, LazyModalConfirm } from "#components";
+import type { FormError, FormErrorEvent, FormSubmitEvent } from '#ui/types';
+import { z } from 'zod';
+import type { ImageError, Merchant } from '~~/shared/types';
+import { LazyAdminMerchantEditLogo, LazyModalConfirm } from '#components';
 
 const { merchants, active_merchant } = storeToRefs(useMerchantsStore());
 const { fetch } = useMerchantsStore();
@@ -10,17 +10,17 @@ const merchantId = useRoute().params.id as string;
 const merchant = ref<Merchant>();
 
 const state = reactive({
-  title: "",
-  slug: "",
-  description: "",
+  title: '',
+  slug: '',
+  description: '',
   category: 0,
-  primary_color: "",
-  logo: "",
-  image_background: "",
+  primary_color: '',
+  logo: '',
+  image_background: '',
 });
 
 definePageMeta({
-  layout: "dashboard",
+  layout: 'dashboard',
 });
 const { merchant_categories } = storeToRefs(useMerchantCategoriesStore());
 const { fetch: fetchCategories } = useMerchantsStore();
@@ -31,11 +31,11 @@ const overlay = useOverlay();
 const modal_edit_logo = overlay.create(LazyAdminMerchantEditLogo);
 const modal_delete_merchant = overlay.create(LazyModalConfirm);
 const base_url = useRuntimeConfig().public.BASE_URL;
-const form = useTemplateRef<HTMLFormElement>("form");
+const form = useTemplateRef<HTMLFormElement>('form');
 
 const logoError = ref<ImageError>({
   isError: false,
-  message: "",
+  message: '',
 });
 
 const schema = z.object({
@@ -46,11 +46,11 @@ const schema = z.object({
     .refine((val) => {
       const regex = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
       return regex.test(val);
-    }, "Slug must be lowercase and can only contain letters, numbers, and dashes.")
+    }, 'Slug must be lowercase and can only contain letters, numbers, and dashes.')
     .refine(async (val) => {
-      if (val === "") return true;
-      const data = await $fetch<Merchant>("/api/merchants/slug/" + val, {
-        method: "get",
+      if (val === '') return true;
+      const data = await $fetch<Merchant>('/api/merchants/slug/' + val, {
+        method: 'get',
       });
       if (!data) {
         return true;
@@ -60,7 +60,7 @@ const schema = z.object({
         }
         return false;
       }
-    }, "Slug already exists"),
+    }, 'Slug already exists'),
   description: z.string().min(5),
   category: z.number(),
   primary_color: z.string(),
@@ -81,13 +81,13 @@ const onLogoChange = (e: Event) => {
 
   modal_edit_logo.open({
     image: URL.createObjectURL(input.files[0]!),
-    "onUpdate:imageBlob": (value) => {
+    'onUpdate:imageBlob': (value) => {
       logoBlob.value = value;
       state.logo = URL.createObjectURL(value!);
       modal_edit_logo.close();
     },
     onCancel: () => {
-      state.logo = "";
+      state.logo = '';
       modal_edit_logo.close();
     },
   });
@@ -99,30 +99,30 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {
   const formData = new FormData();
 
   if (state.title !== merchant.value?.title)
-    formData.append("title", state.title!);
-  if (state.slug !== merchant.value?.slug) formData.append("slug", state.slug!);
+    formData.append('title', state.title!);
+  if (state.slug !== merchant.value?.slug) formData.append('slug', state.slug!);
 
   if (state.description !== merchant.value?.description)
-    formData.append("description", state.description!);
+    formData.append('description', state.description!);
 
   if (state.category !== merchant.value?.category)
-    formData.append("category", String(state.category!));
+    formData.append('category', String(state.category!));
 
   if (logoBlob.value) {
-    formData.append("logo", logoBlob.value);
+    formData.append('logo', logoBlob.value);
   }
 
-  await $fetch("/api/merchants/" + merchantId, {
-    method: "patch",
+  await $fetch('/api/merchants/' + merchantId, {
+    method: 'patch',
     body: formData,
     onResponse: async ({ response }) => {
       if (response.status === 200) {
         await fetch();
         on_submit.value = false;
-        navigateTo("/admin/merchants");
+        navigateTo('/admin/merchants');
         toast.add({
-          title: "Merchant updated",
-          icon: "i-heroicons-check-circle",
+          title: 'Merchant updated',
+          icon: 'i-heroicons-check-circle',
         });
       }
     },
@@ -130,10 +130,10 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {
       if (response.status !== 200) {
         on_submit.value = false;
         toast.add({
-          title: "Failed to update the merchant",
+          title: 'Failed to update the merchant',
           description: error?.message,
-          icon: "i-heroicons-x-circle",
-          color: "error",
+          icon: 'i-heroicons-x-circle',
+          color: 'error',
         });
       }
     },
@@ -143,29 +143,29 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {
 const on_delete = ref<boolean>(false);
 const processDelete = async () => {
   on_delete.value = true;
-  await $fetch("/api/merchants/" + merchantId, {
-    method: "DELETE",
+  await $fetch('/api/merchants/' + merchantId, {
+    method: 'DELETE',
     onResponse: async ({ response }) => {
       if (response.ok) {
         const index = merchants.value?.findIndex(
-          (m) => m.id === Number(merchantId)
+          (m) => m.id === Number(merchantId),
         );
         if (index) merchants.value?.splice(index!, 1);
         if (active_merchant.value === Number(merchantId)) {
           active_merchant.value = merchants.value![0]?.id || 0;
         }
         on_delete.value = false;
-        navigateTo("/admin/merchants");
+        navigateTo('/admin/merchants');
       }
     },
   });
 };
 const deleteMerchant = async () => {
   modal_delete_merchant.open({
-    message: "Are you sure you want to delete this merchant?",
+    message: 'Are you sure you want to delete this merchant?',
     action: {
-      cancel: { color: "neutral" },
-      continue: { color: "error", label: "Delete" },
+      cancel: { color: 'neutral' },
+      continue: { color: 'error', label: 'Delete' },
     },
     onCancel: () => modal_delete_merchant.close(),
     onContinue: () => {
@@ -206,16 +206,16 @@ onMounted(async () => {
   state.slug = merchant.value?.slug!;
   state.description = merchant.value?.description!;
   state.category = merchant.value?.category!;
-  state.primary_color = "blue";
+  state.primary_color = 'blue';
   state.logo = getImg(merchant.value?.logo!);
 });
 const copyLink = async () => {
   await navigator.clipboard.writeText(
-    String(base_url + "/" + merchant.value!.slug)
+    String(base_url + '/' + merchant.value!.slug),
   );
   toast.add({
-    title: "Form link copied!",
-    icon: "i-heroicons-check-circle",
+    title: 'Form link copied!',
+    icon: 'i-heroicons-check-circle',
   });
 };
 </script>
@@ -236,8 +236,8 @@ const copyLink = async () => {
                   label="Save Changes"
                   color="neutral"
                   leading-icon="i-heroicons-document-check-16-solid"
-                  @click="form?.submit()"
                   :loading="on_submit"
+                  @click="form?.submit()"
                 />
                 <UButton
                   label="Cancel"
@@ -264,24 +264,24 @@ const copyLink = async () => {
           <div class="flex flex-col">
             <span>Form Link</span>
             <span class="text-neutral-400"
-              >{{ base_url }}/{{ merchant ? merchant!.slug : "" }}
+              >{{ base_url }}/{{ merchant ? merchant!.slug : '' }}
 
               <UButton
+                v-if="merchant"
                 icon="i-heroicons-square-2-stack-solid"
                 variant="ghost"
                 @click="copyLink"
-                v-if="merchant"
               />
             </span>
           </div>
         </template>
       </UPageCard>
       <UForm
+        ref="form"
         :state="state"
         :schema="schema"
-        @submit="onSubmit"
-        ref="form"
         :validate-on="['blur']"
+        @submit="onSubmit"
       >
         <UPageCard :variant="isEdit ? 'subtle' : 'outline'">
           <UFormField
@@ -342,9 +342,9 @@ const copyLink = async () => {
             :ui="{ container: '' }"
           >
             <USelectMenu
+              v-model="state.category"
               class="w-full"
               :items="merchant_categories"
-              v-model="state.category"
               label-key="title"
               value-key="id"
               :disabled="!isEdit"
@@ -363,11 +363,11 @@ const copyLink = async () => {
             }"
           >
             <input
+              ref="logoRef"
               type="file"
               class="hidden"
               @change="onLogoChange"
-              ref="logoRef"
-            />
+            >
             <!-- accept=".jpg, .jpeg, .png, .webp" -->
 
             <UAvatar :src="state.logo" :alt="state.title" size="lg" />
@@ -376,14 +376,14 @@ const copyLink = async () => {
               label="Choose"
               color="neutral"
               size="md"
-              @click="changeLogo"
               :disabled="!isEdit"
+              @click="changeLogo"
             />
           </UFormField>
         </UPageCard>
       </UForm>
 
-      <USeparator class="mb-4" v-if="merchants?.length! > 1" />
+      <USeparator v-if="merchants?.length! > 1" class="mb-4" />
       <UPageCard
         v-if="merchants?.length! > 1"
         spotlight

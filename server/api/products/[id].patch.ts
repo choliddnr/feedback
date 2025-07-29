@@ -1,19 +1,19 @@
-import { eq, UpdateProductSchema } from "~~/server/utils/db/schema";
-import { Product } from "~~/shared/types";
-import { generateNewFilename } from "~~/server/utils";
-import { isValidURL } from "~/utils";
+import { eq, UpdateProductSchema } from '~~/server/utils/db/schema';
+import { Product } from '~~/shared/types';
+import { generateNewFilename } from '~~/server/utils';
+import { isValidURL } from '~/utils';
 
 export default defineEventHandler(async (e) => {
-  const id = Number(getRouterParam(e, "id"));
+  const id = Number(getRouterParam(e, 'id'));
   const body = parseMultipartData(await readMultipartFormData(e)) as Record<
     keyof Product,
     any
   >;
 
-  let newData = {} as Product;
-  newData["merchant"] = Number(body.merchant) as number;
-  newData["title"] = body.title;
-  newData["description"] = body.description;
+  const newData = {} as Product;
+  newData.merchant = Number(body.merchant) as number;
+  newData.title = body.title;
+  newData.description = body.description;
 
   /**
    * validate
@@ -25,9 +25,9 @@ export default defineEventHandler(async (e) => {
       e,
       createError({
         statusCode: 422,
-        statusMessage: "Invalid Request",
+        statusMessage: 'Invalid Request',
         data: validate.error,
-      })
+      }),
     );
   }
 
@@ -43,8 +43,8 @@ export default defineEventHandler(async (e) => {
         e,
         createError({
           statusCode: 404,
-          statusMessage: "Missing data to update",
-        })
+          statusMessage: 'Missing data to update',
+        }),
       );
     }
     if (body.image) {
@@ -54,16 +54,16 @@ export default defineEventHandler(async (e) => {
        */
       if (oldData.image && !isValidURL(oldData.image))
         await deleteImg(e, oldData.image); // user image could be null, delete it if exists
-      let filename = "product/" + generateNewFilename("_.webp"); // modify the filename to avoid conflicts and load cache
+      const filename = 'product/' + generateNewFilename('_.webp'); // modify the filename to avoid conflicts and load cache
       await saveImg(e, body.image.data, filename); // all uploaded images are saved as webp format
-      newData["image"] = filename;
+      newData.image = filename;
     }
 
     return await db(e).update(products).set(newData).where(eq(products.id, id));
   } catch (err) {
     return sendError(
       e,
-      createError(err instanceof Error ? err.message : "Unknown error")
+      createError(err instanceof Error ? err.message : 'Unknown error'),
     );
   }
 });

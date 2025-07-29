@@ -1,10 +1,10 @@
 export default defineEventHandler(async (e) => {
   const body = await readBody(e);
-  const id = Number(getRouterParam(e, "id"));
+  const id = Number(getRouterParam(e, 'id'));
   if (!id) {
     throw createError({
       statusCode: 400,
-      statusMessage: "ID is required",
+      statusMessage: 'ID is required',
     });
   }
   console.log(id);
@@ -29,6 +29,6 @@ export default defineEventHandler(async (e) => {
       .values({ merchant: id, analysis: body.data })
       .returning();
   } catch (e) {
-    throw createError(e instanceof Error ? e.message : "Unknown error");
+    throw createError(e instanceof Error ? e.message : 'Unknown error');
   }
 });

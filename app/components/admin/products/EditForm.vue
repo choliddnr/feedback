@@ -1,7 +1,7 @@
 <script lang="ts" setup>
-import { LazyAdminProductsEditImage } from "#components";
-import { z } from "zod";
-import type { Product } from "~~/shared/types";
+import { z } from 'zod';
+import { LazyAdminProductsEditImage } from '#components';
+import type { Product } from '~~/shared/types';
 
 const { merchants, active_merchant } = storeToRefs(useMerchantsStore());
 const { fetch } = useProductsStore();
@@ -24,14 +24,14 @@ const emits = defineEmits<{
 const state = reactive<Partial<Product>>({
   title: props.product.title,
   description: props.product.description,
-  image: props.product.image ? getImg(props.product.image) : "",
+  image: props.product.image ? getImg(props.product.image) : '',
   merchant: props.product.merchant,
 });
 
 const imageRef = ref<HTMLInputElement>();
 const imageError = ref<{ isError: boolean; message: string }>({
   isError: false,
-  message: "",
+  message: '',
 });
 
 const changeImage = () => {
@@ -46,7 +46,7 @@ const onImageChange = (e: Event) => {
   if (!input.files || input.files.length === 0) {
     imageError.value = {
       isError: true,
-      message: "No file selected.",
+      message: 'No file selected.',
     };
     return;
   }
@@ -55,7 +55,7 @@ const onImageChange = (e: Event) => {
   imageError.value.isError = false;
   modal_edit_image.open({
     image: URL.createObjectURL(input.files[0]!),
-    "onUpdate:imageBlob": (value) => {
+    'onUpdate:imageBlob': (value) => {
       imageBlob.value = value;
       state.image = URL.createObjectURL(value!);
       modal_edit_image.close();
@@ -68,23 +68,23 @@ const onImageChange = (e: Event) => {
 const onSubmit = async () => {
   onSubmitting.value = true;
   const formData = new FormData();
-  formData.append("title", state.title!);
-  formData.append("description", state.description!);
-  formData.append("merchant", state.merchant!.toString());
+  formData.append('title', state.title!);
+  formData.append('description', state.description!);
+  formData.append('merchant', state.merchant!.toString());
 
   if (imageBlob.value) {
-    formData.append("image", imageBlob.value);
+    formData.append('image', imageBlob.value);
   }
-  const res = await $fetch<Response>("/api/products/" + props.product.id, {
-    method: "PATCH",
+  const res = await $fetch<Response>('/api/products/' + props.product.id, {
+    method: 'PATCH',
     body: formData,
     onResponse: async ({ response }) => {
       if (response.ok) {
         await fetch();
-        emits("close");
+        emits('close');
         toast.add({
-          title: "Product updated",
-          icon: "i-heroicons-check-circle",
+          title: 'Product updated',
+          icon: 'i-heroicons-check-circle',
         });
 
         onSubmitting.value = false;
@@ -93,9 +93,9 @@ const onSubmit = async () => {
     onResponseError: ({ response, error }) => {
       if (!response.ok) {
         toast.add({
-          title: "Failed to update product",
-          icon: "i-heroicons-x-circle",
-          color: "error",
+          title: 'Failed to update product',
+          icon: 'i-heroicons-x-circle',
+          color: 'error',
         });
         onSubmitting.value = false;
       }
@@ -154,7 +154,7 @@ const onSubmit = async () => {
               type="file"
               class="hidden"
               @change="onImageChange"
-            />
+            >
             <!-- accept=".jpg, .jpeg, .png," -->
 
             <UButton

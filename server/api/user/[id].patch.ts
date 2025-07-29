@@ -1,52 +1,52 @@
-import { H3Event, type MultiPartData } from "h3";
-import { user, eq } from "~~/server/utils/db/schema";
-import { User } from "~~/shared/types";
-import { generateNewFilename } from "~~/server/utils";
-import { isValidURL } from "~/utils";
-import { z } from "zod";
+import { H3Event, type MultiPartData } from 'h3';
+import { z } from 'zod';
+import { user, eq } from '~~/server/utils/db/schema';
+import { User } from '~~/shared/types';
+import { generateNewFilename } from '~~/server/utils';
+import { isValidURL } from '~/utils';
 
 export default defineEventHandler(async (e: H3Event) => {
-  const id = Number(getRouterParam(e, "id"));
+  const id = Number(getRouterParam(e, 'id'));
   const body = parseMultipartData(await readMultipartFormData(e));
 
-  let newData = {} as Partial<User>;
-  if (body.username) newData["username"] = body.username;
-  if (body.name) newData["name"] = body.name;
+  const newData = {} as Partial<User>;
+  if (body.username) newData.username = body.username;
+  if (body.name) newData.name = body.name;
   if (body.defaultMerchant)
-    newData["defaultMerchant"] = Number(body.defaultMerchant);
+    newData.defaultMerchant = Number(body.defaultMerchant);
   const validate = UpdateUserSchema.safeParse(newData);
 
-  console.log("validation", validate);
+  console.log('validation', validate);
   if (!validate.success) {
     return sendError(
       e,
       createError({
         statusCode: 422,
-        statusMessage: "Invalid Request",
+        statusMessage: 'Invalid Request',
         data: validate.error,
-      })
+      }),
     );
   }
-  console.log("validation 2", validate);
+  console.log('validation 2', validate);
   try {
-    if (newData["username"]) {
+    if (newData.username) {
       const username = await db(e)
         .select()
         .from(user)
-        .where(eq(user.username, newData["username"]))
+        .where(eq(user.username, newData.username))
         .limit(1)
         .get();
-      console.log("username", username);
+      console.log('username', username);
       if (username) {
         return sendError(
           e,
           createError({
             statusCode: 422,
-            statusMessage: "username is already taken",
-          })
+            statusMessage: 'username is already taken',
+          }),
         );
       }
-      console.log("body", body, username);
+      console.log('body', body, username);
     }
 
     const oldData = await db(e)
@@ -61,9 +61,9 @@ export default defineEventHandler(async (e: H3Event) => {
         e,
         createError({
           statusCode: 404,
-          statusMessage: "Missing data to update",
+          statusMessage: 'Missing data to update',
           data: validate.error,
-        })
+        }),
       );
     }
     if (body.image) {
@@ -74,16 +74,16 @@ export default defineEventHandler(async (e: H3Event) => {
       if (oldData.image && !isValidURL(oldData.image))
         await deleteImg(e, oldData.image); // user image could be null, delete it if exists
 
-      let filename = "user/" + generateNewFilename("_.webp"); // modify the filename to avoid conflicts and load cache
+      const filename = 'user/' + generateNewFilename('_.webp'); // modify the filename to avoid conflicts and load cache
       await saveImg(e, body.image.data, filename); // all uploaded images are saved as webp format
-      newData["image"] = filename;
+      newData.image = filename;
     }
-    console.log("newData update user", newData);
+    console.log('newData update user', newData);
     await db(e).update(user).set(newData).where(eq(user.id, id));
     return auth(e).api.getSession({
       headers: e.headers,
     });
   } catch (e) {
-    throw createError(e instanceof Error ? e.message : "Unknown  error");
+    throw createError(e instanceof Error ? e.message : 'Unknown  error');
   }
 });
