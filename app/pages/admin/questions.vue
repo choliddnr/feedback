@@ -188,7 +188,7 @@ const deleteQuestion = async (id: string | number) => {
 };
 </script>
 <template>
-  <UDashboardPanel id="questions" resizeable :ui="{ body: 'px-0 sm:px-0' }">
+  <UDashboardPanel id="questions" :ui="{ body: 'px-0 sm:px-0' }">
     <template #header>
       <UDashboardNavbar title="Questions" :ui="{ right: 'gap-3' }">
         <template #leading>

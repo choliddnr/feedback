@@ -6,7 +6,7 @@ definePageMeta({
 </script>
 
 <template>
-  <UDashboardPanel id="admin_merchant" resizable>
+  <UDashboardPanel id="admin_merchant">
     <template #header>
       <UDashboardNavbar title="Merchant" :ui="{ right: 'gap-4' }">
         <template #leading>

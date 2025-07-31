@@ -151,3 +151,14 @@ export type AIOutput = [
     output: string;
   },
 ];
+
+
+export type ProductStat = {
+      name: string,
+    avgRating: number,
+    sentiment: { positive: number, neutral: number, negative: number },
+    nps: number,
+    summary: string,
+    themes: string[],
+    quote: string
+}

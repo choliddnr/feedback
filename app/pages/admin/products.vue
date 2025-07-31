@@ -56,7 +56,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <UDashboardPanel id="products" resizeable>
+  <UDashboardPanel id="products">
     <template #header>
       <UDashboardNavbar title="Products" :ui="{ right: 'gap-3' }">
         <template #leading>

@@ -62,16 +62,18 @@ const period = ref<Period>('daily');
         <template #left>
           <!-- NOTE: The `-ms-1` class is used to align with the `DashboardSidebarCollapse` button here. -->
 
-          <AdminHomePeriodSelect v-model="period" :range="range" />
+          <!-- <AdminHomePeriodSelect v-model="period" :range="range" /> -->
         </template>
       </UDashboardToolbar>
     </template>
 
     <template #body>
+      <AdminDashboard />
+
       <AdminHomeStats :period="period" :range="range" />
       <!-- <HomeChart :period="period" :range="range" /> -->
       <AdminHomeResponses :period="period" :range="range" />
-      <AdminHomeResponseAnalysis />
+      <!-- <AdminHomeResponseAnalysis /> -->
     </template>
   </UDashboardPanel>
 </template>
