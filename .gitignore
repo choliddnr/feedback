@@ -25,4 +25,5 @@ logs
 
 
 
-credentials.csvdatabase/local.sqlite3
+credentials.csv
+database/local.sqlite3
