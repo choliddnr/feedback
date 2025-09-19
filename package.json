@@ -17,8 +17,7 @@
     "@aws-sdk/client-s3": "^3.850.0",
     "@bunny.net/storage-sdk": "^0.3.0",
     "@nuxt/image": "1.10.0",
-    "@nuxt/ui": "^3.2.0",
-    "@nuxt/ui-pro": "^3.2.0",
+    "@nuxt/ui-pro": "^3.3.4",
     "@pinia/nuxt": "^0.11.2",
     "@unovis/vue": "^1.5.2",
     "@vitest/ui": "^3.2.4",
@@ -29,7 +28,7 @@
     "date-fns": "^4.1.0",
     "drizzle-orm": "^0.44.3",
     "drizzle-zod": "^0.7.1",
-    "nuxt": "^4.0.2",
+    "nuxt": "^4.1.2",
     "pinia": "^3.0.3",
     "tailwindcss": "^4.1.11",
     "vitest": "^3.2.4",
@@ -48,6 +47,7 @@
     "@pinia/testing": "^1.0.2",
     "@playwright/test": "^1.54.1",
     "@types/better-sqlite3": "^7.6.13",
+    "@typescript-eslint/eslint-plugin": "^8.44.0",
     "@typescript-eslint/parser": "^8.38.0",
     "@vue/test-utils": "^2.4.6",
     "better-sqlite3": "^12.2.0",
@@ -63,5 +63,10 @@
   },
   "overrides": {
     "vite": "npm:rolldown-vite@latest"
+  },
+  "pnpm": {
+    "overrides": {
+      "vite": "npm:rolldown-vite@latest"
+    }
   }
 }

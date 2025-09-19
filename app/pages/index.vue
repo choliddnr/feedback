@@ -1,8 +1,9 @@
 <script setup lang="ts">
 definePageMeta({
-  layout: 'default',
-  middleware: ['auth'],
+  layout: "default",
+  middleware: ["auth"],
 });
+navigateTo("/admin");
 </script>
 
 <template>
