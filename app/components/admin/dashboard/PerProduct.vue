@@ -3,7 +3,6 @@
 
 import { Chart } from 'chart.js/auto'
 import type { ProductStat } from '~~/shared/types';
-// import { type ProductStat } from '~~/shared/types';
 
 const {product} = defineProps<{product:ProductStat}>()
 

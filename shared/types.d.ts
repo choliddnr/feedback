@@ -162,3 +162,9 @@ export type ProductStat = {
     themes: string[],
     quote: string
 }
+
+export type Kpi = {
+  label: string
+  value: string
+  class?: string
+}

@@ -1,49 +1,12 @@
 
 <script setup lang="ts">
-// import { ref, onMounted } from 'vue'
 import { Chart } from 'chart.js/auto'
-import type { ProductStat } from '~~/shared/types'
+// import { useDashboard } from '~~/composables/useDashboard'
 
-const kpis = [
-  { label: 'Total Responses', value: '1,248' },
-  { label: 'Unique Respondents', value: '980' },
-  { label: 'Average Rating', value: '⭐ 4.2 / 5' },
-  { label: 'Response Rate', value: '42%', class: 'text-blue-600' },
-  { label: 'Completion Rate', value: '85%', class: 'text-green-600' }
-]
-
-const products: ProductStat[] = [
-  {
-    name: '🔥 Hot Noodles',
-    avgRating: 4.3,
-    sentiment: { positive: 65, neutral: 20, negative: 15 },
-    nps: 52,
-    summary: 'Customers love the spicy flavor and portion size. Some complain about packaging leakage.',
-    themes: [
-      'Taste → 80% positive',
-      'Packaging → 45% negative',
-      'Price → 70% positive'
-    ],
-    quote: '“The noodles are delicious, but the cup leaks sometimes.”'
-  },
-  {
-    name: '🔥 Jebew Noodles',
-    avgRating: 4.9,
-    sentiment: { positive: 70, neutral: 25, negative: 5 },
-    nps: 52,
-    summary: 'Customers love the spicy flavor and portion size. Some complain about packaging leakage.',
-    themes: [
-      'Taste → 80% positive',
-      'Packaging → 45% negative',
-      'Price → 70% positive'
-    ],
-    quote: '“The noodles are delicious, but the cup leaks sometimes.”'
-  }
-] 
+const { kpis, products, loading } = useDashboard()
 
 const feedbackChart = useTemplateRef<HTMLCanvasElement>("feedbackChart")
 const completionChart = useTemplateRef<HTMLCanvasElement>("completionChart")
-// const sentimentCharts = useTemplateRef<HTMLCanvasElement>("sentimentCharts")
 
 onMounted(() => {
   // Feedback Volume Over Time
@@ -64,7 +27,15 @@ onMounted(() => {
     },
     options: {
       responsive: true,
-      plugins: { legend: { display: false } },
+      plugins: {
+        legend: {
+          display: true,
+          position: 'top',
+        },
+        tooltip: {
+          enabled: true,
+        }
+      },
       scales: { x: { grid: { display: false } }, y: { beginAtZero: true, ticks: { stepSize: 50 } } }
     }
   })
@@ -80,34 +51,26 @@ onMounted(() => {
         borderWidth: 2
       }]
     },
-    options: { plugins: { legend: { position: 'bottom' } }, cutout: '70%' }
+    options: {
+      plugins: {
+        legend: {
+          position: 'bottom'
+        },
+        tooltip: {
+          enabled: true,
+        }
+      },
+      cutout: '70%'
+    }
   })
-
-  // Sentiment Breakdown per product
-//   products.forEach((product, index) => {
-//     const ctx = sentimentCharts.value[index].getContext('2d')
-//     new Chart(ctx, {
-//       type: 'doughnut',
-//       data: {
-//         labels: ['Positive', 'Neutral', 'Negative'],
-//         datasets: [{
-//           data: [product.sentiment.positive, product.sentiment.neutral, product.sentiment.negative],
-//           backgroundColor: ['#22c55e', '#eab308', '#ef4444'],
-//           borderWidth: 2
-//         }]
-//       },
-//       options: { plugins: { legend: { display: false } }, cutout: '70%' }
-//     })
-//   })
 })
 </script>
 <template>
-    <!-- Header -->
-    <!-- <h1 class="text-3xl font-bold mb-6">Feedback Dashboard</h1> -->
-
     <!-- KPI Cards -->
-
-    <UPageGrid  class="lg:grid-cols-5 gap-4 sm:gap-6 lg:gap-px">
+    <div v-if="loading" class="grid grid-cols-5 gap-4">
+      <USkeleton v-for="i in 5" :key="i" class="h-24" />
+    </div>
+    <UPageGrid v-else class="lg:grid-cols-5 gap-4 sm:gap-6 lg:gap-px">
       <UPageCard
         v-for="(kpi, i) in kpis"
          :key="i" 
@@ -133,7 +96,10 @@ onMounted(() => {
       </div>
     </UPageCard>
     <!-- Product Feedback Cards -->
-    <div class="grid grid-cols-1 gap-6">
+    <div v-if="loading" class="grid grid-cols-1 gap-6">
+      <USkeleton v-for="i in 2" :key="i" class="h-48" />
+    </div>
+    <div v-else class="grid grid-cols-1 gap-6">
       <AdminDashboardPerProduct
         v-for="(product, index) in products"
         :key="index"
