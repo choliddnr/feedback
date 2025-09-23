@@ -3,10 +3,10 @@ import {
   LazyAdminProductsEditForm,
   LazyAdminProductsAddForm,
   LazyModalConfirm,
-} from '#components';
+} from "#components";
 const { merchants, active_merchant } = storeToRefs(useMerchantsStore());
 definePageMeta({
-  layout: 'dashboard',
+  layout: "dashboard",
 });
 const overlay = useOverlay();
 const slideover_add = overlay.create(LazyAdminProductsAddForm);
@@ -14,12 +14,13 @@ const slideover_edit = overlay.create(LazyAdminProductsEditForm);
 
 const modal_delete_product = overlay.create(LazyModalConfirm);
 const { products, active_product } = storeToRefs(useProductsStore());
+console.log("products", products);
 
 const product_to_delete = ref<string | number>();
 const processDelete = async (id: string | number) => {
   product_to_delete.value = id;
-  await $fetch('/api/products/' + id, {
-    method: 'DELETE',
+  await $fetch("/api/products/" + id, {
+    method: "DELETE",
     onResponse: async ({ response }) => {
       if (response.ok) {
         const index = products.value.findIndex((p) => p.id === id);
@@ -33,10 +34,10 @@ const processDelete = async (id: string | number) => {
 
 const deleteProduct = async (id: string | number) => {
   modal_delete_product.open({
-    message: 'Are you sure?',
+    message: "Are you sure?",
     action: {
-      cancel: { color: 'neutral' },
-      continue: { color: 'error', label: 'Delete' },
+      cancel: { color: "neutral" },
+      continue: { color: "error", label: "Delete" },
     },
     onCancel: () => modal_delete_product.close(),
     onContinue: () => {
@@ -116,6 +117,7 @@ onMounted(() => {
             />
           </template>
           <template #footer>
+            <span>{{ product.id }}</span>
             <UButtonGroup class="w-full">
               <UButton
                 block

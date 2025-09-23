@@ -6,12 +6,24 @@ import type { Question } from "~~/shared/types";
 import {
   LazyAdminQuestionsAddForm,
   LazyAdminQuestionsEditForm,
+  LazyAdminQuestionsGenerate,
   LazyModalConfirm,
 } from "#components";
 
 definePageMeta({
   layout: "dashboard",
 });
+let loadingAnimationSrc: string;
+let emptyImage: string;
+
+if (import.meta.dev) {
+  loadingAnimationSrc = getImg("public/loading.gif");
+  emptyImage = getImg("public/empty.png");
+} else {
+  loadingAnimationSrc = "/loading.gif";
+  emptyImage = "/empty.png";
+}
+
 const { products, active_product } = storeToRefs(useProductsStore());
 const { merchants, active_merchant } = storeToRefs(useMerchantsStore());
 const overlay = useOverlay();
@@ -21,9 +33,10 @@ const UButton = resolveComponent("UButton");
 
 const toast = useToast();
 const { questions } = storeToRefs(useQuestionsStore());
-
+const { fetch } = useQuestionsStore();
 const slideover_edit = overlay.create(LazyAdminQuestionsEditForm);
 const modal_delete_question = overlay.create(LazyModalConfirm);
+const modal_generate_questions = overlay.create(LazyAdminQuestionsGenerate);
 const slideover_add = overlay.create(LazyAdminQuestionsAddForm);
 const table = useTemplateRef<any>("table");
 const q_type = new Map([
@@ -188,6 +201,66 @@ const deleteQuestion = async (id: string | number) => {
   });
   //
 };
+
+const onGeneratingQuestions = ref<boolean>(false);
+
+const generatingQuestions = async (
+  id: string | number,
+  title: string,
+  description: string,
+  keys: string
+) => {
+  onGeneratingQuestions.value = true;
+  const questions = await $fetch("/api/questions/generate", {
+    method: "POST",
+    body: { id, title, description, keys },
+    onResponse: async ({ response }) => {
+      if (response.ok) {
+        if (response._data.generatedQuestionsError.length > 0) {
+          response._data.generatedQuestionsError.forEach((err: any) => {
+            toast.add({
+              title: err.message,
+              icon: "i-heroicons-x-circle",
+              color: "error",
+            });
+          });
+        } else {
+          fetch();
+          toast.add({
+            title: "Questions generated",
+            icon: "i-heroicons-check-circle",
+          });
+        }
+      }
+      console.log("response:", response);
+
+      onGeneratingQuestions.value = false;
+    },
+  });
+  console.log("keys:", keys);
+};
+
+const generateQuestions = async (id: string | number) => {
+  if (!id) {
+    toast.add({
+      title: "Please select a product first",
+      icon: "i-heroicons-x-circle",
+      color: "error",
+    });
+    return;
+  }
+  const product = products.value.find((p) => p.id === id);
+  modal_generate_questions.open({
+    title: product?.title,
+    description: product?.description,
+    onCancel: () => modal_generate_questions.close(),
+    onContinue: async (title: string, description: string, keys: string) => {
+      // processDelete(id);
+      modal_generate_questions.close();
+      await generatingQuestions(id, title, description, keys);
+    },
+  });
+};
 </script>
 <template>
   <UDashboardPanel id="questions" :ui="{ body: 'px-0 sm:px-0' }">
@@ -254,9 +327,10 @@ const deleteQuestion = async (id: string | number) => {
 
         <template #empty>
           <div
+            v-if="!onGeneratingQuestions"
             class="w-auto mx-auto max-w-xs flex flex-col gap-5 justify-content-center"
           >
-            <NuxtImg src="/empty.png" />
+            <NuxtImg :src="emptyImage" width="200" class="mx-auto" />
             <span class="mx-auto font-bold text-xl">No Question </span>
             <UButton
               class="mx-auto"
@@ -271,19 +345,23 @@ const deleteQuestion = async (id: string | number) => {
                 }
               "
             />
+
             <UButton
               class="mx-auto"
               label="Generate questions"
               trailing-icon="i-simple-icons-googlegemini"
-              color="neutral"
-              @click="
-                () => {
-                  slideover_add.open({
-                    onClose: slideover_add.close,
-                  });
-                }
-              "
+              color="primary"
+              @click="generateQuestions(active_product!)"
             />
+          </div>
+          <div
+            v-else
+            class="w-auto mx-auto max-w-xs flex flex-col gap-5 justify-content-center"
+          >
+            <NuxtImg :src="loadingAnimationSrc" width="100" class="mx-auto" />
+            <span class="mx-auto font-bold text-xl"
+              >Generating questions...</span
+            >
           </div>
         </template>
       </UTable>

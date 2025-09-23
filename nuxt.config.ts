@@ -42,8 +42,8 @@ export default defineNuxtConfig({
     WASABI_KEY: process.env.NUXT_WASABI_KEY,
     WASABI_SECRET: process.env.NUXT_WASABI_SECRET,
     WASABI_BUCKET: process.env.NUXT_WASABI_BUCKET,
-
     N8N_API: process.env.NUXT_N8N_API,
+    geminiApiKey: import.meta.env.NUXT_GEMINI_API_KEY || "",
     public: {
       BASE_URL: process.env.NUXT_BASE_URL,
     },
@@ -52,5 +52,8 @@ export default defineNuxtConfig({
   nitro: {
     preset: "cloudflare-pages",
     logLevel: "debug",
+  },
+  image: {
+    format: ["webp"],
   },
 });

@@ -1,7 +1,7 @@
-import { defineStore, acceptHMRUpdate } from 'pinia';
-import type { Question } from '~~/shared/types';
+import { defineStore, acceptHMRUpdate } from "pinia";
+import type { Question } from "~~/shared/types";
 
-export const useQuestionsStore = defineStore('questions', () => {
+export const useQuestionsStore = defineStore("questions", () => {
   const { active_product } = storeToRefs(useProductsStore());
   const questions = ref<Question[]>([]);
   const { refresh: fetch } = useLazyFetch(
@@ -12,11 +12,13 @@ export const useQuestionsStore = defineStore('questions', () => {
       onRequest: ({ request }) => {},
       onResponse: ({ response }) => {
         if (response.ok) {
-          questions.value = response._data;
+          questions.value = response._data as Question[];
         }
       },
-    },
+    }
   );
+  console.log("questions store initialized");
+
   return { questions, fetch };
 });
 
