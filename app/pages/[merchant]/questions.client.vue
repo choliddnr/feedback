@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import { watchDebounced } from '@vueuse/core';
-import type { Product, Question } from '~~/shared/types';
+import { watchDebounced } from "@vueuse/core";
+import type { Product, Question } from "~~/shared/types";
 
 const { selected_product, products, answers, all_questions, merchant } =
   storeToRefs(useResponseStore());
 const { data: all_questions_data } = await useFetch<Question[]>(
-  '/api/public/questions',
+  "/api/public/questions",
   {
     server: false,
     query: {
@@ -14,7 +14,7 @@ const { data: all_questions_data } = await useFetch<Question[]>(
     onResponse: ({ response }) => {
       all_questions.value = response._data;
     },
-  },
+  }
 );
 const state = reactive({
   product_index: 0,
@@ -23,37 +23,37 @@ const state = reactive({
 
 const answer_invalid = ref<string>();
 const product = computed<Product | undefined>(
-  () => products.value![state.product_index!],
+  () => products.value![state.product_index!]
 );
 const products_length = computed<number>(() => products.value!.length);
 const questions = computed<Question[] | undefined>(() => {
   if (all_questions_data.value && products.value) {
     return all_questions_data.value!.filter(
-      (question) => question.product === product.value!.id,
+      (question) => question.product === product.value!.id
     );
   } else {
     return [];
   }
 });
 const question = computed<Question | undefined>(
-  () => questions.value![state.question_index!],
+  () => questions.value![state.question_index!]
 );
 const questions_length = computed<number>(() => questions.value!.length);
 const keyid = computed<string>(() => {
   if (product.value && question.value) {
     return `${product.value!.id}_${question.value!.id}`;
   } else {
-    return '';
+    return "";
   }
 });
-const answer = ref<string>('');
+const answer = ref<string>("");
 const saveState = () => {
   answers.value.set(keyid.value, answer.value);
   localStorage.setItem(keyid.value, answer.value);
 };
 const loadState = () => {
   const on_map_store = answers.value.get(keyid.value);
-  if (!on_map_store || on_map_store === '') {
+  if (!on_map_store || on_map_store === "") {
     answer.value = localStorage.getItem(keyid.value)!;
   } else {
     answer.value = on_map_store;
@@ -118,8 +118,8 @@ const isAllValid = () => {
       state.question_index = j;
 
       const a = answers.value.get(`${p?.id}_${q?.id}`);
-      if (!a || a === '') {
-        answer_invalid.value = 'Please, answer this question.';
+      if (!a || a === "") {
+        answer_invalid.value = "Please, answer this question.";
         return false;
       }
     }
@@ -145,12 +145,12 @@ watch(questions_length, () => {
 watchDebounced(
   answer,
   () => {
-    if (!answer.value && answer.value === '') return;
+    if (!answer.value && answer.value === "") return;
 
     answers.value.set(keyid.value, answer.value);
     answer_invalid.value = undefined;
   },
-  { debounce: 500, maxWait: 2000, deep: true },
+  { debounce: 500, maxWait: 2000, deep: true }
 );
 watch(keyid, () => {
   loadState();
@@ -171,7 +171,7 @@ onMounted(() => {
     >
       <template #header>
         <div class="flex text-xl justify-between">
-          <span class="font-bold">{{ product ? product.title : '' }} </span>
+          <span class="font-bold">{{ product ? product.title : "" }} </span>
           <div class="flex flex-row gap-1">
             <UButton
               icon="i-heroicons-chevron-left-solid"
@@ -224,7 +224,7 @@ onMounted(() => {
           @click="answer = opt"
         />
       </div>
-      <UButtonGroup size="md" orientation="horizontal" class="w-full my-5">
+      <UFieldGroup size="md" orientation="horizontal" class="w-full my-5">
         <UButton
           color="primary"
           block
@@ -241,8 +241,8 @@ onMounted(() => {
           variant="soft"
           @click="nextQuestion"
         />
-      </UButtonGroup>
-      <br >
+      </UFieldGroup>
+      <br />
 
       <div class="flex flex-row gap-1">
         <UButton

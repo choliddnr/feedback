@@ -45,7 +45,7 @@ const emit = defineEmits(["continue", "cancel"]);
           <UTextarea v-model="keys" class="w-full" />
         </UFormField>
 
-        <UButtonGroup class="w-full">
+        <UFieldGroup class="w-full">
           <UButton
             block
             color="primary"
@@ -63,7 +63,7 @@ const emit = defineEmits(["continue", "cancel"]);
             icon="i-heroicons-x-mark-20-solid"
             @click="emit('cancel')"
           />
-        </UButtonGroup>
+        </UFieldGroup>
         <!-- </UForm> -->
       </UCard>
     </template>

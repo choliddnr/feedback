@@ -117,8 +117,8 @@ onMounted(() => {
             />
           </template>
           <template #footer>
-            <span>{{ product.id }}</span>
-            <UButtonGroup class="w-full">
+            <!-- <span>{{ product.id }}</span> -->
+            <UFieldGroup class="w-full">
               <UButton
                 block
                 color="neutral"
@@ -144,7 +144,7 @@ onMounted(() => {
                   }
                 "
               />
-            </UButtonGroup>
+            </UFieldGroup>
           </template>
         </UPageCard>
       </div>

@@ -1,8 +1,8 @@
 <script lang="ts" setup>
-import { z } from 'zod';
-import { UInput } from '#components';
-import type { NewQuestion, Question } from '~~/shared/types';
-import { useQuestionTypesStore } from '~/stores/question_types';
+import { z } from "zod";
+import { UInput } from "#components";
+import type { NewQuestion, Question } from "~~/shared/types";
+import { useQuestionTypesStore } from "~/stores/question_types";
 
 const { question } = defineProps<{ question: Partial<Question> }>();
 
@@ -41,32 +41,32 @@ watch(
   () => state.product,
   () => {
     active_product.value = state.product;
-  },
+  }
 );
 const onSubmit = async () => {
   onSubmitting.value = true;
-  await $fetch<Response>('/api/questions/' + question.id, {
-    method: 'patch',
+  await $fetch<Response>("/api/questions/" + question.id, {
+    method: "patch",
     body: state,
     onResponse: async ({ response }) => {
       if (response.ok) {
         const index = questions.value.findIndex((q) => q.id === question.id);
         questions.value[index] = response._data[0];
         toast.add({
-          title: 'Question updated',
-          icon: 'i-heroicons-check-circle',
+          title: "Question updated",
+          icon: "i-heroicons-check-circle",
         });
 
         onSubmitting.value = false;
-        emits('close');
+        emits("close");
       }
     },
     onResponseError: ({ response, error }) => {
       if (!response.ok) {
         toast.add({
-          title: 'Failed to update question',
-          icon: 'i-heroicons-x-circle',
-          color: 'error',
+          title: "Failed to update question",
+          icon: "i-heroicons-x-circle",
+          color: "error",
         });
         onSubmitting.value = false;
       }
@@ -100,7 +100,7 @@ const onSubmit = async () => {
             label="Answer options"
             name="answer_options"
           >
-            <UButtonGroup class="mt-2 w-full">
+            <UFieldGroup class="mt-2 w-full">
               <UInput
                 v-model="answer_option"
                 block
@@ -113,7 +113,7 @@ const onSubmit = async () => {
                 class="max-w-10"
                 @click="pushNewOption"
               />
-            </UButtonGroup>
+            </UFieldGroup>
           </UFormField>
           <UInputMenu
             v-if="state.type !== 2 && state.answer_options!.length > 0"
@@ -147,7 +147,7 @@ const onSubmit = async () => {
             />
           </UFormField>
 
-          <UButtonGroup class="w-full">
+          <UFieldGroup class="w-full">
             <UButton
               block
               color="primary"
@@ -164,7 +164,7 @@ const onSubmit = async () => {
               icon="i-heroicons-x-mark-20-solid"
               @click="emits('close')"
             />
-          </UButtonGroup>
+          </UFieldGroup>
         </UForm>
       </UCard>
     </template>

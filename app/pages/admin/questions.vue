@@ -251,8 +251,8 @@ const generateQuestions = async (id: string | number) => {
   }
   const product = products.value.find((p) => p.id === id);
   modal_generate_questions.open({
-    title: product?.title,
-    description: product?.description,
+    title: product?.title || "",
+    description: product?.description || "",
     onCancel: () => modal_generate_questions.close(),
     onContinue: async (title: string, description: string, keys: string) => {
       // processDelete(id);

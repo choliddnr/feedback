@@ -1,11 +1,11 @@
 <script lang="ts" setup>
-import { z } from 'zod';
-import { error } from '#build/ui-pro';
+import { z } from "zod";
+import { error } from "#build/ui-pro";
 import {
   LazyAdminProductsEditForm,
   LazyAdminProductsEditImage,
-} from '#components';
-import type { NewProduct } from '~~/shared/types';
+} from "#components";
+import type { NewProduct } from "~~/shared/types";
 
 const { merchants, active_merchant } = storeToRefs(useMerchantsStore());
 const { fetch } = useProductsStore();
@@ -24,16 +24,16 @@ const emits = defineEmits<{
 }>();
 
 const state = reactive<NewProduct>({
-  title: '',
-  description: '',
-  image: '',
+  title: "",
+  description: "",
+  image: "",
   merchant: active_merchant.value as number,
 });
 
 const imageRef = ref<HTMLInputElement>();
 const imageError = ref<{ isError: boolean; message: string }>({
   isError: false,
-  message: '',
+  message: "",
 });
 
 const changeImage = () => {
@@ -49,7 +49,7 @@ const onImageChange = (e: Event) => {
   if (!input.files?.length) {
     imageError.value = {
       isError: true,
-      message: 'Image product is required.',
+      message: "Image product is required.",
     };
     return;
   } else {
@@ -57,7 +57,7 @@ const onImageChange = (e: Event) => {
   }
   modal_edit_image.open({
     image: URL.createObjectURL(input.files[0]!),
-    'onUpdate:imageBlob': (value) => {
+    "onUpdate:imageBlob": (value) => {
       imageBlob.value = value;
       state.image = URL.createObjectURL(value!);
       modal_edit_image.close();
@@ -71,22 +71,22 @@ const onImageChange = (e: Event) => {
 const onSubmit = async () => {
   onSubmitting.value = true;
   const formData = new FormData();
-  formData.append('title', state.title!);
-  formData.append('description', state.description!);
-  formData.append('merchant', state.merchant.toString());
+  formData.append("title", state.title!);
+  formData.append("description", state.description!);
+  formData.append("merchant", state.merchant.toString());
 
   if (imageBlob.value) {
-    formData.append('image', imageBlob.value);
+    formData.append("image", imageBlob.value);
   }
 
-  const res = await $fetch<Response>('/api/products', {
-    method: 'post',
+  const res = await $fetch<Response>("/api/products", {
+    method: "post",
     body: formData,
     onResponse: async ({ response }) => {
       if (response.ok) {
         await fetch();
-        emits('close');
-        toast.add({ title: 'Product added', icon: 'i-heroicons-check-circle' });
+        emits("close");
+        toast.add({ title: "Product added", icon: "i-heroicons-check-circle" });
 
         onSubmitting.value = false;
       }
@@ -94,9 +94,9 @@ const onSubmit = async () => {
     onResponseError: ({ response, error }) => {
       if (!response.ok) {
         toast.add({
-          title: 'Failed to add product',
-          icon: 'i-heroicons-x-circle',
-          color: 'error',
+          title: "Failed to add product",
+          icon: "i-heroicons-x-circle",
+          color: "error",
         });
         onSubmitting.value = false;
       }
@@ -155,7 +155,7 @@ const onSubmit = async () => {
               type="file"
               class="hidden"
               @change="onImageChange"
-            >
+            />
             <!-- accept=".jpg, .jpeg, .png," -->
 
             <UButton
@@ -165,7 +165,7 @@ const onSubmit = async () => {
               @click="changeImage"
             />
           </UFormField>
-          <UButtonGroup class="w-full">
+          <UFieldGroup class="w-full">
             <UButton
               block
               color="primary"
@@ -182,7 +182,7 @@ const onSubmit = async () => {
               icon="i-heroicons-x-mark-20-solid"
               @click="emits('close')"
             />
-          </UButtonGroup>
+          </UFieldGroup>
         </UForm>
       </UCard>
     </template>

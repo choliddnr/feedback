@@ -6,7 +6,7 @@ export default defineNuxtConfig({
     compatibilityVersion: 4,
   },
   modules: [
-    "@nuxt/ui-pro",
+    "@nuxt/ui",
     "@pinia/nuxt",
     "@nuxt/image",
     "@nuxt/test-utils/module",
