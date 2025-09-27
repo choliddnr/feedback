@@ -17,7 +17,6 @@ export const useQuestionsStore = defineStore("questions", () => {
       },
     }
   );
-  console.log("questions store initialized");
 
   return { questions, fetch };
 });

@@ -1,90 +1,113 @@
-      
 <script lang="ts" setup>
+import { Chart } from "chart.js/auto";
+import type { ProductStat } from "~~/shared/types";
 
-import { Chart } from 'chart.js/auto'
-import type { ProductStat } from '~~/shared/types';
-
-const {product} = defineProps<{product:ProductStat}>()
-
-
+const { product } = defineProps<{ product: ProductStat }>();
 
 // Sentiment Breakdown per product
-const sentimentCharts = useTemplateRef<HTMLCanvasElement>("sentimentCharts")
+const sentimentCharts = useTemplateRef<HTMLCanvasElement>("sentimentCharts");
 
 onMounted(() => {
-    console.log('sentimentCharts', sentimentCharts.value);
-    
-    new Chart(sentimentCharts.value!.getContext('2d')!, {
-        type: 'pie',
-        data: {
-        labels: ['Positive', 'Neutral', 'Negative'],
-        datasets: [{
-            data: [product.sentiment.positive, product.sentiment.neutral, product.sentiment.negative],
-            backgroundColor: ['#22c55e', '#eab308', '#ef4444'],
-            borderWidth: 2
-        }]
+  console.log("sentimentCharts", sentimentCharts.value);
+  // if (sentimentCharts.value) {
+  //   drawChart();
+  // } else {
+  //   const unwatch = watch(sentimentCharts, () => {
+  //     if (sentimentCharts.value) {
+  //       drawChart();
+  //       unwatch();
+  //     }
+  //   });
+  // }
+
+  new Chart(sentimentCharts.value!.getContext("2d")!, {
+    type: "pie",
+    data: {
+      labels: ["Positive", "Neutral", "Negative"],
+      datasets: [
+        {
+          data: [
+            product.sentiment.positive,
+            product.sentiment.neutral,
+            product.sentiment.negative,
+          ],
+          backgroundColor: ["#22c55e", "#eab308", "#ef4444"],
+          borderWidth: 2,
         },
-        options: { plugins: { legend: { display: false } }, cutout: '70%' }
-    })
-})
+      ],
+    },
+    options: { plugins: { legend: { display: false } }, cutout: "70%" },
+  });
+});
 </script>
 <template>
-     <UPageCard class="p-6 rounded-2xl shadow">
-        <!-- Header -->
+  <UPageCard class="p-6 rounded-2xl shadow">
+    <!-- Header -->
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <!-- Left: Sentiment Chart -->
+      <div>
+        <canvas ref="sentimentCharts" height="100"></canvas>
+
+        <div class="flex justify-around mt-4 text-center">
+          <div>
+            <p class="text-green-600 font-bold">
+              {{ product.sentiment.positive }}%
+            </p>
+            <p class="text-sm text-gray-300">Positive</p>
+          </div>
+          <div>
+            <p class="text-yellow-500 font-bold">
+              {{ product.sentiment.neutral }}%
+            </p>
+            <p class="text-sm text-gray-300">Neutral</p>
+          </div>
+          <div>
+            <p class="text-red-500 font-bold">
+              {{ product.sentiment.negative }}%
+            </p>
+            <p class="text-sm text-gray-300">Negative</p>
+          </div>
+        </div>
+        <p class="mt-4 text-gray-300">
+          <span class="font-bold">NPS (Adapted):</span>
+          <span class="text-green-600 font-semibold">{{ product.nps }}</span>
+        </p>
+      </div>
+
+      <!-- Right: AI Insights -->
+      <div class="space-y-4 col-span-2">
         <div class="flex justify-between items-center mb-4">
           <h2 class="text-2xl font-bold">{{ product.name }}</h2>
-          <span class="px-3 py-1 text-sm bg-green-100 text-green-700 rounded-full">{{ product.avgRating }} ★ Avg Rating</span>
+          <span
+            class="px-3 py-1 text-sm bg-green-100 text-green-700 rounded-full"
+            >{{ product.avgRating }} ★ Avg Rating</span
+          >
         </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <!-- Left: Sentiment Chart -->
-          <div>
-            <p class="font-semibold text-gray-200 mb-2">Sentiment Breakdown</p>
-
-            <canvas ref="sentimentCharts" height="100"></canvas>
-            <div class="flex justify-around mt-4 text-center">
-              <div>
-                <p class="text-green-600 font-bold">{{ product.sentiment.positive }}%</p>
-                <p class="text-sm text-gray-300">Positive</p>
-              </div>
-              <div>
-                <p class="text-yellow-500 font-bold">{{ product.sentiment.neutral }}%</p>
-                <p class="text-sm text-gray-300">Neutral</p>
-              </div>
-              <div>
-                <p class="text-red-500 font-bold">{{ product.sentiment.negative }}%</p>
-                <p class="text-sm text-gray-300">Negative</p>
-              </div>
-            </div>
-            <p class="mt-4 text-gray-300">
-              <span class="font-bold">NPS (Adapted):</span> 
-              <span class="text-green-600 font-semibold">{{ product.nps }}</span>
-            </p>
-          </div>
-
-          <!-- Right: AI Insights -->
-          <div class="space-y-4">
-            <div>
-              <p class="font-semibold text-gray-200">AI Summary</p>
-              <p class="text-gray-300 text-sm">{{ product.summary }}</p>
-            </div>
-            <div>
-              <p class="font-semibold text-gray-200">Top Themes</p>
-              <ul class="list-disc list-inside text-sm text-gray-300">
-                <li v-for="(theme, tIndex) in product.themes" :key="tIndex">{{ theme }}</li>
-              </ul>
-            </div>
-            <div>
-              <p class="font-semibold text-gray-200">Highlighted Feedback</p>
-              <blockquote class="border-l-4 border-gray-300 pl-3 italic text-gray-300 text-sm">
-                {{ product.quote }}
-              </blockquote>
-            </div>
-          </div>
+        <p class="font-semibold text-gray-200 mb-2">Sentiment Breakdown</p>
+        <div>
+          <p class="font-semibold text-gray-200">AI Summary</p>
+          <p class="text-gray-300 text-sm">{{ product.summary }}</p>
         </div>
-      </UPageCard>
+        <div>
+          <p class="font-semibold text-gray-200">Top Themes</p>
+          <ul class="list-disc list-inside text-sm text-gray-300">
+            <li v-for="(theme, tIndex) in product.themes" :key="tIndex">
+              {{ theme }}
+            </li>
+          </ul>
+        </div>
+        <div>
+          <p class="font-semibold text-gray-200">Highlighted Feedback</p>
+          <blockquote
+            class="border-l-4 border-gray-300 pl-3 italic text-gray-300 text-sm"
+          >
+            {{ product.quote }}
+          </blockquote>
+        </div>
+      </div>
+    </div>
+  </UPageCard>
 </template>
 
-<style>
-
-</style>
+<style></style>

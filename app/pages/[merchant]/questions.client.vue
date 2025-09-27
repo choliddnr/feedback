@@ -21,7 +21,7 @@ const state = reactive({
   question_index: 0,
 });
 
-const answer_invalid = ref<string>();
+const answer_invalid = ref<string>("Invalid messages here");
 const product = computed<Product | undefined>(
   () => products.value![state.product_index!]
 );
@@ -48,6 +48,7 @@ const keyid = computed<string>(() => {
 });
 const answer = ref<string>("");
 const saveState = () => {
+  if (!answer.value || answer.value === "") return;
   answers.value.set(keyid.value, answer.value);
   localStorage.setItem(keyid.value, answer.value);
 };
@@ -66,7 +67,6 @@ const loadState = () => {
     answer_as_number.value = Number(answer.value);
   }
 };
-
 const prevProduct = () => {
   if (state.product_index !== 0) {
     saveState();
@@ -119,7 +119,7 @@ const isAllValid = () => {
 
       const a = answers.value.get(`${p?.id}_${q?.id}`);
       if (!a || a === "") {
-        answer_invalid.value = "Please, answer this question.";
+        answer_invalid.value = "Please, answer this question!";
         return false;
       }
     }
@@ -130,7 +130,7 @@ const isAllValid = () => {
 
 const submitFeedback = () => {
   saveState();
-  if (!isAllValid) return;
+  if (!isAllValid()) return;
   navigateTo(`/${merchant.value?.slug}/review`);
 };
 const answer_as_number = ref<number>(0);
@@ -145,10 +145,9 @@ watch(questions_length, () => {
 watchDebounced(
   answer,
   () => {
-    if (!answer.value && answer.value === "") return;
-
+    if (!answer.value || answer.value === "" || answer.value === "0") return;
     answers.value.set(keyid.value, answer.value);
-    answer_invalid.value = undefined;
+    answer_invalid.value = "";
   },
   { debounce: 500, maxWait: 2000, deep: true }
 );
@@ -162,11 +161,9 @@ onMounted(() => {
 </script>
 <template>
   <ClientOnly>
-    <UCard v-if="answer_invalid" class="">
-      <h1>{{ answer_invalid }}</h1>
-    </UCard>
     <UCard
       :ui="{ root: 'backdrop-blur-sm bg-neutral/60' }"
+      variant="subtle"
       class="w-full md:w-2/3"
     >
       <template #header>
@@ -199,6 +196,10 @@ onMounted(() => {
           </div>
         </div>
       </template>
+
+      <h1 v-if="answer_invalid" class="text-error-400 mb-3">
+        {{ answer_invalid }}
+      </h1>
       <UFormField v-if="question">
         <template #label>
           <span>{{ question!.question }}</span>
@@ -213,7 +214,7 @@ onMounted(() => {
         />
         <Rating v-if="question!.type === 2" v-model="answer_as_number" />
       </UFormField>
-      <div v-if="question" class="flex flex-row gap-1 my-2">
+      <div v-if="question" class="flex flex-row flex-wrap gap-1 my-2">
         <UButton
           v-for="(opt, index) in question?.answer_options"
           v-if="question.type === 1"

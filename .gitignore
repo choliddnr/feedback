@@ -27,3 +27,6 @@ logs
 
 credentials.csv
 database/local.sqlite3
+
+.wrangler
+.wrangler/

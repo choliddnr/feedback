@@ -4,7 +4,7 @@
   <div class="bg-cover bg-center">
     <UContainer
       :ui="{
-        constrained: 'max-w-4xl',
+        constrained: 'w-screen',
         base: 'h-screen content-center',
       }"
     >

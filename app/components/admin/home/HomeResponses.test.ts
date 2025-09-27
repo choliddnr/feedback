@@ -1,9 +1,9 @@
-import { mount } from '@vue/test-utils';
-import { describe, it, expect } from 'vitest';
-import HomeResponses from '~/components/admin/home/HomeResponses.vue';
+import { mount } from "@vue/test-utils";
+import { describe, it, expect } from "vitest";
+import HomeResponses from "~/components/admin/responses/Index.vue";
 
-describe('HomeResponses.vue', () => {
-  it('mounts successfully', async () => {
+describe("HomeResponses.vue", () => {
+  it("mounts successfully", async () => {
     const wrapper = mount(HomeResponses, {
       global: {
         stubs: {

@@ -1,18 +1,21 @@
-import { defineStore, acceptHMRUpdate } from 'pinia';
+import { defineStore, acceptHMRUpdate } from "pinia";
 import type {
   Product,
   Merchant,
   RespondentForm,
   Question,
-} from '~~/shared/types';
+  Respondent,
+  ResponseTable,
+} from "~~/shared/types";
 
-export const useResponseStore = defineStore('response', () => {
+export const useResponseStore = defineStore("response", () => {
   const merchant = ref<Merchant>();
   const respondent = ref<RespondentForm>();
   const selected_product = ref<number[]>([]);
   const products = ref<Product[]>([]);
   const answers = ref(new Map());
   const all_questions = ref<Question[]>();
+  const responses = ref<ResponseTable[]>([]);
 
   return {
     merchant,
@@ -21,6 +24,7 @@ export const useResponseStore = defineStore('response', () => {
     products,
     all_questions,
     answers,
+    responses,
   };
 });
 

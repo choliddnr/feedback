@@ -11,8 +11,10 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits<{ close: [boolean] }>();
+console.log("response_id", props.response_id);
+
 const { data } = await useFetch(
-  '/api/statistics/answers/' + props.response_id,
+  "/api/statistics/answers/" + props.response_id,
   {
     transform: (
       data: {
@@ -20,7 +22,7 @@ const { data } = await useFetch(
         question: string;
         type: string;
         answer: string;
-      }[],
+      }[]
     ) => {
       const res: {
         [key: string]: ResponseData[];
@@ -33,7 +35,7 @@ const { data } = await useFetch(
       });
       return res;
     },
-  },
+  }
 );
 </script>
 
