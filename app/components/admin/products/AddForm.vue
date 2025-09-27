@@ -1,10 +1,6 @@
 <script lang="ts" setup>
 import { z } from "zod";
-import { error } from "#build/ui-pro";
-import {
-  LazyAdminProductsEditForm,
-  LazyAdminProductsEditImage,
-} from "#components";
+import { LazyAdminProductsEditImage } from "#components";
 import type { NewProduct } from "~~/shared/types";
 
 const { merchants, active_merchant } = storeToRefs(useMerchantsStore());
