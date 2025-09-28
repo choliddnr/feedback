@@ -42,6 +42,15 @@ const providers = [
             toast.add({ title: "Google", description: "Login with Google" });
             navigateTo("/admin");
           },
+          onError: (ctx) => {
+            console.log("ctx", ctx);
+
+            toast.add({
+              title: "Google",
+              description: ctx.error.message,
+              color: "error",
+            });
+          },
         }
       );
     },
@@ -90,6 +99,10 @@ const onSubmit = async (payload: FormSubmitEvent<Schema>) => {
       onError: (ctx) => {
         // display the error message
         alert(ctx.error.message);
+      },
+      onFinally: (_ctx: any) => {
+        // hide loading
+        console.log("finally", _ctx);
       },
     }
   );
