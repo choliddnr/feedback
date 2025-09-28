@@ -30,3 +30,4 @@ database/local.sqlite3
 
 .wrangler
 .wrangler/
+wrangler.toml
