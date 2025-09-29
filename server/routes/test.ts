@@ -1,8 +1,9 @@
-import { Merchant } from '~~/shared/types';
+import { DB } from "better-auth/adapters/drizzle";
+import { Merchant } from "~~/shared/types";
 
 export default defineEventHandler(async (e) => {
   try {
-    const rows = await db(e)
+    const rows = await (db(e) as DB)
       .select({
         productId: products.id,
         productTitle: products.title,
@@ -91,7 +92,7 @@ export default defineEventHandler(async (e) => {
         }
 
         grouped[record.product_id].questions[record.question].push(
-          record.answer,
+          record.answer
         );
         // console.log(grouped[record.product_id].questions[record.question]);
       }
@@ -141,9 +142,9 @@ export default defineEventHandler(async (e) => {
       e,
       createError({
         statusCode: 500,
-        statusMessage: 'Internal Server Error',
+        statusMessage: "Internal Server Error",
         data: error,
-      }),
+      })
     );
   }
 

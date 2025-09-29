@@ -1,11 +1,14 @@
 <script lang="ts" setup>
 import { Chart } from "chart.js/auto";
-import type { ProductStat } from "~~/shared/types";
+import type { ProductAnalysis } from "~~/shared/types";
 
-const { product } = defineProps<{ product: ProductStat }>();
+const { product } = defineProps<{ product: ProductAnalysis }>();
 
 // Sentiment Breakdown per product
 const sentimentCharts = useTemplateRef<HTMLCanvasElement>("sentimentCharts");
+
+const isAnalysisAvailable = product.sentiment ? true : false;
+console.log("product in per product", product.name, product.sentiment);
 
 onMounted(() => {
   console.log("sentimentCharts", sentimentCharts.value);
@@ -20,28 +23,30 @@ onMounted(() => {
   //   });
   // }
 
-  new Chart(sentimentCharts.value!.getContext("2d")!, {
-    type: "pie",
-    data: {
-      labels: ["Positive", "Neutral", "Negative"],
-      datasets: [
-        {
-          data: [
-            product.sentiment.positive,
-            product.sentiment.neutral,
-            product.sentiment.negative,
-          ],
-          backgroundColor: ["#22c55e", "#eab308", "#ef4444"],
-          borderWidth: 2,
-        },
-      ],
-    },
-    options: { plugins: { legend: { display: false } }, cutout: "70%" },
-  });
+  // // if (isAnalysisAvailable) {
+  // new Chart(sentimentCharts.value!.getContext("2d")!, {
+  //   type: "pie",
+  //   data: {
+  //     labels: ["Positive", "Neutral", "Negative"],
+  //     datasets: [
+  //       {
+  //         data: [
+  //           product.sentiment!.positive || 0,
+  //           product.sentiment!.neutral || 0,
+  //           product.sentiment!.negative || 0,
+  //         ],
+  //         backgroundColor: ["#22c55e", "#eab308", "#ef4444"],
+  //         borderWidth: 2,
+  //       },
+  //     ],
+  //   },
+  //   options: { plugins: { legend: { display: false } }, cutout: "70%" },
+  // });
+  // // }
 });
 </script>
 <template>
-  <UPageCard class="p-6 rounded-2xl shadow">
+  <UPageCard v-if="isAnalysisAvailable" class="p-6 rounded-2xl shadow">
     <!-- Header -->
 
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -52,26 +57,28 @@ onMounted(() => {
         <div class="flex justify-around mt-4 text-center">
           <div>
             <p class="text-green-600 font-bold">
-              {{ product.sentiment.positive }}%
+              {{ product.sentiment!.positive }}%
             </p>
             <p class="text-sm text-gray-300">Positive</p>
           </div>
           <div>
             <p class="text-yellow-500 font-bold">
-              {{ product.sentiment.neutral }}%
+              {{ product.sentiment!.neutral }}%
             </p>
             <p class="text-sm text-gray-300">Neutral</p>
           </div>
           <div>
             <p class="text-red-500 font-bold">
-              {{ product.sentiment.negative }}%
+              {{ product.sentiment!.negative }}%
             </p>
             <p class="text-sm text-gray-300">Negative</p>
           </div>
         </div>
         <p class="mt-4 text-gray-300">
           <span class="font-bold">NPS (Adapted):</span>
-          <span class="text-green-600 font-semibold">{{ product.nps }}</span>
+          <span class="text-green-600 font-semibold">{{
+            product.net_promoter_score
+          }}</span>
         </p>
       </div>
 
@@ -81,7 +88,7 @@ onMounted(() => {
           <h2 class="text-2xl font-bold">{{ product.name }}</h2>
           <span
             class="px-3 py-1 text-sm bg-green-100 text-green-700 rounded-full"
-            >{{ product.avgRating }} ★ Avg Rating</span
+            >{{ product.average_rating }} ★ Avg Rating</span
           >
         </div>
         <p class="font-semibold text-gray-200 mb-2">Sentiment Breakdown</p>
@@ -102,7 +109,7 @@ onMounted(() => {
           <blockquote
             class="border-l-4 border-gray-300 pl-3 italic text-gray-300 text-sm"
           >
-            {{ product.quote }}
+            {{ product.highlight }}
           </blockquote>
         </div>
       </div>

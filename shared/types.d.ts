@@ -1,11 +1,11 @@
 // type User = typeof auth.$Infer.Session.user & { id?: number };
 
-import { InferModel } from 'drizzle-orm';
-import { products, questions, question_types } from '~~/server/utils/db/schema';
+import { InferModel } from "drizzle-orm";
+import { products, questions, question_types } from "~~/server/utils/db/schema";
 
-import type { AvatarProps } from '@nuxt/ui';
+import type { AvatarProps } from "@nuxt/ui";
 
-export type NewProduct = InferModel<typeof products, 'insert'>;
+export type NewProduct = InferModel<typeof products, "insert">;
 export type Product = InferModel<typeof products>;
 
 // export type Product = {
@@ -17,7 +17,7 @@ export type Product = InferModel<typeof products>;
 // };
 export type QuestionType = InferModel<typeof question_types>;
 
-export type NewQuestion = InferModel<typeof questions, 'insert'>;
+export type NewQuestion = InferModel<typeof questions, "insert">;
 export type Question = InferModel<typeof questions>;
 // export type Question = {
 //   id: number;
@@ -34,11 +34,11 @@ export type Question = InferModel<typeof questions>;
 //   answer_options: string[];
 // };
 
-export type NewRespondent = InferModel<typeof respondents, 'insert'>;
+export type NewRespondent = InferModel<typeof respondents, "insert">;
 export type Respondent = InferModel<typeof respondents>;
-export type RespondentForm = Omit<NewRespondent, 'whatsapp' | 'gender'> & {
+export type RespondentForm = Omit<NewRespondent, "whatsapp" | "gender"> & {
   whatsapp: number;
-  gender: 'female' | 'male';
+  gender: "female" | "male";
 };
 // export type Respondent = {
 //   id?: number;
@@ -47,7 +47,7 @@ export type RespondentForm = Omit<NewRespondent, 'whatsapp' | 'gender'> & {
 //   age: number;
 //   whatsapp: number;
 // };
-export type NewMerchant = InferModel<typeof merchants, 'insert'>;
+export type NewMerchant = InferModel<typeof merchants, "insert">;
 export type Merchant = InferModel<typeof merchants>;
 
 // export type Merchant = {
@@ -85,8 +85,8 @@ export type Stat = {
   formatter?: (value: number) => string;
 };
 
-export type UserStatus = 'subscribed' | 'unsubscribed' | 'bounced';
-export type SaleStatus = 'paid' | 'failed' | 'refunded';
+export type UserStatus = "subscribed" | "unsubscribed" | "bounced";
+export type SaleStatus = "paid" | "failed" | "refunded";
 
 export type User = {
   id: number;
@@ -109,7 +109,7 @@ export type Mail = {
 export type Member = {
   name: string;
   username: string;
-  role: 'member' | 'owner';
+  role: "member" | "owner";
   avatar: Avatar;
 };
 
@@ -139,7 +139,7 @@ export type Notification = {
   date: string;
 };
 
-export type Period = 'daily' | 'weekly' | 'monthly';
+export type Period = "daily" | "weekly" | "monthly";
 
 export type Range = {
   start: Date;
@@ -149,22 +149,24 @@ export type Range = {
 export type AIOutput = [
   {
     output: string;
-  },
+  }
 ];
 
-
-export type ProductStat = {
-      name: string,
-    avgRating: number,
-    sentiment: { positive: number, neutral: number, negative: number },
-    nps: number,
-    summary: string,
-    themes: string[],
-    quote: string
-}
+export type ProductAnalysis = {
+  product?: number;
+  name?: string;
+  sentiment?: { positive: number; neutral: number; negative: number };
+  net_promoter_score?: number;
+  summary?: string;
+  highlight?: string;
+  themes?: string[];
+  trends?: string[];
+  average_rating?: number;
+  recommendations?: string[];
+};
 
 export type Kpi = {
-  label: string
-  value: string
-  class?: string
-}
+  label: string;
+  value: string;
+  class?: string;
+};

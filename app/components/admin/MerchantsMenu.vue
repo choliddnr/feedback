@@ -1,18 +1,23 @@
 <script setup lang="ts">
-import type { DropdownMenuItem } from '@nuxt/ui';
-import type { Merchant } from '~~/shared/types';
+import type { DropdownMenuItem } from "@nuxt/ui";
+import type { Merchant } from "~~/shared/types";
 defineProps<{
   collapsed?: boolean;
 }>();
 
 const { merchants, active_merchant } = storeToRefs(useMerchantsStore());
+// if (merchants.value === undefined) {
+//   const { fetch } = useMerchantsStore();
+//   await fetch();
+//   console.log("fetch merchants", merchants.value);
+// }
 const merchant_list = computed<DropdownMenuItem[]>(() => {
   const items = [] as DropdownMenuItem[];
   merchants.value?.forEach((m) => {
     items.push({
       label: m.title,
       avatar: {
-        src: m.logo ? getImg(m.logo) : '',
+        src: m.logo ? getImg(m.logo) : "",
         alt: m.title,
       },
       onSelect: () => (active_merchant.value = m.id),

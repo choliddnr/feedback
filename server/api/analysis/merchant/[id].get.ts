@@ -12,9 +12,9 @@ export default defineEventHandler(async (e) => {
 
   const _analysis = await db(e)
     .select()
-    .from(analysis)
-    .where(eq(analysis.product, id))
-    .limit(1);
+    .from(products)
+    .where(eq(products.merchant, id))
+    .leftJoin(analysis, eq(analysis.product, products.id));
 
   if (_analysis.length === 0) {
     return sendError(
@@ -26,5 +26,6 @@ export default defineEventHandler(async (e) => {
     );
   }
 
-  return JSON.parse(_analysis[0].analysis);
+  //   return JSON.parse(_analysis[0].analysis);
+  return _analysis;
 });

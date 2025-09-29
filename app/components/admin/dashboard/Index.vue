@@ -1,8 +1,59 @@
 <script setup lang="ts">
 import { Chart } from "chart.js/auto";
+import type { Product, ProductAnalysis } from "~~/shared/types";
 // import { useDashboard } from '~~/composables/useDashboard'
 
-const { kpis, products, loading } = useDashboard();
+const { kpis } = useDashboard();
+
+const loading = ref<boolean>(false);
+const analysis = ref<any[]>([]);
+const { active_merchant } = storeToRefs(useMerchantsStore());
+
+const { data: _analysisResult } = await useFetch<
+  {
+    products: Product;
+    analysis: { product: number; analysis: string } | null;
+  }[]
+>(() => "/api/analysis/merchant/" + active_merchant.value, {
+  onResponse: ({ response }) => {
+    loading.value = false;
+  },
+  onRequest: ({}) => {
+    loading.value = true;
+  },
+});
+for (const item of _analysisResult.value || []) {
+  if (!item.analysis) {
+    analysis.value.push({
+      product: item.products.id,
+      name: `🔥 ${item.products.title}`,
+      average_rating: 0,
+      sentiment: { positive: 0, neutral: 0, negative: 0 },
+      net_promoter_score: 0,
+      summary: "No analysis available.",
+      themes: [],
+      highlight: "",
+      recomendations: [],
+    });
+  } else {
+    const _analysis = JSON.parse(
+      JSON.parse(item.analysis.analysis)
+    ) as ProductAnalysis;
+
+    analysis.value.push({
+      product: item.products.id,
+      name: `🔥 ${item.products.title}`,
+      average_rating: _analysis.average_rating,
+      sentiment: _analysis.sentiment,
+
+      net_promoter_score: _analysis.net_promoter_score,
+      summary: _analysis.summary,
+      themes: _analysis.themes,
+      highlight: _analysis.highlight,
+      recomendations: _analysis.recommendations,
+    });
+  }
+}
 
 const feedbackChart = useTemplateRef<HTMLCanvasElement>("feedbackChart");
 const completionChart = useTemplateRef<HTMLCanvasElement>("completionChart");
@@ -106,10 +157,10 @@ onMounted(() => {
     <USkeleton v-for="i in 2" :key="i" class="h-48" />
   </div>
   <div v-else class="grid grid-cols-1 gap-6">
-    <AdminDashboardPerProduct
-      v-for="(product, index) in products"
+    <AdminDashboardAnalysis
+      v-for="(analysis, index) in analysis"
       :key="index"
-      :product="product"
+      :analysis="analysis"
     />
   </div>
 </template>

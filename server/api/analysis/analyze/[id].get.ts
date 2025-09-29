@@ -1,15 +1,15 @@
-import { DB } from 'better-auth/adapters/drizzle';
-import { AIOutput } from '~~/shared/types';
+import { DB } from "better-auth/adapters/drizzle";
+import { AIOutput } from "~~/shared/types";
 
 export default defineEventHandler(async (e) => {
-  const id = Number(getRouterParam(e, 'id'));
+  const id = Number(getRouterParam(e, "id"));
   if (!id) {
     return sendError(
       e,
       createError({
         statusCode: 400,
-        statusMessage: 'ID is required for analysis',
-      }),
+        statusMessage: "ID is required for analysis",
+      })
     );
   }
 
@@ -86,23 +86,25 @@ export default defineEventHandler(async (e) => {
       grouped[record.product_id].questions[record.question].push(record.answer);
     }
     const text_responses = JSON.stringify(Object.values(grouped));
+    // return Object.values(grouped);
+    return rows;
 
-    const analysis = await $fetch<AIOutput>(
-      useRuntimeConfig().N8N_API + '/webhook-test/analyze_response',
-      {
-        method: 'POST',
-        body: {
-          data: text_responses,
-          id,
-        },
-      },
-    );
-    return await $fetch('/api/analysis/' + id, {
-      method: 'POST',
-      body: {
-        data: analysis[0].output,
-      },
-    });
+    // const analysis = await $fetch<AIOutput>(
+    //   useRuntimeConfig().N8N_API + '/webhook-test/analyze_response',
+    //   {
+    //     method: 'POST',
+    //     body: {
+    //       data: text_responses,
+    //       id,
+    //     },
+    //   },
+    // );
+    // return await $fetch('/api/analysis/' + id, {
+    //   method: 'POST',
+    //   body: {
+    //     data: analysis[0].output,
+    //   },
+    // });
     // console.log("Analysis result:", analysis);
     // return analysis[0].output;
   } catch (error) {
@@ -110,8 +112,8 @@ export default defineEventHandler(async (e) => {
       e,
       createError({
         statusCode: 500,
-        statusMessage: 'Internal Server Error: ' + e,
-      }),
+        statusMessage: "Internal Server Error: " + e,
+      })
     );
   }
 });
