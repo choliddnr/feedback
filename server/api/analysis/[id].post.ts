@@ -7,7 +7,6 @@ export default defineEventHandler(async (e) => {
       statusMessage: "ID is required",
     });
   }
-  console.log(id);
 
   // return { body: body.data };
   try {

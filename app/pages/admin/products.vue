@@ -14,7 +14,6 @@ const slideover_edit = overlay.create(LazyAdminProductsEditForm);
 
 const modal_delete_product = overlay.create(LazyModalConfirm);
 const { products, active_product } = storeToRefs(useProductsStore());
-console.log("products", products);
 
 const product_to_delete = ref<string | number>();
 const processDelete = async (id: string | number) => {

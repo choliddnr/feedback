@@ -21,21 +21,26 @@ if (
   isAnalysisAvailable.value = false;
 }
 
+const onGenerating = ref<boolean>(false);
+
 const generateAnalysis = async () => {
   // Emit event to parent to generate analysis
   // console.log("Generate analysis for", analysisData.value.name);
   // emit("generate-analysis", productId);
+  onGenerating.value = true;
   const data = await $fetch<ProductAnalysis>(
-    "/api/analysis/analyze/product/" + analysisData.value.product
+    "/api/analysis/analyze/product/" + analysisData.value.product,
+    {
+      onResponse: () => {
+        onGenerating.value = false;
+      },
+    }
   );
   analysisData.value = data;
   isAnalysisAvailable.value = true;
-  console.log("Generate analysis for", analysisData.value.product);
 };
 
 onMounted(() => {
-  console.log("sentimentCharts", sentimentCharts.value);
-
   if (sentimentCharts.value) {
     new Chart(sentimentCharts.value!.getContext("2d")!, {
       type: "pie",
@@ -135,6 +140,7 @@ onMounted(() => {
       <h2 class="text-2xl font-bold">{{ analysisData.name }}</h2>
       <p class="text-gray-300 text-center">No analysis available.</p>
       <UButton
+        :loading="onGenerating"
         class="mx-auto"
         label="Generate Analysis"
         trailing-icon="i-simple-icons-googlegemini"
