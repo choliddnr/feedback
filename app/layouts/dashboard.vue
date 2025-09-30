@@ -82,11 +82,31 @@ const links = computed(() => [
     },
   ],
 ]);
+
+import { AdminMerchantOptions } from "#components";
+import type { NavigationMenuItem } from "@nuxt/ui";
+
+const items: NavigationMenuItem[] = [
+  {
+    label: "Home",
+    icon: "i-lucide-house",
+    active: true,
+  },
+  {
+    label: "Inbox",
+    icon: "i-lucide-inbox",
+  },
+  {
+    label: "Contacts",
+    icon: "i-lucide-users",
+  },
+];
 </script>
 
 <template>
   <UDashboardGroup unit="rem">
     <UDashboardSidebar
+      toggle-side="right"
       id="default"
       v-model:open="open"
       collapsible
@@ -95,9 +115,8 @@ const links = computed(() => [
       :ui="{ footer: 'lg:border-t lg:border-default' }"
     >
       <template #header="{ collapsed }">
-        <AdminMerchantsMenu :collapsed="collapsed" />
+        <AdminMerchantOptions :collapsed="collapsed" />
       </template>
-
       <template #default="{ collapsed }">
         <UDashboardSearchButton
           v-if="false"
@@ -118,13 +137,10 @@ const links = computed(() => [
           class="mt-auto"
         />
       </template>
-
       <template #footer="{ collapsed }">
         <UserMenu :collapsed="collapsed" />
       </template>
     </UDashboardSidebar>
-
-    <!-- <UDashboardSearch :groups="groups" /> -->
 
     <slot />
   </UDashboardGroup>
