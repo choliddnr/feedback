@@ -1,0 +1,25 @@
+
+{
+  "$schema": "https://unpkg.com/knip@5/schema.json",
+  "entry": [
+    "app/app.vue",
+    "nuxt.config.ts"
+  ],
+  "project": [
+    "**/*.{js,ts,vue}",
+    "!eslint.config.mjs"
+  ],
+  "ignore": [
+    "node_modules",
+    ".nuxt",
+    "dist",
+    "server/db/migrations"
+  ],
+  "ignoreDependencies": [
+    "knip",
+    "typescript"
+  ],
+  "vitest": {
+    "config": []
+  }
+}
