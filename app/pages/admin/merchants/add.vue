@@ -10,8 +10,11 @@ definePageMeta({
 });
 
 const { merchant_categories } = storeToRefs(useMerchantCategoriesStore());
+const { user } = storeToRefs(useUserStore());
 const { fetch } = useMerchantsStore();
-const { merchants } = storeToRefs(useMerchantsStore());
+const { fetch: fetchUser } = useUserStore();
+
+const { merchants, active_merchant } = storeToRefs(useMerchantsStore());
 if (
   merchant_categories.value === undefined ||
   merchant_categories.value.length === 0
@@ -127,6 +130,11 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {
     onResponse: async ({ response }) => {
       if (response.status === 200) {
         await fetch();
+        if (Number(user.value?.defaultMerchant) === 0) {
+          console.log("user.1", user.value?.defaultMerchant, merchants.value);
+          await fetchUser();
+          console.log("user.2", user.value?.defaultMerchant, merchants.value);
+        }
         on_submit.value = false;
         navigateTo("/admin/merchants");
         toast.add({

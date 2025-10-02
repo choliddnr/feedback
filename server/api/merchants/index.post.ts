@@ -56,10 +56,26 @@ export default defineEventHandler(async (e) => {
       );
     }
     await saveImg(e, body.logo.data, filename); // all uploaded images are saved as webp format
-    return await db(e).insert(merchants).values(newData).returning();
+    const new_merchant = await db(e)
+      .insert(merchants)
+      .values(newData)
+      .returning();
+    const session = await auth(e).api.getSession({
+      headers: e.headers,
+    });
+    if (Number(session?.user.defaultMerchant) === 0) {
+      await db(e)
+        .update(user)
+        .set({ defaultMerchant: Number(new_merchant[0].id) })
+        .where(eq(user.id, Number(session?.user.id)));
+    }
+    return new_merchant;
   } catch (err) {
-    throw createError(
-      err instanceof Error ? err.message : "Unknown usr/id/patch error"
+    return sendError(
+      e,
+      createError(
+        err instanceof Error ? err.message : "Unknown usr/id/patch error"
+      )
     );
   }
 });

@@ -26,14 +26,12 @@ const isEdit = ref<boolean>(false);
 const imageBlob = ref<Blob>();
 const formRef = useTemplateRef<HTMLFormElement>("formRef");
 
-console.log("user", user.value);
-
 const state = reactive({
   name: user.value?.name as string,
   email: user.value?.email as string,
   username: user.value?.username as string,
   image: user.value?.image ? getImg(user.value?.image) : "",
-  defaultMerchant: Number(user.value?.defaultMerchant) as number,
+  defaultMerchant: Number(user.value?.defaultMerchant),
 });
 
 const schema = z.object({

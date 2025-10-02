@@ -13,6 +13,7 @@ export const useMerchantsStore = defineStore("merchants", () => {
       },
     }
   );
+
   return { merchants, active_merchant, fetch };
 });
 

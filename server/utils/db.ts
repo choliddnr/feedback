@@ -1,16 +1,16 @@
-import type { H3Event } from 'h3';
+import type { H3Event } from "h3";
 
 import {
   drizzle as sqliteDrizzle,
   type BetterSQLite3Database,
-} from 'drizzle-orm/better-sqlite3';
-import Database from 'better-sqlite3';
+} from "drizzle-orm/better-sqlite3";
+import Database from "better-sqlite3";
 
-import { drizzle, type DrizzleD1Database } from 'drizzle-orm/d1';
-import type { D1Database } from '@cloudflare/workers-types';
-import * as schema from './db/schema/index';
+import { drizzle, type DrizzleD1Database } from "drizzle-orm/d1";
+import type { D1Database } from "@cloudflare/workers-types";
+import * as schema from "./db/schema/index";
 
-export const db = (e: H3Event) => {
+export const db = (e: H3Event): DB => {
   if (import.meta.dev) {
     /**
      * Development config
@@ -21,7 +21,7 @@ export const db = (e: H3Event) => {
     return sqliteDrizzle({
       client: sqlite,
       schema,
-      casing: 'snake_case',
+      casing: "snake_case",
     });
     // };
   } else {
@@ -33,7 +33,7 @@ export const db = (e: H3Event) => {
 
     return drizzle(e.context.cloudflare.env.NUXT_DB as D1Database, {
       schema,
-      casing: 'snake_case',
+      casing: "snake_case",
     });
   }
 };

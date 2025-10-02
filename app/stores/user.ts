@@ -7,11 +7,8 @@ export const useUserStore = defineStore("user", () => {
   const fetch = async () => {
     user.value = (await authClient.useSession(useFetch)).data.value
       ?.user as User;
-    active_merchant.value = user.value
-      ? user.value.defaultMerchant !== 0
-        ? (Number(user.value.defaultMerchant) as number)
-        : 0
-      : 0;
+    if (user.value && Number(user.value.defaultMerchant) !== 0)
+      active_merchant.value = Number(user.value.defaultMerchant);
   };
 
   return { user, fetch };
