@@ -26,6 +26,8 @@ const isEdit = ref<boolean>(false);
 const imageBlob = ref<Blob>();
 const formRef = useTemplateRef<HTMLFormElement>("formRef");
 
+console.log("user", user.value);
+
 const state = reactive({
   name: user.value?.name as string,
   email: user.value?.email as string,
@@ -46,7 +48,7 @@ const schema = z.object({
     })
     .refine(
       async (value) => {
-        if (value === user.value.username) return true;
+        if (value === user.value!.username) return true;
         const data = await $fetch<User>("/api/user/username/" + value);
         return !data;
       },
@@ -94,12 +96,12 @@ const onSubmitting = ref<boolean>(false);
 const onSubmit = async () => {
   onSubmitting.value = true;
   const formData = new FormData();
-  if (state.username !== user.value.username)
+  if (state.username !== user.value!.username)
     formData.append("username", state.username as string);
 
-  if (state.name !== user.value.name)
+  if (state.name !== user.value!.name)
     formData.append("name", state.name as string);
-  if (state.defaultMerchant !== user.value.defaultMerchant)
+  if (state.defaultMerchant !== user.value!.defaultMerchant)
     formData.append(
       "defaultMerchant",
       state.defaultMerchant?.toString() as string

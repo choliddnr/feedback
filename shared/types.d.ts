@@ -88,15 +88,6 @@ export type Stat = {
 export type UserStatus = "subscribed" | "unsubscribed" | "bounced";
 export type SaleStatus = "paid" | "failed" | "refunded";
 
-export type User = {
-  id: number;
-  name: string;
-  email: string;
-  avatar?: AvatarProps;
-  status: UserStatus;
-  location: string;
-};
-
 export type Mail = {
   id: number;
   unread?: boolean;
@@ -170,3 +161,6 @@ export type Kpi = {
   value: string;
   class?: string;
 };
+
+export type Session = typeof _auth.$Infer.Session;
+export type User = typeof _auth.$Infer.Session.user;
