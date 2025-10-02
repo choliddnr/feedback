@@ -1,16 +1,16 @@
 <script setup lang="ts">
-import type { FormError, FormSubmitEvent } from '#ui/types';
+import type { FormError, FormSubmitEvent } from "#ui/types";
 
-import type { User } from 'better-auth';
-import z from 'zod';
-import { useUserStore } from '@/stores/user';
+import type { User } from "better-auth";
+import z from "zod";
+import { useUserStore } from "@/stores/user";
 import {
   LazyAdminUserDeleteAccountModal,
   LazyAdminUserEditUserPicture,
-} from '#components';
+} from "#components";
 // const
 definePageMeta({
-  layout: 'dashboard',
+  layout: "dashboard",
 });
 const { merchants, active_merchant } = storeToRefs(useMerchantsStore());
 
@@ -24,13 +24,13 @@ const { user } = storeToRefs(useUserStore());
 const fileRef = ref<HTMLInputElement>();
 const isEdit = ref<boolean>(false);
 const imageBlob = ref<Blob>();
-const formRef = useTemplateRef<HTMLFormElement>('formRef');
+const formRef = useTemplateRef<HTMLFormElement>("formRef");
 
 const state = reactive({
   name: user.value?.name as string,
   email: user.value?.email as string,
   username: user.value?.username as string,
-  image: user.value?.image ? getImg(user.value?.image) : '',
+  image: user.value?.image ? getImg(user.value?.image) : "",
   defaultMerchant: Number(user.value?.defaultMerchant) as number,
 });
 
@@ -42,19 +42,19 @@ const schema = z.object({
     .min(4)
     .refine((value) => /^[a-z0-9]+(?:[-.][a-z0-9]+)*$/.test(value), {
       message:
-        'username must be lowercase and can only contain letters, numbers, dot, and dashes.',
+        "username must be lowercase and can only contain letters, numbers, dot, and dashes.",
     })
     .refine(
       async (value) => {
         if (value === user.value.username) return true;
-        const data = await $fetch<User>('/api/user/username/' + value);
+        const data = await $fetch<User>("/api/user/username/" + value);
         return !data;
       },
       {
-        message: 'username must be unique.',
-      },
+        message: "username must be unique.",
+      }
     ),
-  defaultMerchant: z.number().gt(0, 'select one of this merchents'),
+  defaultMerchant: z.number().gt(0, "select one of this merchents"),
 });
 
 const overlay = useOverlay();
@@ -73,13 +73,13 @@ const onFileChange = (e: Event) => {
 
   modal_edit_user.open({
     image: URL.createObjectURL(input.files[0]!),
-    'onUpdate:imageBlob': (value) => {
+    "onUpdate:imageBlob": (value) => {
       imageBlob.value = value;
       state.image = URL.createObjectURL(value!);
       modal_edit_user.close();
     },
     onCancel: () => {
-      state.image = user.value?.image || '';
+      state.image = user.value?.image || "";
       modal_edit_user.close();
     },
   });
@@ -95,29 +95,29 @@ const onSubmit = async () => {
   onSubmitting.value = true;
   const formData = new FormData();
   if (state.username !== user.value.username)
-    formData.append('username', state.username as string);
+    formData.append("username", state.username as string);
 
   if (state.name !== user.value.name)
-    formData.append('name', state.name as string);
+    formData.append("name", state.name as string);
   if (state.defaultMerchant !== user.value.defaultMerchant)
     formData.append(
-      'defaultMerchant',
-      state.defaultMerchant?.toString() as string,
+      "defaultMerchant",
+      state.defaultMerchant?.toString() as string
     );
 
   if (imageBlob.value) {
-    formData.append('image', imageBlob.value!);
+    formData.append("image", imageBlob.value!);
   }
   await $fetch(`/api/user/${user.value?.id}`, {
-    method: 'PATCH' as any,
+    method: "PATCH" as any,
     body: formData,
     onResponse: async ({ response }) => {
       if (response.status === 200) {
         user.value = response._data.user;
         active_merchant.value = user.value?.defaultMerchant!;
         toast.add({
-          title: 'Profile updated',
-          icon: 'i-heroicons-check-circle',
+          title: "Profile updated",
+          icon: "i-heroicons-check-circle",
         });
       }
     },
@@ -125,9 +125,9 @@ const onSubmit = async () => {
       if (response.status !== 200) {
         toast.add({
           description: response._data.statusMessage,
-          title: 'Failed!',
-          icon: 'i-heroicons-x-circle',
-          color: 'error',
+          title: "Failed!",
+          icon: "i-heroicons-x-circle",
+          color: "error",
         });
       }
     },
@@ -189,7 +189,7 @@ const deleteAccount = () => {
     </template>
 
     <template #body>
-      <UPageCard
+      <!-- <UPageCard
         v-if="!merchants || merchants?.length === 0"
         :ui="{ root: 'mx-5 my-5 border-0' }"
         spotlight
@@ -209,7 +209,7 @@ const deleteAccount = () => {
             size="xl"
           />
         </template>
-      </UPageCard>
+      </UPageCard> -->
       <UForm ref="formRef" :state="state" :schema="schema" @submit="onSubmit">
         <UPageCard
           :variant="isEdit ? 'subtle' : 'outline'"
@@ -319,7 +319,7 @@ const deleteAccount = () => {
               type="file"
               class="hidden"
               @change="onFileChange"
-            >
+            />
             <!-- accept=".jpg, .jpeg, .png, .gif" -->
           </UFormField>
         </UPageCard>

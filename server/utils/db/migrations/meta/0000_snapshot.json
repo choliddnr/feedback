@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "67ed2bfd-1a67-40ae-8db4-914d99a7f07b",
+  "id": "73213b42-9627-4e15-808d-0c62ecfbceaa",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "account": {
@@ -361,6 +361,67 @@
       "uniqueConstraints": {},
       "checkConstraints": {}
     },
+    "analysis": {
+      "name": "analysis",
+      "columns": {
+        "product": {
+          "name": "product",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "analysis": {
+          "name": "analysis",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "id": {
+          "name": "id",
+          "type": "integer",
+          "primaryKey": true,
+          "notNull": true,
+          "autoincrement": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false,
+          "default": "(strftime('%s','now'))"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false,
+          "default": "(strftime('%s','now') )"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "analysis_product_products_id_fk": {
+          "name": "analysis_product_products_id_fk",
+          "tableFrom": "analysis",
+          "tableTo": "products",
+          "columnsFrom": [
+            "product"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
     "merchant_categories": {
       "name": "merchant_categories",
       "columns": {
@@ -458,8 +519,7 @@
           "type": "text",
           "primaryKey": false,
           "notNull": false,
-          "autoincrement": false,
-          "default": "'fuel-yellow'"
+          "autoincrement": false
         },
         "image_background": {
           "name": "image_background",
@@ -472,7 +532,7 @@
           "name": "logo",
           "type": "text",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "autoincrement": false
         },
         "id": {
@@ -600,6 +660,57 @@
             "id"
           ],
           "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "checkConstraints": {}
+    },
+    "products_to_responses": {
+      "name": "products_to_responses",
+      "columns": {
+        "product_id": {
+          "name": "product_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "response_id": {
+          "name": "response_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "products_to_responses_product_id_products_id_fk": {
+          "name": "products_to_responses_product_id_products_id_fk",
+          "tableFrom": "products_to_responses",
+          "tableTo": "products",
+          "columnsFrom": [
+            "product_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "products_to_responses_response_id_respondents_id_fk": {
+          "name": "products_to_responses_response_id_respondents_id_fk",
+          "tableFrom": "products_to_responses",
+          "tableTo": "respondents",
+          "columnsFrom": [
+            "response_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
           "onUpdate": "no action"
         }
       },

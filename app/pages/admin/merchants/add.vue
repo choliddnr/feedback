@@ -1,16 +1,17 @@
 <script setup lang="ts">
-import type { FormError, FormErrorEvent, FormSubmitEvent } from '#ui/types';
-import { z } from 'zod';
-import type { NavigationMenuItem } from '@nuxt/ui';
-import type { ImageError, Merchant } from '~~/shared/types';
-import { LazyAdminMerchantEditLogo } from '#components';
+import type { FormError, FormErrorEvent, FormSubmitEvent } from "#ui/types";
+import { z } from "zod";
+import type { NavigationMenuItem } from "@nuxt/ui";
+import type { ImageError, Merchant } from "~~/shared/types";
+import { LazyAdminMerchantEditLogo } from "#components";
 
 definePageMeta({
-  layout: 'dashboard',
+  layout: "dashboard",
 });
 
 const { merchant_categories } = storeToRefs(useMerchantCategoriesStore());
 const { fetch } = useMerchantsStore();
+const { merchants } = storeToRefs(useMerchantsStore());
 if (
   merchant_categories.value === undefined ||
   merchant_categories.value.length === 0
@@ -22,19 +23,19 @@ const overlay = useOverlay();
 
 const modal_edit_logo = overlay.create(LazyAdminMerchantEditLogo);
 
-const form = useTemplateRef('form');
+const form = useTemplateRef("form");
 
 const MAX_FILE_SIZE = 1 * 1024 * 1024; // 1MB
 const ACCEPTED_FILE_TYPES = [
-  'image/jpeg',
-  'image/jpeg',
-  'image/png',
-  'image/webp',
+  "image/jpeg",
+  "image/jpeg",
+  "image/png",
+  "image/webp",
 ];
 
 const logoError = ref<ImageError>({
   isError: false,
-  message: '',
+  message: "",
 });
 
 const schema = z.object({
@@ -45,14 +46,14 @@ const schema = z.object({
     .refine((val) => {
       const regex = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
       return regex.test(val);
-    }, 'Slug must be lowercase and can only contain letters, numbers, and dashes.')
+    }, "Slug must be lowercase and can only contain letters, numbers, and dashes.")
     .refine(async (val) => {
-      if (val === '') return true;
-      const data = await $fetch<Merchant>('/api/merchants/slug/' + val, {
-        method: 'get',
+      if (val === "") return true;
+      const data = await $fetch<Merchant>("/api/merchants/slug/" + val, {
+        method: "get",
       });
       return !data;
-    }, 'Slug already exists'),
+    }, "Slug already exists"),
   description: z.string(),
   category: z.number(),
   primary_color: z.string(),
@@ -60,13 +61,13 @@ const schema = z.object({
 
 type Schema = z.output<typeof schema>;
 const state = reactive({
-  title: '',
-  slug: '',
-  description: '',
+  title: "",
+  slug: "",
+  description: "",
   category: 1,
-  primary_color: 'blue',
-  image_background: '',
-  logo: '',
+  primary_color: "blue",
+  image_background: "",
+  logo: "",
 });
 
 const logoRef = ref<HTMLInputElement>();
@@ -83,17 +84,17 @@ const onLogoChange = (e: Event) => {
 
   modal_edit_logo.open({
     image: URL.createObjectURL(input.files[0]!),
-    'onUpdate:imageBlob': (value) => {
+    "onUpdate:imageBlob": (value) => {
       logoBlob.value = value;
       state.logo = URL.createObjectURL(value!);
       modal_edit_logo.close();
       logoError.value = {
         isError: false,
-        message: '',
+        message: "",
       };
     },
     onCancel: () => {
-      state.logo = '';
+      state.logo = "";
       modal_edit_logo.close();
     },
   });
@@ -103,34 +104,34 @@ const on_submit = ref<boolean>(false);
 const onSubmit = async (event: FormSubmitEvent<Schema>) => {
   on_submit.value = true;
   const formData = new FormData();
-  formData.append('title', state.title);
+  formData.append("title", state.title);
 
-  formData.append('slug', state.slug);
-  formData.append('description', state.description);
-  formData.append('category', String(state.category));
-  formData.append('primary_color', state.primary_color);
+  formData.append("slug", state.slug);
+  formData.append("description", state.description);
+  formData.append("category", String(state.category));
+  formData.append("primary_color", state.primary_color);
 
   if (logoBlob.value) {
-    formData.append('logo', logoBlob.value);
+    formData.append("logo", logoBlob.value);
   } else {
     logoError.value = {
       isError: true,
-      message: 'Merchant logo is required.',
+      message: "Merchant logo is required.",
     };
     return;
   }
 
-  await $fetch('/api/merchants', {
-    method: 'post',
+  await $fetch("/api/merchants", {
+    method: "post",
     body: formData,
     onResponse: async ({ response }) => {
       if (response.status === 200) {
         await fetch();
         on_submit.value = false;
-        navigateTo('/admin/merchants');
+        navigateTo("/admin/merchants");
         toast.add({
-          title: 'Merchant created',
-          icon: 'i-heroicons-check-circle',
+          title: "Merchant created",
+          icon: "i-heroicons-check-circle",
         });
       }
     },
@@ -138,10 +139,10 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {
       if (response.status !== 200) {
         on_submit.value = false;
         toast.add({
-          title: 'Failed to create merchant',
+          title: "Failed to create merchant",
           description: error?.message,
-          icon: 'i-heroicons-x-circle',
-          color: 'error',
+          icon: "i-heroicons-x-circle",
+          color: "error",
         });
       }
     },
@@ -179,6 +180,21 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {
       </UDashboardNavbar>
     </template>
     <template #body>
+      <UPageCard
+        v-if="!merchants || merchants?.length === 0"
+        :ui="{ root: 'mx-5 my-5 border-0' }"
+        spotlight
+        spotlight-color="warning"
+        highlight
+        highlight-color="warning"
+      >
+        <template #body>
+          <h1>
+            You don't have any merchant right now. Please create it at least one
+            (1) to get started.
+          </h1>
+        </template>
+      </UPageCard>
       <UForm
         ref="form"
         :state="state"
@@ -268,7 +284,7 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {
               type="file"
               class="hidden"
               @change="onLogoChange"
-            >
+            />
             <!-- accept=".jpg, .jpeg, .png" -->
 
             <UAvatar :src="state.logo" :alt="state.title" size="lg" />

@@ -52,6 +52,15 @@ CREATE TABLE `verification` (
 	`updated_at` integer
 );
 --> statement-breakpoint
+CREATE TABLE `analysis` (
+	`product` integer,
+	`analysis` text NOT NULL,
+	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
+	`created_at` integer DEFAULT (strftime('%s','now')),
+	`updated_at` integer DEFAULT (strftime('%s','now') ),
+	FOREIGN KEY (`product`) REFERENCES `products`(`id`) ON UPDATE no action ON DELETE cascade
+);
+--> statement-breakpoint
 CREATE TABLE `merchant_categories` (
 	`title` text NOT NULL,
 	`description` text,
@@ -67,9 +76,9 @@ CREATE TABLE `merchants` (
 	`category` integer,
 	`owner` integer,
 	`greeting` text NOT NULL,
-	`primery_color` text DEFAULT 'fuel-yellow',
+	`primery_color` text,
 	`image_background` text,
-	`logo` text,
+	`logo` text NOT NULL,
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
 	`created_at` integer DEFAULT (strftime('%s','now')),
 	`updated_at` integer DEFAULT (strftime('%s','now') ),
@@ -86,6 +95,13 @@ CREATE TABLE `products` (
 	`created_at` integer DEFAULT (strftime('%s','now')),
 	`updated_at` integer DEFAULT (strftime('%s','now') ),
 	FOREIGN KEY (`merchant`) REFERENCES `merchants`(`id`) ON UPDATE no action ON DELETE cascade
+);
+--> statement-breakpoint
+CREATE TABLE `products_to_responses` (
+	`product_id` integer NOT NULL,
+	`response_id` integer NOT NULL,
+	FOREIGN KEY (`product_id`) REFERENCES `products`(`id`) ON UPDATE no action ON DELETE no action,
+	FOREIGN KEY (`response_id`) REFERENCES `respondents`(`id`) ON UPDATE no action ON DELETE no action
 );
 --> statement-breakpoint
 CREATE TABLE `question_types` (

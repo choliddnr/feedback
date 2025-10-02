@@ -3,12 +3,52 @@ import { AIOutput } from "~~/shared/types";
 
 import { GoogleGenAI, Type, type ContentListUnion } from "@google/genai";
 import { Product } from "~~/shared/types";
+import { negative } from "zod";
 
 const ai = new GoogleGenAI({
   apiKey: useRuntimeConfig().geminiApiKey,
 });
 
+const getRandomNumber = (
+  min: number,
+  max: number,
+  isDecimal: boolean = false
+) => {
+  min = Math.ceil(min); // Ensure min is an integer
+  max = Math.floor(max); // Ensure max is an integer
+  if (isDecimal) return Math.random() * (max - min + 1) + min;
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+};
+
 export default defineEventHandler(async (e) => {
+  const positif = getRandomNumber(1, 50);
+  const neutral = getRandomNumber(1, 30);
+  const negatif = 100 - positif - neutral;
+  return JSON.parse(
+    `{\n  "sentiment": {\n    "positive": ${positif},\n    "neutral": ${neutral},\n    "negative": ${negatif}\n  },\n  "net_promoter_score": ${getRandomNumber(
+      -50,
+      50
+    )},\n  "summary": "Pelanggan memiliki pendapat beragam tentang rasa, namun secara konsisten mengeluhkan harga yang mahal, porsi yang kecil, dan tekstur pentol bakso yang tidak memuaskan (terlalu keras atau lembek). Kualitas toping juga menjadi area yang perlu ditingkatkan.",\n  "highlight": "Rasa kuahnya ada yang suka, tapi harga, porsi, dan tekstur pentolnya mengecewakan.",\n  "themes": [\n    "Harga & Porsi → ${getRandomNumber(
+      1,
+      100
+    )}% negatif",\n    "Tekstur Pentol → ${getRandomNumber(
+      1,
+      100
+    )}% negatif",\n    "Kualitas Toping → ${getRandomNumber(
+      1,
+      100
+    )}% negatif",\n    "Rasa Keseluruhan → ${getRandomNumber(
+      1,
+      100
+    )}% positif"\n  ],\n  "trends": [\n    "Keluhan yang paling sering muncul adalah harga yang dianggap tidak sepadan dengan porsi yang didapat.",\n    "Ketidakpuasan terhadap tekstur pentol bakso menjadi masalah utama yang dilaporkan oleh semua responden."\n  ],\n  "average_rating": ${getRandomNumber(
+      1,
+      4.5,
+      true
+    ).toFixed(
+      2
+    )},\n  "recommendations": [\n    "Lakukan penyesuaian harga atau perbesar ukuran porsi untuk memberikan nilai yang lebih baik bagi pelanggan.",\n    "Perbaiki resep pentol bakso untuk memastikan tekstur yang kenyal dan rasa daging yang lebih kuat.",\n    "Tingkatkan kualitas bahan baku untuk toping seperti pangsit dan siomay.",\n    "Standarisasi resep kuah untuk menjaga konsistensi rasa agar tidak terlalu asin."\n  ]\n}`
+  );
+
   const id = Number(getRouterParam(e, "id"));
   if (!id) {
     return sendError(
@@ -176,11 +216,11 @@ export default defineEventHandler(async (e) => {
         },
       },
     });
-    await e.$fetch("/api/analysis/" + id, {
-      method: "POST",
-      body: { data: JSON.stringify(analysisResult.text) },
-    });
-    return analysisResult.text;
+    // await e.$fetch("/api/analysis/" + id, {
+    //   method: "POST",
+    //   body: { data: JSON.stringify(analysisResult.text) },
+    // });
+    // return analysisResult.text;
   } catch (error) {
     return sendError(
       e,

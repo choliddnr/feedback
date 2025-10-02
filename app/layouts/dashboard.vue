@@ -83,24 +83,17 @@ const links = computed(() => [
   ],
 ]);
 
-import { AdminMerchantOptions } from "#components";
-import type { NavigationMenuItem } from "@nuxt/ui";
-
-const items: NavigationMenuItem[] = [
-  {
-    label: "Home",
-    icon: "i-lucide-house",
-    active: true,
-  },
-  {
-    label: "Inbox",
-    icon: "i-lucide-inbox",
-  },
-  {
-    label: "Contacts",
-    icon: "i-lucide-users",
-  },
-];
+if (!merchants.value) {
+  if (route.path !== "/admin/merchants/add") navigateTo("/admin/merchants/add");
+  const unwatch = watch(route, () => {
+    if (merchants.value && merchants.value.length > 0) {
+      unwatch();
+      return;
+    }
+    if (route.path !== "/admin/merchants/add")
+      navigateTo("/admin/merchants/add");
+  });
+}
 </script>
 
 <template>

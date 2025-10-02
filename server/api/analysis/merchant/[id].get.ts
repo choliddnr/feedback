@@ -16,6 +16,13 @@ export default defineEventHandler(async (e) => {
     .where(eq(products.merchant, id))
     .leftJoin(analysis, eq(analysis.product, products.id));
 
+  // const an =_analysis.map((a) => {
+  //   if (a.analysis) {
+  //     a["n"] = JSON.parse(a.analysis as unknown as string);
+  //   }
+  //   return a;
+  // })
+
   if (_analysis.length === 0) {
     return sendError(
       e,

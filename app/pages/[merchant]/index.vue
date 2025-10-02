@@ -1,7 +1,11 @@
 <script setup lang="ts">
 const { merchant } = storeToRefs(useResponseStore());
 const route = useRoute();
-navigateTo(`/${route.params.merchant}/respondent`);
+if (merchant.value) {
+  navigateTo(`/${merchant.value.slug}/respondent`);
+} else {
+  navigateTo(`/${route.params.merchant}/404`);
+}
 </script>
 <template>
   <UCard>

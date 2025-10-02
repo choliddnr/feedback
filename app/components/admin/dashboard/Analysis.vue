@@ -22,44 +22,53 @@ if (
 }
 
 const onGenerating = ref<boolean>(false);
-
+const chart = ref<Chart>();
 const generateAnalysis = async () => {
-  // Emit event to parent to generate analysis
-  // console.log("Generate analysis for", analysisData.value.name);
-  // emit("generate-analysis", productId);
   onGenerating.value = true;
-  const data = await $fetch<ProductAnalysis>(
-    "/api/analysis/analyze/product/" + analysisData.value.product,
-    {
-      onResponse: () => {
-        onGenerating.value = false;
-      },
+  try {
+    const data = await $fetch<ProductAnalysis>(
+      "/api/analysis/analyze/product/" + analysisData.value.product
+    );
+    analysisData.value = data;
+    isAnalysisAvailable.value = true;
+
+    await nextTick();
+
+    if (sentimentCharts.value) {
+      if (chart.value) chart.value.destroy();
+      drawChart(sentimentCharts.value);
     }
-  );
-  analysisData.value = data;
-  isAnalysisAvailable.value = true;
+  } catch (error) {
+    console.error("Failed to generate analysis:", error);
+  } finally {
+    onGenerating.value = false;
+  }
+};
+
+const drawChart = (canvas: HTMLCanvasElement) => {
+  chart.value = new Chart(canvas.getContext("2d")!, {
+    type: "pie",
+    data: {
+      labels: ["Positive", "Neutral", "Negative"],
+      datasets: [
+        {
+          data: [
+            analysisData.value.sentiment?.positive || 0,
+            analysisData.value.sentiment?.neutral || 0,
+            analysisData.value.sentiment?.negative || 0,
+          ],
+          backgroundColor: ["#22c55e", "#eab308", "#ef4444"],
+          borderWidth: 2,
+        },
+      ],
+    },
+    options: { plugins: { legend: { display: false } } },
+  });
 };
 
 onMounted(() => {
   if (sentimentCharts.value) {
-    new Chart(sentimentCharts.value!.getContext("2d")!, {
-      type: "pie",
-      data: {
-        labels: ["Positive", "Neutral", "Negative"],
-        datasets: [
-          {
-            data: [
-              analysisData.value.sentiment!.positive || 0,
-              analysisData.value.sentiment!.neutral || 0,
-              analysisData.value.sentiment!.negative || 0,
-            ],
-            backgroundColor: ["#22c55e", "#eab308", "#ef4444"],
-            borderWidth: 2,
-          },
-        ],
-      },
-      options: { plugins: { legend: { display: false } }, cutout: "70%" },
-    });
+    drawChart(sentimentCharts.value);
   }
 });
 </script>
@@ -103,11 +112,29 @@ onMounted(() => {
       <!-- Right: AI Insights -->
       <div class="space-y-4 col-span-2">
         <div class="flex justify-between items-center mb-4">
-          <h2 class="text-2xl font-bold">{{ analysisData.name }}</h2>
-          <span
-            class="px-3 py-1 text-sm bg-green-100 text-green-700 rounded-full"
-            >{{ analysisData.average_rating }} ★ Avg Rating</span
-          >
+          <div class="flex flex-row items-center gap-2">
+            <h2 class="text-2xl font-bold">{{ analysisData.name }}</h2>
+            <span
+              class="px-3 py-1 mt-2 text-sm rounded-full"
+              :class="[
+                analysisData.average_rating && analysisData.average_rating >= 4
+                  ? 'bg-green-100 text-green-700'
+                  : analysisData.average_rating &&
+                    analysisData.average_rating >= 2
+                  ? 'bg-yellow-100 text-yellow-700'
+                  : 'bg-red-100 text-red-700',
+              ]"
+              >{{ analysisData.average_rating }} ★ Avg Rating</span
+            >
+          </div>
+          <UButton
+            :loading="onGenerating"
+            class="px-3 py-1 rounded-4xl"
+            label="Re-Generate Analysis"
+            trailing-icon="i-simple-icons-googlegemini"
+            color="primary"
+            @click="generateAnalysis"
+          />
         </div>
         <p class="font-semibold text-gray-200 mb-2">Sentiment Breakdown</p>
         <div>

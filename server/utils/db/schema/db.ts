@@ -188,6 +188,16 @@ export const responses = sqliteTable("responses", {
     .$default(() => 0),
   ...dafaultField,
 });
+
+export const productsToResponses = sqliteTable("products_to_responses", {
+  productId: int()
+    .notNull()
+    .references(() => products.id),
+  responseId: int()
+    .notNull()
+    .references(() => respondents.id),
+});
+
 export const response_answers = sqliteTable("response_answers", {
   response: int().references((): AnySQLiteColumn => responses.id, {
     onDelete: "cascade",
