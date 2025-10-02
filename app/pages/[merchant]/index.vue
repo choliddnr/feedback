@@ -1,14 +1,20 @@
 <script setup lang="ts">
 const { merchant } = storeToRefs(useResponseStore());
 const route = useRoute();
-if (merchant.value) {
-  navigateTo(`/${merchant.value.slug}/respondent`);
-} else {
-  navigateTo(`/${route.params.merchant}/404`);
-}
+
+const { loadingAnimationSrc } = useDashboard();
+
+onMounted(async () => {
+  await nextTick();
+  if (merchant.value) {
+    navigateTo(`/${merchant.value.slug}/respondent`);
+  } else {
+    navigateTo(`/${route.params.merchant}/404`);
+  }
+});
 </script>
 <template>
-  <UCard>
+  <!-- <UCard>
     <article class="text-wrap text-xl text-center items-center">
       <h4 class="font-bold">Welcome,</h4>
       <USeparator class="mb-4 mt-2" />
@@ -23,5 +29,6 @@ if (merchant.value) {
         @click="navigateTo(`/${route.params.merchant}/respondent`)"
       />
     </article>
-  </UCard>
+  </UCard> -->
+  <NuxtImg :src="loadingAnimationSrc" alt="loading form" width="100" />
 </template>

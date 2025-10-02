@@ -1,12 +1,13 @@
-import { D1Database } from '@cloudflare/workers-types';
-import { SQLiteTableWithColumns } from 'drizzle-orm/sqlite-core';
+import { D1Database } from "@cloudflare/workers-types";
+import { DB } from "better-auth/adapters/drizzle";
+import { SQLiteTableWithColumns } from "drizzle-orm/sqlite-core";
 import {
   InsertRespondentsSchema,
   InsertResponseAnswerSchema,
-} from '~~/server/utils/db/schema';
+} from "~~/server/utils/db/schema";
 
 interface SQLiteTransactionConfig {
-  behavior?: 'deferred' | 'immediate' | 'exclusive';
+  behavior?: "deferred" | "immediate" | "exclusive";
 }
 
 export default defineEventHandler(async (e) => {
@@ -16,15 +17,15 @@ export default defineEventHandler(async (e) => {
     merchant: string;
   };
   const respondent_validation = InsertRespondentsSchema.safeParse(
-    body.respondent,
+    body.respondent
   );
   if (!respondent_validation.success)
     return sendError(
       e,
       createError({
         statusCode: 422,
-        statusMessage: 'Invalid respondent data!',
-      }),
+        statusMessage: "Invalid respondent data!",
+      })
     );
 
   /**
@@ -37,19 +38,19 @@ export default defineEventHandler(async (e) => {
    */
 
   const parseKey = (key: string): [number, number] => {
-    const arr = key.split('_', 2);
+    const arr = key.split("_", 2);
     return [Number(arr[0]), Number(arr[1])];
   };
 
   Object.keys(body.answers).forEach((key) => {
     // const  = body.answers[key];
-    if (!body.answers[key] || body.answers[key] === '') {
+    if (!body.answers[key] || body.answers[key] === "") {
       return sendError(
         e,
         createError({
           statusCode: 422,
-          statusMessage: 'Invalid answers data!',
-        }),
+          statusMessage: "Invalid answers data!",
+        })
       );
     }
   });
@@ -61,8 +62,8 @@ export default defineEventHandler(async (e) => {
      */
     const runTransactionAsync = async () => {
       return await Promise.resolve(
-        db(e).transaction(
-          (tx) => {
+        (db(e) as DB).transaction(
+          (tx: DB) => {
             const answers = [] as {
               response: number;
               question: number;
@@ -92,9 +93,9 @@ export default defineEventHandler(async (e) => {
             tx.insert(response_answers).values(answers).run();
           },
           {
-            behavior: 'deferred',
-          },
-        ),
+            behavior: "deferred",
+          }
+        )
       );
     };
     await runTransactionAsync();
@@ -155,10 +156,10 @@ export default defineEventHandler(async (e) => {
         e,
         createError({
           statusCode: 500,
-          statusMessage: 'Failed to process response!',
-        }),
+          statusMessage: "Failed to process response!",
+        })
       );
     }
   }
-  return { success: true, message: 'Response procecced successfully.' };
+  return { success: true, message: "Response procecced successfully." };
 });
