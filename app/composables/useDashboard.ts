@@ -6,6 +6,16 @@ const _useDashboard = () => {
   const kpis = ref<Kpi[]>([]);
   // const products = ref<ProductStat[]>([]);
   const loading = ref(true);
+  let emptyImage: string;
+  let loadingAnimationSrc: string;
+
+  if (import.meta.dev) {
+    loadingAnimationSrc = getImg("public/loading.gif");
+    emptyImage = getImg("public/empty.png");
+  } else {
+    loadingAnimationSrc = "/loading.gif";
+    emptyImage = "/empty.png";
+  }
 
   // const analysis = ref<any[]>([]);
 
@@ -111,6 +121,8 @@ const _useDashboard = () => {
 
   return {
     kpis,
+    emptyImage,
+    loadingAnimationSrc,
   };
 };
 

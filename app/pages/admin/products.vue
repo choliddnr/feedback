@@ -4,10 +4,14 @@ import {
   LazyAdminProductsAddForm,
   LazyModalConfirm,
 } from "#components";
-const { merchants, active_merchant } = storeToRefs(useMerchantsStore());
 definePageMeta({
   layout: "dashboard",
 });
+
+const { emptyImage } = useDashboard();
+
+const { merchants, active_merchant } = storeToRefs(useMerchantsStore());
+
 const overlay = useOverlay();
 const slideover_add = overlay.create(LazyAdminProductsAddForm);
 const slideover_edit = overlay.create(LazyAdminProductsEditForm);
@@ -151,7 +155,7 @@ onMounted(() => {
         v-else
         class="w-auto mx-auto max-w-xs flex flex-col gap-5 justify-content-center"
       >
-        <NuxtImg src="/empty.png" />
+        <NuxtImg :src="emptyImage" width="200" class="mx-auto" />
         <span class="mx-auto font-bold text-xl">No Product </span>
         <UButton
           class="mx-auto"

@@ -13,16 +13,7 @@ import {
 definePageMeta({
   layout: "dashboard",
 });
-let loadingAnimationSrc: string;
-let emptyImage: string;
-
-if (import.meta.dev) {
-  loadingAnimationSrc = getImg("public/loading.gif");
-  emptyImage = getImg("public/empty.png");
-} else {
-  loadingAnimationSrc = "/loading.gif";
-  emptyImage = "/empty.png";
-}
+const { emptyImage, loadingAnimationSrc } = useDashboard();
 
 const { products, active_product } = storeToRefs(useProductsStore());
 const { merchants, active_merchant } = storeToRefs(useMerchantsStore());
