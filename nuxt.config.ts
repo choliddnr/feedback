@@ -36,6 +36,7 @@ export default defineNuxtConfig({
   routeRules: {
     "/admin/**": {
       appMiddleware: ["auth"],
+      ssr: false,
     },
   },
   runtimeConfig: {

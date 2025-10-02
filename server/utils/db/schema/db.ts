@@ -189,11 +189,11 @@ export const responses = sqliteTable("responses", {
   ...dafaultField,
 });
 
-export const productsToResponses = sqliteTable("products_to_responses", {
-  productId: int()
+export const products_to_responses = sqliteTable("products_to_responses", {
+  product_id: int()
     .notNull()
     .references(() => products.id),
-  responseId: int()
+  response_id: int()
     .notNull()
     .references(() => respondents.id),
 });

@@ -161,12 +161,26 @@ onMounted(() => {
     </div>
   </UPageCard>
   <UPageCard v-else class="p-6 rounded-2xl shadow">
-    <div
-      class="w-auto mx-auto max-w-xs flex flex-col gap-5 justify-content-center"
-    >
+    <div class="w-auto mx-auto flex flex-col gap-5 justify-content-center">
       <h2 class="text-2xl font-bold">{{ analysisData.name }}</h2>
-      <p class="text-gray-300 text-center">No analysis available.</p>
+      <p
+        v-if="
+          analysisData.un_analyzed_responses &&
+          analysisData.un_analyzed_responses > 0
+        "
+        class="text-gray-300 text-center"
+      >
+        No analysis available. There were
+        {{ analysisData.un_analyzed_responses }} responses to analyze
+      </p>
+      <p v-else class="text-gray-300 text-center">
+        No responses to analyze. Try to collect responses.
+      </p>
       <UButton
+        v-if="
+          analysisData.un_analyzed_responses &&
+          analysisData.un_analyzed_responses > 0
+        "
         :loading="onGenerating"
         class="mx-auto"
         label="Generate Analysis"

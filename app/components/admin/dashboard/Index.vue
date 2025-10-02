@@ -6,6 +6,7 @@ import type { Product, ProductAnalysis } from "~~/shared/types";
 // const { kpis } = useDashboard();
 
 const loading = ref<boolean>(false);
+const isEmpty = ref<boolean>(false);
 const analysis = ref<any[]>([]);
 const { active_merchant } = storeToRefs(useMerchantsStore());
 
@@ -13,10 +14,14 @@ const { data: _analysisResult } = await useFetch<
   {
     products: Product;
     analysis: { product: number; analysis: string } | null;
+    products_to_responses: { product_id: number; response_id: number }[] | null;
   }[]
 >(() => "/api/analysis/merchant/" + active_merchant.value, {
   onResponse: ({ response }) => {
     loading.value = false;
+    if (response.status === 404) {
+      isEmpty.value = true;
+    }
   },
   onRequest: ({}) => {
     loading.value = true;
@@ -34,6 +39,10 @@ for (const item of _analysisResult.value || []) {
       themes: [],
       highlight: "",
       recomendations: [],
+      un_analyzed_response:
+        item.products_to_responses !== null
+          ? item.products_to_responses.length
+          : -1,
     });
   } else {
     const _analysis = JSON.parse(
@@ -45,12 +54,15 @@ for (const item of _analysisResult.value || []) {
       name: `🔥 ${item.products.title}`,
       average_rating: _analysis.average_rating,
       sentiment: _analysis.sentiment,
-
       net_promoter_score: _analysis.net_promoter_score,
       summary: _analysis.summary,
       themes: _analysis.themes,
       highlight: _analysis.highlight,
       recomendations: _analysis.recommendations,
+      un_analyzed_response:
+        item.products_to_responses !== null
+          ? item.products_to_responses.length
+          : 0,
     });
   }
 }
@@ -122,6 +134,28 @@ onMounted(() => {
 });
 </script>
 <template>
+  <UPageCard
+    v-if="isEmpty"
+    :ui="{ root: 'mx-5 my-5 border-0' }"
+    spotlight
+    spotlight-color="warning"
+    highlight
+    highlight-color="warning"
+  >
+    <template #body>
+      <h1>
+        You don't have any metrics to display here. Start to create the product
+        and its respective questions. Then try to collect responses.
+      </h1>
+      <UButton
+        label="Create a product"
+        target="/admin/products"
+        variant="outline"
+        color="primary"
+        class="mt-3"
+      />
+    </template>
+  </UPageCard>
   <!-- KPI Cards -->
   <!-- <div v-if="loading" class="grid grid-cols-5 gap-4">
     <USkeleton v-for="i in 5" :key="i" class="h-24" />
@@ -152,6 +186,7 @@ onMounted(() => {
       </div>
     </div>
   </UPageCard> -->
+
   <!-- Product Feedback Cards -->
   <div v-if="loading" class="grid grid-cols-1 gap-6">
     <USkeleton v-for="i in 2" :key="i" class="h-48" />

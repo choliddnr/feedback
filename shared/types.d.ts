@@ -154,6 +154,7 @@ export type ProductAnalysis = {
   trends?: string[];
   average_rating?: number;
   recommendations?: string[];
+  un_analyzed_responses?: number;
 };
 
 export type Kpi = {
