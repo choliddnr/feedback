@@ -70,6 +70,8 @@ onMounted(() => {
   if (sentimentCharts.value) {
     drawChart(sentimentCharts.value);
   }
+
+  console.log("analysis", analysisData.value.un_analyzed_responses);
 });
 </script>
 <template>

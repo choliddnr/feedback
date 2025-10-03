@@ -153,7 +153,7 @@ export type ProductAnalysis = {
   themes?: string[];
   trends?: string[];
   average_rating?: number;
-  recommendations?: string[];
+  recomendations?: string[];
   un_analyzed_responses?: number;
 };
 

@@ -7,7 +7,7 @@ import type { Product, ProductAnalysis } from "~~/shared/types";
 
 const loading = ref<boolean>(false);
 const isEmpty = ref<boolean>(false);
-const analysis = ref<any[]>([]);
+const analysis = ref<ProductAnalysis[]>([]);
 const { active_merchant } = storeToRefs(useMerchantsStore());
 
 const { data: _analysisResult } = await useFetch<
@@ -39,7 +39,7 @@ for (const item of _analysisResult.value || []) {
       themes: [],
       highlight: "",
       recomendations: [],
-      un_analyzed_response:
+      un_analyzed_responses:
         item.products_to_responses !== null
           ? item.products_to_responses.length
           : -1,
@@ -58,8 +58,8 @@ for (const item of _analysisResult.value || []) {
       summary: _analysis.summary,
       themes: _analysis.themes,
       highlight: _analysis.highlight,
-      recomendations: _analysis.recommendations,
-      un_analyzed_response:
+      recomendations: _analysis.recomendations,
+      un_analyzed_responses:
         item.products_to_responses !== null
           ? item.products_to_responses.length
           : 0,

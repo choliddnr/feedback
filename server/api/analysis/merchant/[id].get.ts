@@ -11,12 +11,12 @@ export default defineEventHandler(async (e) => {
   }
 
   try {
-    const _analysis = await db(e)
+    const raw_analysis = await db(e)
       .select()
       .from(products)
       .where(eq(products.merchant, id))
       .leftJoin(analysis, eq(analysis.product, products.id))
-      .leftJoin(
+      .innerJoin(
         products_to_responses,
         eq(products_to_responses.product_id, products.id)
       );
@@ -27,6 +27,20 @@ export default defineEventHandler(async (e) => {
     //   }
     //   return a;
     // })
+    const _analysis = Object.values(
+      raw_analysis.reduce((acc, row) => {
+        const pid = row.products.id;
+        if (!acc[pid]) {
+          acc[pid] = {
+            products: row.products,
+            products_to_responses: [],
+            analysis: row.analysis,
+          };
+        }
+        acc[pid].products_to_responses.push(row.products_to_responses);
+        return acc;
+      }, {} as Record<number, any>)
+    );
     return _analysis;
   } catch (error) {
     return sendError(

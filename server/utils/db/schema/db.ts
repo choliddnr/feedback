@@ -192,10 +192,15 @@ export const responses = sqliteTable("responses", {
 export const products_to_responses = sqliteTable("products_to_responses", {
   product_id: int()
     .notNull()
-    .references(() => products.id),
+    .references(() => products.id, {
+      onDelete: "cascade",
+    }),
   response_id: int()
     .notNull()
-    .references(() => respondents.id),
+    .references(() => respondents.id, {
+      onDelete: "cascade",
+    }),
+  ...dafaultField,
 });
 
 export const response_answers = sqliteTable("response_answers", {

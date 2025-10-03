@@ -69,6 +69,10 @@ export default defineEventHandler(async (e) => {
               question: number;
               answer: string;
             }[];
+            const products_to_responses_data = [] as {
+              product_id: number;
+              response_id: number;
+            }[];
             const respondent_id = tx
               .insert(respondents)
               .values(body.respondent)
@@ -84,13 +88,24 @@ export default defineEventHandler(async (e) => {
               .get();
             Object.keys(body.answers).forEach((key) => {
               const ids = parseKey(key);
+              const product_list = [] as number[];
               answers.push({
                 response: response_id.inserted_id,
                 question: ids[1],
                 answer: body.answers[key],
               });
+              if (!product_list.includes(ids[0])) {
+                products_to_responses_data.push({
+                  product_id: ids[0],
+                  response_id: response_id.inserted_id,
+                });
+                product_list.push(ids[0]);
+              }
             });
             tx.insert(response_answers).values(answers).run();
+            tx.insert(products_to_responses)
+              .values(products_to_responses_data)
+              .run();
           },
           {
             behavior: "deferred",
