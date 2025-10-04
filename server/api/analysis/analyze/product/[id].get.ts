@@ -3,7 +3,7 @@ import { AIOutput } from "~~/shared/types";
 
 import { GoogleGenAI, Type, type ContentListUnion } from "@google/genai";
 import { Product } from "~~/shared/types";
-import { negative } from "zod";
+import { z } from "zod";
 
 const ai = new GoogleGenAI({
   apiKey: useRuntimeConfig().geminiApiKey,
@@ -49,6 +49,17 @@ export default defineEventHandler(async (e) => {
     )},\n  "recomendations": [\n    "Lakukan penyesuaian harga atau perbesar ukuran porsi untuk memberikan nilai yang lebih baik bagi pelanggan.",\n    "Perbaiki resep pentol bakso untuk memastikan tekstur yang kenyal dan rasa daging yang lebih kuat.",\n    "Tingkatkan kualitas bahan baku untuk toping seperti pangsit dan siomay.",\n    "Standarisasi resep kuah untuk menjaga konsistensi rasa agar tidak terlalu asin."\n  ]\n}`
   );
 
+  const query = getQuery<{ start: string; end: string }>(e);
+  // if (!query.success) {
+  //   return sendError(
+  //     e,
+  //     createError({
+  //       statusCode: 400,
+  //       statusMessage: "query is not valid!. Data: " + query.error,
+  //     })
+  //   );
+  // }
+
   const id = Number(getRouterParam(e, "id"));
   if (!id) {
     return sendError(
@@ -76,42 +87,47 @@ export default defineEventHandler(async (e) => {
   }[];
 
   try {
-    // const q = async (db: DB) =>
-    //   db
-    //     .select({
-    //       product_id: products.id,
-    //       product_title: products.title,
-    //       product_description: products.description,
-    //       question_id: questions.id,
-    //       question: questions.question,
-    //       response_id: response_answers.response,
-    //       answer: response_answers.answer,
-    //     })
-    //     .from(products)
-    //     .where(eq(products.id, id))
-    //     .innerJoin(questions, eq(questions.product, products.id))
-    //     .innerJoin(
-    //       response_answers,
-    //       eq(response_answers.question, questions.id)
-    //     )
-    //     .orderBy(products.id, response_answers.response, questions.id);
+    const q = async (db: DB) =>
+      db
+        .select({
+          product_id: products.id,
+          product_title: products.title,
+          product_description: products.description,
+          question_id: questions.id,
+          question: questions.question,
+          response_id: response_answers.response,
+          answer: response_answers.answer,
+        })
+        .from(products)
+        .where(eq(products.id, id))
+        .innerJoin(questions, eq(questions.product, products.id))
+        .innerJoin(
+          response_answers,
+          and(
+            eq(response_answers.question, questions.id),
+            gte(response_answers.createdAt, Number(query.start)),
+            lte(response_answers.createdAt, Number(query.end))
+          )
+        )
+        .orderBy(products.id, response_answers.response, questions.id);
 
-    // const rows = await q(db(e));
+    const rows = await q(db(e));
 
-    // const records: FlatRecord[] = [];
-    // const group = [] as any[]; // Initialize group array
+    const records: FlatRecord[] = [];
+    const group = [] as any[]; // Initialize group array
 
-    // // for (const row of rows) {
-    // for (let i = 0; i < rows.length; i++) {
-    //   const row = rows[i];
-    //   records.push({
-    //     product_id: row.product_id,
-    //     product_title: row.product_title,
-    //     product_description: row.product_description,
-    //     question: row.question,
-    //     answer: row.answer,
-    //   });
-    // }
+    console.log("query", typeof rows, rows);
+    // for (const row of rows) {
+    for (let i = 0; i < rows.length; i++) {
+      const row = rows[i];
+      records.push({
+        product_id: row.product_id,
+        product_title: row.product_title,
+        product_description: row.product_description,
+        question: row.question,
+        answer: row.answer,
+      });
+    }
 
     // const grouped: Record<
     //   number,
@@ -220,11 +236,11 @@ export default defineEventHandler(async (e) => {
     //   method: "POST",
     //   body: { data: JSON.stringify(analysisResult.text) },
     // });
-    await e.$fetch("/api/analysis/" + id, {
-      method: "POST",
-      body: { data: JSON.stringify(ai_result) },
-    });
-    return ai_result;
+    // await e.$fetch("/api/analysis/" + id, {
+    //   method: "POST",
+    //   body: { data: JSON.stringify(ai_result) },
+    // });
+    return { ...ai_result, data: rows };
   } catch (error) {
     return sendError(
       e,

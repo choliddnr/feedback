@@ -163,5 +163,10 @@ export type Kpi = {
   class?: string;
 };
 
+export type DateRange = {
+  start: Date;
+  end: Date;
+};
+
 export type Session = typeof _auth.$Infer.Session;
 export type User = typeof _auth.$Infer.Session.user;

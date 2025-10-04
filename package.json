@@ -18,6 +18,7 @@
     "@aws-sdk/client-s3": "^3.850.0",
     "@bunny.net/storage-sdk": "^0.3.0",
     "@google/genai": "^1.20.0",
+    "@internationalized/date": "^3.10.0",
     "@nuxt/image": "^1.11.0",
     "@nuxt/ui": "^4.0.0",
     "@pinia/nuxt": "^0.11.2",

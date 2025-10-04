@@ -7,7 +7,7 @@ import { ZodString } from "better-auth";
 import dafaultField from "./default_field";
 import { user } from "./better-auth";
 import { Merchant } from "~~/shared/types";
-export { sql, eq, and, or } from "drizzle-orm";
+export { sql, eq, and, or, gte, lte } from "drizzle-orm";
 
 // export const users = sqliteTable("users", {
 //   name: text().notNull(),

@@ -1,7 +1,8 @@
 <script lang="ts" setup>
 import { UPageCard } from "#components";
 import { Chart } from "chart.js/auto";
-import type { ProductAnalysis } from "~~/shared/types";
+import type { DateRange, ProductAnalysis } from "~~/shared/types";
+import { LazyAdminDashboardAnalyzeModal } from "#components";
 
 const { analysis } = defineProps<{
   analysis: ProductAnalysis;
@@ -23,11 +24,36 @@ if (
 
 const onGenerating = ref<boolean>(false);
 const chart = ref<Chart>();
-const generateAnalysis = async () => {
+
+const overlay = useOverlay();
+const analyzeModal = overlay.create(LazyAdminDashboardAnalyzeModal);
+
+const generateAnalysis = () => {
+  analyzeModal.open({
+    // onAnalyze: (range: { start: Date; end: Date }) => {
+    //   runAnalysis(range);
+    // },
+    onAnalyze: (range: DateRange) => {
+      analyzeModal.close();
+      runAnalysis(range);
+    },
+    onClose: () => {
+      analyzeModal.close();
+    },
+  });
+};
+
+const runAnalysis = async (range: { start: Date; end: Date }) => {
+  console.log("reange", range);
+
   onGenerating.value = true;
   try {
     const data = await $fetch<ProductAnalysis>(
-      "/api/analysis/analyze/product/" + analysisData.value.product
+      `/api/analysis/analyze/product/${analysisData.value.product}`,
+      {
+        method: "GET",
+        query: { start: range.start.getTime(), end: range.end.getTime() },
+      }
     );
     analysisData.value = {
       product: analysisData.value.product,
@@ -133,7 +159,7 @@ onMounted(() => {
               <p class="text-sm text-gray-400">Negative</p>
             </div>
           </div>
-          <UDivider />
+          <USeparator />
           <div class="flex flex-col gap-4 mt-4">
             <div class="flex justify-between items-center">
               <span class="font-semibold text-gray-300">NPS (Adapted):</span>
@@ -267,5 +293,9 @@ onMounted(() => {
     </div>
   </UPageCard>
 </template>
+
+<AnalyzeModal v-model="isModalOpen" @analyze="runAnalysis" />
+
+<AnalyzeModal v-model="isModalOpen" @analyze="runAnalysis" />
 
 <style></style>
