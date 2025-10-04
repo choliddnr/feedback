@@ -39,15 +39,16 @@ for (const item of _analysisResult.value || []) {
       themes: [],
       highlight: "",
       recomendations: [],
+      trends: [],
       un_analyzed_responses:
         item.products_to_responses !== null
           ? item.products_to_responses.length
           : -1,
     });
   } else {
-    const _analysis = JSON.parse(
-      JSON.parse(item.analysis.analysis)
-    ) as ProductAnalysis;
+    const _analysis = JSON.parse(item.analysis.analysis) as ProductAnalysis;
+
+    console.log(_analysis);
 
     analysis.value.push({
       product: item.products.id,
@@ -59,6 +60,7 @@ for (const item of _analysisResult.value || []) {
       themes: _analysis.themes,
       highlight: _analysis.highlight,
       recomendations: _analysis.recomendations,
+      trends: _analysis.trends,
       un_analyzed_responses:
         item.products_to_responses !== null
           ? item.products_to_responses.length

@@ -1,12 +1,19 @@
-
 {
   "$schema": "https://unpkg.com/knip@5/schema.json",
   "entry": [
     "app/app.vue",
-    "nuxt.config.ts"
+    "nuxt.config.ts",
+    "app/pages/**/*.vue",
+    "app/layouts/**/*.vue",
+    "app/middleware/**/*.ts"
   ],
   "project": [
-    "**/*.{js,ts,vue}",
+    "app/**/*.ts",
+    "app/**/*.vue",
+    "server/**/*.ts",
+    "app/composables/**/*.ts",
+    "app/utils/**/*.ts",
+    "app/stores/**/*.ts",
     "!eslint.config.mjs"
   ],
   "ignore": [
@@ -19,7 +26,5 @@
     "knip",
     "typescript"
   ],
-  "vitest": {
-    "config": []
-  }
+  "vitest": false
 }

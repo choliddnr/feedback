@@ -29,7 +29,11 @@ const generateAnalysis = async () => {
     const data = await $fetch<ProductAnalysis>(
       "/api/analysis/analyze/product/" + analysisData.value.product
     );
-    analysisData.value = data;
+    analysisData.value = {
+      product: analysisData.value.product,
+      name: analysisData.value.name,
+      ...data,
+    };
     isAnalysisAvailable.value = true;
 
     await nextTick();
@@ -70,113 +74,183 @@ onMounted(() => {
   if (sentimentCharts.value) {
     drawChart(sentimentCharts.value);
   }
-
-  console.log("analysis", analysisData.value.un_analyzed_responses);
 });
 </script>
 <template>
-  <UPageCard v-if="isAnalysisAvailable" class="p-6 rounded-2xl shadow">
-    <!-- Header -->
-
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-      <!-- Left: Sentiment Chart -->
-      <div>
-        <canvas ref="sentimentCharts" height="100"></canvas>
-
-        <div class="flex justify-around mt-4 text-center">
-          <div>
-            <p class="text-green-600 font-bold">
-              {{ analysisData.sentiment!.positive }}%
-            </p>
-            <p class="text-sm text-gray-300">Positive</p>
-          </div>
-          <div>
-            <p class="text-yellow-500 font-bold">
-              {{ analysisData.sentiment!.neutral }}%
-            </p>
-            <p class="text-sm text-gray-300">Neutral</p>
-          </div>
-          <div>
-            <p class="text-red-500 font-bold">
-              {{ analysisData.sentiment!.negative }}%
-            </p>
-            <p class="text-sm text-gray-300">Negative</p>
-          </div>
-        </div>
-        <p class="mt-4 text-gray-300">
-          <span class="font-bold">NPS (Adapted):</span>
-          <span class="text-green-600 font-semibold">{{
-            analysisData.net_promoter_score
-          }}</span>
-        </p>
-      </div>
-
-      <!-- Right: AI Insights -->
-      <div class="space-y-4 col-span-2">
-        <div class="flex justify-between items-center mb-4">
-          <div class="flex flex-row items-center gap-2">
-            <h2 class="text-2xl font-bold">{{ analysisData.name }}</h2>
-            <span
-              class="px-3 py-1 mt-2 text-sm rounded-full"
-              :class="[
-                analysisData.average_rating && analysisData.average_rating >= 4
-                  ? 'bg-green-100 text-green-700'
-                  : analysisData.average_rating &&
-                    analysisData.average_rating >= 2
-                  ? 'bg-yellow-100 text-yellow-700'
-                  : 'bg-red-100 text-red-700',
-              ]"
-              >{{ analysisData.average_rating }} ★ Avg Rating</span
-            >
-          </div>
+  <UPageCard v-if="isAnalysisAvailable">
+    <template #header>
+      <div class="flex justify-between items-center">
+        <h2 class="text-xl font-bold">{{ analysisData.name }}</h2>
+        <div class="flex items-center gap-4">
+          <span
+            class="px-3 py-1 text-sm rounded-full"
+            :class="[
+              analysisData.average_rating && analysisData.average_rating >= 4
+                ? 'bg-green-100 text-green-700'
+                : analysisData.average_rating &&
+                  analysisData.average_rating >= 2
+                ? 'bg-yellow-100 text-yellow-700'
+                : 'bg-red-100 text-red-700',
+            ]"
+            >{{ analysisData.average_rating }} ★ Avg Rating</span
+          >
           <UButton
             :loading="onGenerating"
-            class="px-3 py-1 rounded-4xl"
+            size="xs"
             label="Re-Generate Analysis"
             trailing-icon="i-simple-icons-googlegemini"
             color="primary"
             @click="generateAnalysis"
           />
         </div>
-        <p class="font-semibold text-gray-200 mb-2">Sentiment Breakdown</p>
-        <div>
-          <p class="font-semibold text-gray-200">AI Summary</p>
-          <p class="text-gray-300 text-sm">{{ analysisData.summary }}</p>
+      </div>
+    </template>
+
+    <div class="grid grid-cols-1 md:grid-cols-5 gap-8">
+      <!-- Left (2/5): Chart and Stats -->
+      <div class="md:col-span-2 flex flex-col gap-6">
+        <UCard :ui="{ body: 'p-4 sm:p-4' }">
+          <canvas ref="sentimentCharts" height="150"></canvas>
+        </UCard>
+        <UCard :ui="{ body: 'p-4 sm:p-6' }">
+          <div class="flex justify-around text-center mb-4">
+            <div>
+              <p class="text-lg font-bold text-green-500">
+                {{ analysisData.sentiment!.positive }}%
+              </p>
+              <p class="text-sm text-gray-400">Positive</p>
+            </div>
+            <div>
+              <p class="text-lg font-bold text-yellow-500">
+                {{ analysisData.sentiment!.neutral }}%
+              </p>
+              <p class="text-sm text-gray-400">Neutral</p>
+            </div>
+            <div>
+              <p class="text-lg font-bold text-red-500">
+                {{ analysisData.sentiment!.negative }}%
+              </p>
+              <p class="text-sm text-gray-400">Negative</p>
+            </div>
+          </div>
+          <UDivider />
+          <div class="flex flex-col gap-4 mt-4">
+            <div class="flex justify-between items-center">
+              <span class="font-semibold text-gray-300">NPS (Adapted):</span>
+              <span class="text-2xl font-bold text-primary">{{
+                analysisData.net_promoter_score
+              }}</span>
+            </div>
+            <div
+              v-if="analysisData.un_analyzed_responses! > 0"
+              class="flex justify-between items-center"
+            >
+              <span class="font-semibold text-gray-300">New Responses:</span>
+              <UBadge size="lg">{{
+                analysisData.un_analyzed_responses
+              }}</UBadge>
+            </div>
+          </div>
+        </UCard>
+      </div>
+
+      <!-- Right (3/5): AI Insights -->
+      <div class="md:col-span-3 flex flex-col gap-4">
+        <UCard>
+          <template #header>
+            <h3 class="text-base font-semibold">AI Summary</h3>
+          </template>
+          <p class="text-sm text-gray-400 prose dark:prose-invert max-w-none">
+            {{ analysisData.summary }}
+          </p>
+        </UCard>
+        <UCard>
+          <template #header>
+            <h3 class="text-base font-semibold">Highlighted Feedback</h3>
+          </template>
+          <blockquote
+            class="border-l-4 border-gray-500 pl-4 italic text-gray-400 text-sm"
+          >
+            "{{ analysisData.highlight }}"
+          </blockquote>
+        </UCard>
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          <UCard v-if="analysisData.themes && analysisData.themes.length > 0">
+            <template #header>
+              <h3 class="text-base font-semibold">Top Themes</h3>
+            </template>
+            <div class="flex flex-wrap gap-2">
+              <UBadge
+                v-for="(theme, i) in analysisData.themes"
+                :key="i"
+                color="primary"
+                variant="soft"
+                >{{ theme }}</UBadge
+              >
+            </div>
+          </UCard>
+          <UCard v-if="analysisData.trends && analysisData.trends.length > 0">
+            <template #header>
+              <h3 class="text-base font-semibold">Trends</h3>
+            </template>
+            <div class="flex flex-wrap gap-2">
+              <UBadge
+                v-for="(trend, i) in analysisData.trends"
+                :key="i"
+                color="info"
+                variant="soft"
+                >{{ trend }}</UBadge
+              >
+            </div>
+          </UCard>
         </div>
-        <div>
-          <p class="font-semibold text-gray-200">Top Themes</p>
-          <ul class="list-disc list-inside text-sm text-gray-300">
-            <li v-for="(theme, tIndex) in analysisData.themes" :key="tIndex">
-              {{ theme }}
+        <UCard
+          v-if="
+            analysisData.recomendations &&
+            analysisData.recomendations.length > 0
+          "
+        >
+          <template #header>
+            <h3 class="text-base font-semibold">Recomendations</h3>
+          </template>
+          <ul class="space-y-2">
+            <li
+              v-for="(rec, i) in analysisData.recomendations"
+              :key="i"
+              class="flex items-center gap-2 text-sm text-gray-400"
+            >
+              <UIcon name="i-heroicons-check-circle" class="text-green-500" />
+              <span>{{ rec }}</span>
             </li>
           </ul>
-        </div>
-        <div>
-          <p class="font-semibold text-gray-200">Highlighted Feedback</p>
-          <blockquote
-            class="border-l-4 border-gray-300 pl-3 italic text-gray-300 text-sm"
-          >
-            {{ analysisData.highlight }}
-          </blockquote>
-        </div>
+        </UCard>
       </div>
     </div>
   </UPageCard>
-  <UPageCard v-else class="p-6 rounded-2xl shadow">
-    <div class="w-auto mx-auto flex flex-col gap-5 justify-content-center">
+  <UPageCard v-else>
+    <div
+      class="w-auto mx-auto flex flex-col gap-5 justify-center items-center p-8 text-center"
+    >
+      <UIcon
+        name="i-heroicons-inbox-arrow-down"
+        class="text-5xl text-gray-400"
+      />
       <h2 class="text-2xl font-bold">{{ analysisData.name }}</h2>
       <p
         v-if="
           analysisData.un_analyzed_responses &&
           analysisData.un_analyzed_responses > 0
         "
-        class="text-gray-300 text-center"
+        class="text-gray-400"
       >
-        No analysis available. There were
-        {{ analysisData.un_analyzed_responses }} responses to analyze
+        No analysis available. There are
+        <span class="font-bold text-primary">{{
+          analysisData.un_analyzed_responses
+        }}</span>
+        new responses to analyze.
       </p>
-      <p v-else class="text-gray-300 text-center">
-        No responses to analyze. Try to collect responses.
+      <p v-else class="text-gray-400">
+        No responses to analyze. Try to collect some feedback first.
       </p>
       <UButton
         v-if="
@@ -184,7 +258,7 @@ onMounted(() => {
           analysisData.un_analyzed_responses > 0
         "
         :loading="onGenerating"
-        class="mx-auto"
+        size="lg"
         label="Generate Analysis"
         trailing-icon="i-simple-icons-googlegemini"
         color="primary"

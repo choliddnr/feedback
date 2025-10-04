@@ -37,7 +37,9 @@ export default defineEventHandler(async (e) => {
             analysis: row.analysis,
           };
         }
-        acc[pid].products_to_responses.push(row.products_to_responses);
+        if (row.products_to_responses.createdAt! > row.analysis?.createdAt!) {
+          acc[pid].products_to_responses.push(row.products_to_responses);
+        }
         return acc;
       }, {} as Record<number, any>)
     );
