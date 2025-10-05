@@ -79,6 +79,7 @@ export default defineEventHandler(async (e) => {
     question: string;
     // responseId: number;
     answer: string;
+    response_id?: number;
   };
   type FormattedData = {
     product_title: string;
@@ -116,7 +117,6 @@ export default defineEventHandler(async (e) => {
     const records: FlatRecord[] = [];
     const group = [] as any[]; // Initialize group array
 
-    console.log("query", typeof rows, rows);
     // for (const row of rows) {
     for (let i = 0; i < rows.length; i++) {
       const row = rows[i];
@@ -126,37 +126,38 @@ export default defineEventHandler(async (e) => {
         product_description: row.product_description,
         question: row.question,
         answer: row.answer,
+        response_id: row.response_id,
       });
     }
 
-    // const grouped: Record<
-    //   number,
-    //   {
-    //     product_title: string;
-    //     product_description: string;
-    //     questions: Record<string, string[]>;
-    //   }
-    // > = {};
+    const grouped: Record<
+      number,
+      {
+        product_title: string;
+        product_description: string;
+        questions: Record<string, string[]>;
+      }
+    > = {};
 
-    // for (const record of records as FlatRecord[]) {
-    //   if (!grouped[record.product_id]) {
-    //     grouped[record.product_id] = {
-    //       product_title: record.product_title,
-    //       product_description: record.product_description,
-    //       questions: {},
-    //     };
-    //   }
-    //   const group = grouped[record.product_id];
-    //   if (!group.questions[record.question]) {
-    //     group.questions[record.question] = [];
-    //   }
-    //   grouped[record.product_id].questions[record.question].push(record.answer);
-    // }
-    // const data = grouped[id];
-    // let prompt = `product title: ${data.product_title}\n product description: ${data.product_description}\n customer feedback data: `;
-    // for (const [question, answers] of Object.entries(data.questions)) {
-    //   prompt += `\nQuestion: ${question}\nAnswers: ${answers.join("; ")}`;
-    // }
+    for (const record of records as FlatRecord[]) {
+      if (!grouped[record.product_id]) {
+        grouped[record.product_id] = {
+          product_title: record.product_title,
+          product_description: record.product_description,
+          questions: {},
+        };
+      }
+      const group = grouped[record.product_id];
+      if (!group.questions[record.question]) {
+        group.questions[record.question] = [];
+      }
+      grouped[record.product_id].questions[record.question].push(record.answer);
+    }
+    const data = grouped[id];
+    let prompt = `product title: ${data.product_title}\n product description: ${data.product_description}\n customer feedback data: `;
+    for (const [question, answers] of Object.entries(data.questions)) {
+      prompt += `\nQuestion: ${question}\nAnswers: ${answers.join("; ")}`;
+    }
 
     // const analysisResult = await ai.models.generateContent({
     //   model: "gemini-2.5-pro",
@@ -240,7 +241,7 @@ export default defineEventHandler(async (e) => {
     //   method: "POST",
     //   body: { data: JSON.stringify(ai_result) },
     // });
-    return { ...ai_result, data: rows };
+    return { ...ai_result, data: prompt };
   } catch (error) {
     return sendError(
       e,

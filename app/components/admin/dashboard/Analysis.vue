@@ -52,7 +52,10 @@ const runAnalysis = async (range: { start: Date; end: Date }) => {
       `/api/analysis/analyze/product/${analysisData.value.product}`,
       {
         method: "GET",
-        query: { start: range.start.getTime(), end: range.end.getTime() },
+        query: {
+          start: Math.floor(range.start.getTime() / 1000),
+          end: Math.floor(range.end.getTime() / 1000),
+        },
       }
     );
     analysisData.value = {
@@ -293,9 +296,5 @@ onMounted(() => {
     </div>
   </UPageCard>
 </template>
-
-<AnalyzeModal v-model="isModalOpen" @analyze="runAnalysis" />
-
-<AnalyzeModal v-model="isModalOpen" @analyze="runAnalysis" />
 
 <style></style>
