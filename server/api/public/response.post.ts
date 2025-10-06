@@ -73,6 +73,8 @@ export default defineEventHandler(async (e) => {
               product_id: number;
               response_id: number;
             }[];
+            const product_list = [] as number[];
+
             const respondent_id = tx
               .insert(respondents)
               .values(body.respondent)
@@ -86,9 +88,9 @@ export default defineEventHandler(async (e) => {
               })
               .returning({ inserted_id: responses.id })
               .get();
+
             Object.keys(body.answers).forEach((key) => {
               const ids = parseKey(key);
-              const product_list = [] as number[];
               answers.push({
                 response: response_id.inserted_id,
                 question: ids[1],
