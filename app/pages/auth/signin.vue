@@ -126,7 +126,7 @@ const onSubmit = async (payload: FormSubmitEvent<Schema>) => {
           Don't have an account?
           <ULink to="/auth/signup" class="text-primary font-medium"
             >Sign up</ULink
-          >. github build
+          >.
         </template>
       </UAuthForm>
     </UPageCard>
