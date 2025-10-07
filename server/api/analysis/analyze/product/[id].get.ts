@@ -4,50 +4,51 @@ import { AIOutput } from "~~/shared/types";
 import { GoogleGenAI, Type, type ContentListUnion } from "@google/genai";
 import { Product } from "~~/shared/types";
 import { z } from "zod";
+import _ from "~~/server/routes/seed/1";
 
 const ai = new GoogleGenAI({
   apiKey: useRuntimeConfig().geminiApiKey,
 });
 
-const getRandomNumber = (
-  min: number,
-  max: number,
-  isDecimal: boolean = false
-) => {
-  min = Math.ceil(min); // Ensure min is an integer
-  max = Math.floor(max); // Ensure max is an integer
-  if (isDecimal) return Math.random() * (max - min + 1) + min;
-  return Math.floor(Math.random() * (max - min + 1)) + min;
-};
+// const getRandomNumber = (
+//   min: number,
+//   max: number,
+//   isDecimal: boolean = false
+// ) => {
+//   min = Math.ceil(min); // Ensure min is an integer
+//   max = Math.floor(max); // Ensure max is an integer
+//   if (isDecimal) return Math.random() * (max - min + 1) + min;
+//   return Math.floor(Math.random() * (max - min + 1)) + min;
+// };
 
 export default defineEventHandler(async (e) => {
-  const positif = getRandomNumber(1, 50);
-  const neutral = getRandomNumber(1, 30);
-  const negatif = 100 - positif - neutral;
-  const ai_result = JSON.parse(
-    `{\n  "sentiment": {\n    "positive": ${positif},\n    "neutral": ${neutral},\n    "negative": ${negatif}\n  },\n  "net_promoter_score": ${getRandomNumber(
-      -50,
-      50
-    )},\n  "summary": "Pelanggan memiliki pendapat beragam tentang rasa, namun secara konsisten mengeluhkan harga yang mahal, porsi yang kecil, dan tekstur pentol bakso yang tidak memuaskan (terlalu keras atau lembek). Kualitas toping juga menjadi area yang perlu ditingkatkan.",\n  "highlight": "Rasa kuahnya ada yang suka, tapi harga, porsi, dan tekstur pentolnya mengecewakan.",\n  "themes": [\n    "Harga & Porsi → ${getRandomNumber(
-      1,
-      100
-    )}% negatif",\n    "Tekstur Pentol → ${getRandomNumber(
-      1,
-      100
-    )}% negatif",\n    "Kualitas Toping → ${getRandomNumber(
-      1,
-      100
-    )}% negatif",\n    "Rasa Keseluruhan → ${getRandomNumber(
-      1,
-      100
-    )}% positif"\n  ],\n  "trends": [\n    "Keluhan yang paling sering muncul adalah harga yang dianggap tidak sepadan dengan porsi yang didapat.",\n    "Ketidakpuasan terhadap tekstur pentol bakso menjadi masalah utama yang dilaporkan oleh semua responden."\n  ],\n  "average_rating": ${getRandomNumber(
-      1,
-      4.5,
-      true
-    ).toFixed(
-      2
-    )},\n  "recomendations": [\n    "Lakukan penyesuaian harga atau perbesar ukuran porsi untuk memberikan nilai yang lebih baik bagi pelanggan.",\n    "Perbaiki resep pentol bakso untuk memastikan tekstur yang kenyal dan rasa daging yang lebih kuat.",\n    "Tingkatkan kualitas bahan baku untuk toping seperti pangsit dan siomay.",\n    "Standarisasi resep kuah untuk menjaga konsistensi rasa agar tidak terlalu asin."\n  ]\n}`
-  );
+  // const positif = getRandomNumber(1, 50);
+  // const neutral = getRandomNumber(1, 30);
+  // const negatif = 100 - positif - neutral;
+  // const ai_result = JSON.parse(
+  //   `{\n  "sentiment": {\n    "positive": ${positif},\n    "neutral": ${neutral},\n    "negative": ${negatif}\n  },\n  "net_promoter_score": ${getRandomNumber(
+  //     -50,
+  //     50
+  //   )},\n  "summary": "Pelanggan memiliki pendapat beragam tentang rasa, namun secara konsisten mengeluhkan harga yang mahal, porsi yang kecil, dan tekstur pentol bakso yang tidak memuaskan (terlalu keras atau lembek). Kualitas toping juga menjadi area yang perlu ditingkatkan.",\n  "highlight": "Rasa kuahnya ada yang suka, tapi harga, porsi, dan tekstur pentolnya mengecewakan.",\n  "themes": [\n    "Harga & Porsi → ${getRandomNumber(
+  //     1,
+  //     100
+  //   )}% negatif",\n    "Tekstur Pentol → ${getRandomNumber(
+  //     1,
+  //     100
+  //   )}% negatif",\n    "Kualitas Toping → ${getRandomNumber(
+  //     1,
+  //     100
+  //   )}% negatif",\n    "Rasa Keseluruhan → ${getRandomNumber(
+  //     1,
+  //     100
+  //   )}% positif"\n  ],\n  "trends": [\n    "Keluhan yang paling sering muncul adalah harga yang dianggap tidak sepadan dengan porsi yang didapat.",\n    "Ketidakpuasan terhadap tekstur pentol bakso menjadi masalah utama yang dilaporkan oleh semua responden."\n  ],\n  "average_rating": ${getRandomNumber(
+  //     1,
+  //     4.5,
+  //     true
+  //   ).toFixed(
+  //     2
+  //   )},\n  "recomendations": [\n    "Lakukan penyesuaian harga atau perbesar ukuran porsi untuk memberikan nilai yang lebih baik bagi pelanggan.",\n    "Perbaiki resep pentol bakso untuk memastikan tekstur yang kenyal dan rasa daging yang lebih kuat.",\n    "Tingkatkan kualitas bahan baku untuk toping seperti pangsit dan siomay.",\n    "Standarisasi resep kuah untuk menjaga konsistensi rasa agar tidak terlalu asin."\n  ]\n}`
+  // );
 
   const query = getQuery<{ start: string; end: string }>(e);
   // if (!query.success) {
@@ -95,6 +96,7 @@ export default defineEventHandler(async (e) => {
           product_title: products.title,
           product_description: products.description,
           question_id: questions.id,
+          type: questions.type,
           question: questions.question,
           response_id: response_answers.response,
           answer: response_answers.answer,
@@ -117,9 +119,14 @@ export default defineEventHandler(async (e) => {
     const records: FlatRecord[] = [];
     const group = [] as any[]; // Initialize group array
 
+    const all_rating = [] as number[];
+
     // for (const row of rows) {
     for (let i = 0; i < rows.length; i++) {
       const row = rows[i];
+      if (row.type === 2) {
+        all_rating.push(Number(row.answer));
+      }
       records.push({
         product_id: row.product_id,
         product_title: row.product_title,
@@ -129,6 +136,26 @@ export default defineEventHandler(async (e) => {
         response_id: row.response_id,
       });
     }
+
+    const promoters = [];
+    const detractors = [];
+    const passives = [];
+
+    const average_rating = (
+      all_rating.reduce((a, b) => a + b, 0) / all_rating.length
+    ).toFixed(2);
+
+    for (const rating of all_rating) {
+      if (rating >= 4) {
+        promoters.push(rating);
+      } else if (rating <= 2) {
+        detractors.push(rating);
+      } else {
+        passives.push(rating);
+      }
+    }
+    const nps =
+      ((promoters.length - detractors.length) / all_rating.length) * 100;
 
     const grouped: Record<
       number,
@@ -158,90 +185,104 @@ export default defineEventHandler(async (e) => {
     for (const [question, answers] of Object.entries(data.questions)) {
       prompt += `\nQuestion: ${question}\nAnswers: ${answers.join("; ")}`;
     }
+    const _analysisResult = await ai.models.generateContent({
+      model: "gemini-2.5-pro",
+      contents: [
+        {
+          role: "user",
+          parts: [
+            {
+              text: prompt,
+            },
+          ],
+        },
+      ],
+      config: {
+        systemInstruction: `You are a data analyst. Analyze the following customer feedback data for the product and provide insights, trends, and suggestions for improvement. Format the output in JSON with sections for Sentiment with 3 properties (positive, neutral, negative), Net Promoter Score (NPS), themes,
+        Summary, Highlight, Trends, Average Rating, and Recommendations. Be concise and focus on actionable insights.
+        # this is the example output:
+        {
+          sentiment: { positive: 70, neutral: 25, negative: 5 },
+          summary: "Customers love the spicy flavor and portion size. Some complain about packaging leakage.",
+          highlight: "The noodles are delicious, but the cup leaks sometimes.",
+          themes: [
+            "Taste → 80% positive",
+            "Packaging → 45% negative",
+            "Price → 70% positive",
+          ],
+          trends: [
+            "Increasing positive feedback on taste over the last quarter.",
+            "Rising concerns about packaging durability.",
+          ],
+          recommendations: [
+            "Improve packaging to prevent leakage.",
+            "Maintain focus on flavor innovation.",
+          ]
+        },
+        # use language based on the languages used in the user prompts.
+        # total score of sentiment is 100.
+        # the answers are ordered from the oldest response to the newest response.
+        # rating is between 1 to 5.
+        # the product response are provided in the user prompt.
+        `,
+        responseMimeType: "application/json",
+        responseSchema: {
+          type: Type.OBJECT,
+          properties: {
+            sentiment: {
+              type: Type.OBJECT,
+              properties: {
+                positive: { type: Type.INTEGER },
+                neutral: { type: Type.INTEGER },
+                negative: { type: Type.INTEGER },
+              },
+              required: ["positive", "neutral", "negative"],
+            },
+            summary: { type: Type.STRING },
+            highlight: { type: Type.STRING },
+            themes: { type: Type.ARRAY, items: { type: Type.STRING } },
+            trends: { type: Type.ARRAY, items: { type: Type.STRING } },
+            recomendations: { type: Type.ARRAY, items: { type: Type.STRING } },
+          },
+          required: [
+            "sentiment",
+            "summary",
+            "highlight",
+            "themes",
+            "trends",
+            "recomendations",
+          ],
+        },
+      },
+    });
 
-    // const analysisResult = await ai.models.generateContent({
-    //   model: "gemini-2.5-pro",
-    //   contents: [
-    //     {
-    //       role: "user",
-    //       parts: [
-    //         {
-    //           text: prompt,
-    //         },
-    //       ],
-    //     },
-    //   ],
-    //   config: {
-    //     systemInstruction: `You are a data analyst. Analyze the following customer feedback data for the product and provide insights, trends, and suggestions for improvement. Format the output in JSON with sections for Sentiment with 3 properties (positive, neutral, negative), Net Promoter Score (NPS), themes,
-    //     Summary, Highlight, Trends, Average Rating, and Recommendations. Be concise and focus on actionable insights.
-    //     # this is the example output:
-    //     {
-    //       sentiment: { positive: 70, neutral: 25, negative: 5 },
-    //       net_promoter_score: 52,
-    //       summary: "Customers love the spicy flavor and portion size. Some complain about packaging leakage.",
-    //       highlight: "The noodles are delicious, but the cup leaks sometimes.",
-    //       themes: [
-    //         "Taste → 80% positive",
-    //         "Packaging → 45% negative",
-    //         "Price → 70% positive",
-    //       ],
-    //       trends: [
-    //         "Increasing positive feedback on taste over the last quarter.",
-    //         "Rising concerns about packaging durability.",
-    //       ],
-    //       average_rating: 4.3,
-    //       recommendations: [
-    //         "Improve packaging to prevent leakage.",
-    //         "Maintain focus on flavor innovation.",
-    //       ]
-    //     },
-    //     # use language based on the languages used in the user prompts.
-    //     # the answers are ordered from the oldest response to the newest response.
-    //     # the product response are provided in the user prompt.
-    //     `,
-    //     responseMimeType: "application/json",
-    //     responseSchema: {
-    //       type: Type.OBJECT,
-    //       properties: {
-    //         sentiment: {
-    //           type: Type.OBJECT,
-    //           properties: {
-    //             positive: { type: Type.INTEGER },
-    //             neutral: { type: Type.INTEGER },
-    //             negative: { type: Type.INTEGER },
-    //           },
-    //           required: ["positive", "neutral", "negative"],
-    //         },
-    //         net_promoter_score: { type: Type.INTEGER },
-    //         summary: { type: Type.STRING },
-    //         highlight: { type: Type.STRING },
-    //         themes: { type: Type.ARRAY, items: { type: Type.STRING } },
-    //         trends: { type: Type.ARRAY, items: { type: Type.STRING } },
-    //         average_rating: { type: Type.NUMBER },
-    //         recomendations: { type: Type.ARRAY, items: { type: Type.STRING } },
-    //       },
-    //       required: [
-    //         "sentiment",
-    //         "net_promoter_score",
-    //         "summary",
-    //         "highlight",
-    //         "themes",
-    //         "trends",
-    //         "average_rating",
-    //         "recomendations",
-    //       ],
-    //     },
-    //   },
-    // });
-    // await e.$fetch("/api/analysis/" + id, {
-    //   method: "POST",
-    //   body: { data: JSON.stringify(analysisResult.text) },
-    // });
-    // await e.$fetch("/api/analysis/" + id, {
-    //   method: "POST",
-    //   body: { data: JSON.stringify(ai_result) },
-    // });
-    return { ...ai_result, data: prompt };
+    let analysisResult = {};
+
+    if (typeof _analysisResult.text === "string") {
+      analysisResult = {
+        ...JSON.parse(_analysisResult.text),
+        net_promoter_score: nps,
+        average_rating,
+      };
+    } else if (typeof _analysisResult.text === "object") {
+      analysisResult = {
+        ...(_analysisResult.text as Object),
+        net_promoter_score: nps,
+        average_rating,
+      };
+    }
+
+    await e.$fetch("/api/analysis/" + id, {
+      method: "POST",
+      body: {
+        data: JSON.stringify(analysisResult),
+      },
+    });
+
+    return analysisResult;
+
+    // await new Promise((resolve) => setTimeout(resolve, 20000));
+    // return { ...ai_result, data: prompt };
   } catch (error) {
     return sendError(
       e,

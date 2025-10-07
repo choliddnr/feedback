@@ -27,6 +27,7 @@ const { data: _analysisResult } = await useFetch<
     loading.value = true;
   },
 });
+
 for (const item of _analysisResult.value || []) {
   if (!item.analysis) {
     analysis.value.push({
@@ -47,8 +48,6 @@ for (const item of _analysisResult.value || []) {
     });
   } else {
     const _analysis = JSON.parse(item.analysis.analysis) as ProductAnalysis;
-
-    console.log(_analysis);
 
     analysis.value.push({
       product: item.products.id,

@@ -42,7 +42,7 @@ const onCancelClick = () => {
     </template>
     <template #footer>
       <div class="flex flex-row w-full justify-end gap-2">
-        <UButton color="error" variant="ghost" @click="onCancelClick"
+        <UButton color="warning" variant="outline" @click="onCancelClick"
           >Cancel</UButton
         >
         <UButton @click="onAnalyzeClick">Analyze Responses</UButton>

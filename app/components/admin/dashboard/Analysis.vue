@@ -7,6 +7,8 @@ import { LazyAdminDashboardAnalyzeModal } from "#components";
 const { analysis } = defineProps<{
   analysis: ProductAnalysis;
 }>();
+
+const { loadingAnimationSrc } = useDashboard();
 const analysisData = ref<ProductAnalysis>(analysis);
 
 // Sentiment Breakdown per product
@@ -44,8 +46,6 @@ const generateAnalysis = () => {
 };
 
 const runAnalysis = async (range: { start: Date; end: Date }) => {
-  console.log("reange", range);
-
   onGenerating.value = true;
   try {
     const data = await $fetch<ProductAnalysis>(
@@ -63,6 +63,7 @@ const runAnalysis = async (range: { start: Date; end: Date }) => {
       name: analysisData.value.name,
       ...data,
     };
+
     isAnalysisAvailable.value = true;
 
     await nextTick();
@@ -106,32 +107,22 @@ onMounted(() => {
 });
 </script>
 <template>
-  <UPageCard v-if="isAnalysisAvailable">
+  <UPageCard v-if="isAnalysisAvailable" :ui="{ header: 'w-full' }" spotlight>
     <template #header>
       <div class="flex justify-between items-center">
-        <h2 class="text-xl font-bold">{{ analysisData.name }}</h2>
-        <div class="flex items-center gap-4">
-          <span
-            class="px-3 py-1 text-sm rounded-full"
-            :class="[
-              analysisData.average_rating && analysisData.average_rating >= 4
-                ? 'bg-green-100 text-green-700'
-                : analysisData.average_rating &&
-                  analysisData.average_rating >= 2
-                ? 'bg-yellow-100 text-yellow-700'
-                : 'bg-red-100 text-red-700',
-            ]"
-            >{{ analysisData.average_rating }} ★ Avg Rating</span
-          >
-          <UButton
-            :loading="onGenerating"
-            size="xs"
-            label="Re-Generate Analysis"
-            trailing-icon="i-simple-icons-googlegemini"
-            color="primary"
-            @click="generateAnalysis"
-          />
-        </div>
+        <span class="flex items-start gap-4">
+          <h2 class="text-xl font-bold">{{ analysisData.name }}</h2>
+          <NuxtImg v-if="onGenerating" :src="loadingAnimationSrc" width="36" />
+        </span>
+        <UButton
+          :loading="onGenerating"
+          size="lg"
+          label="Re-Generate Analysis"
+          trailing-icon="i-simple-icons-googlegemini"
+          color="primary"
+          class="rounded-full"
+          @click="generateAnalysis"
+        />
       </div>
     </template>
 
@@ -140,9 +131,8 @@ onMounted(() => {
       <div class="md:col-span-2 flex flex-col gap-6">
         <UCard :ui="{ body: 'p-4 sm:p-4' }">
           <canvas ref="sentimentCharts" height="150"></canvas>
-        </UCard>
-        <UCard :ui="{ body: 'p-4 sm:p-6' }">
-          <div class="flex justify-around text-center mb-4">
+
+          <div class="flex justify-around text-center my-4">
             <div>
               <p class="text-lg font-bold text-green-500">
                 {{ analysisData.sentiment!.positive }}%
@@ -162,8 +152,26 @@ onMounted(() => {
               <p class="text-sm text-gray-400">Negative</p>
             </div>
           </div>
-          <USeparator />
-          <div class="flex flex-col gap-4 mt-4">
+        </UCard>
+        <UCard :ui="{ body: 'p-4 sm:p-6' }">
+          <div class="flex flex-col gap-4">
+            <div class="flex justify-between items-center">
+              <span class="font-semibold text-gray-300">Avg Rating:</span>
+              <span
+                class="px-3 py-1 text-sm rounded-full"
+                :class="[
+                  analysisData.average_rating &&
+                  analysisData.average_rating >= 4
+                    ? 'bg-green-100 text-green-700'
+                    : analysisData.average_rating &&
+                      analysisData.average_rating >= 2
+                    ? 'bg-yellow-100 text-yellow-700'
+                    : 'bg-red-100 text-red-700',
+                ]"
+                >{{ analysisData.average_rating }} ★
+              </span>
+            </div>
+
             <div class="flex justify-between items-center">
               <span class="font-semibold text-gray-300">NPS (Adapted):</span>
               <span class="text-2xl font-bold text-primary">{{
@@ -260,7 +268,9 @@ onMounted(() => {
     <div
       class="w-auto mx-auto flex flex-col gap-5 justify-center items-center p-8 text-center"
     >
+      <NuxtImg v-if="onGenerating" :src="loadingAnimationSrc" width="100" />
       <UIcon
+        v-else
         name="i-heroicons-inbox-arrow-down"
         class="text-5xl text-gray-400"
       />
@@ -291,10 +301,9 @@ onMounted(() => {
         label="Generate Analysis"
         trailing-icon="i-simple-icons-googlegemini"
         color="primary"
+        class="rounded-full"
         @click="generateAnalysis"
       />
     </div>
   </UPageCard>
 </template>
-
-<style></style>

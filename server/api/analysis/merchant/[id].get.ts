@@ -37,7 +37,9 @@ export default defineEventHandler(async (e) => {
             analysis: row.analysis,
           };
         }
-        if (row.products_to_responses.createdAt! > row.analysis?.createdAt!) {
+        if (
+          row.products_to_responses.createdAt! > (row.analysis?.updatedAt || 0)
+        ) {
           acc[pid].products_to_responses.push(row.products_to_responses);
         }
         return acc;
