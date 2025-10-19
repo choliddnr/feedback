@@ -55,8 +55,17 @@ const betterAuthOptions = {
       },
     },
   },
-  secret: process.env.NUXT_BETTER_AUTH_SECRET,
-  url: process.env.NUXT_BASE_URL,
+  // secret: process.env.BETTER_AUTH_SECRET,
+  // url: process.env.NUXT_BASE_URL,
+  logger: {
+    disabled: false,
+    disableColors: false,
+    level: "debug",
+    log: (level, message, ...args) => {
+      // Custom logging implementation
+      console.log(`[${level}] ${message}`, ...args);
+    },
+  },
 } as BetterAuthOptions;
 
 export const _auth = (e: H3Event) => {
