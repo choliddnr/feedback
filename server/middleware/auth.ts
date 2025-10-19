@@ -7,7 +7,7 @@ export default defineEventHandler(async (e) => {
     url.pathname.startsWith("/api/statistics") ||
     url.pathname.startsWith("/api/user")
   ) {
-    const session = await auth(e).api.getSession({
+    const session = await _auth(e).api.getSession({
       headers: e.headers,
     });
     // if (!session) {

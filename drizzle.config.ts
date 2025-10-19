@@ -1,15 +1,15 @@
-import dotenv from 'dotenv';
-import { defineConfig } from 'drizzle-kit';
+import "dotenv";
+import { defineConfig } from "drizzle-kit";
 
-dotenv.config({
-  path: './.env.local',
-});
 export default defineConfig({
-  out: './server/utils/db/migrations',
-  schema: './server/utils/db/schema/index.ts',
-  dialect: 'sqlite',
+  out: "./server/utils/db/migrations",
+  schema: "./server/utils/db/schema/index.ts",
+  dialect: "sqlite",
+  driver: "d1-http",
+  casing: "snake_case",
   dbCredentials: {
-    url: process.env.NUXT_DB_PATH!,
+    accountId: process.env.CLOUDFLARE_ACCOUNT_ID!,
+    databaseId: process.env.CLOUDFLARE_DATABASE_ID!,
+    token: process.env.CLOUDFLARE_D1_TOKEN!,
   },
-  casing: 'snake_case',
 });

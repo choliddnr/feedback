@@ -8,7 +8,7 @@ import {
 import { saveImg } from "~~/server/utils/image";
 
 export default defineEventHandler(async (e) => {
-  const session = await auth(e).api.getSession({
+  const session = await _auth(e).api.getSession({
     headers: e.headers,
   });
 
@@ -60,7 +60,7 @@ export default defineEventHandler(async (e) => {
       .insert(merchants)
       .values(newData)
       .returning();
-    const session = await auth(e).api.getSession({
+    const session = await _auth(e).api.getSession({
       headers: e.headers,
     });
     if (Number(session?.user.defaultMerchant) === 0) {

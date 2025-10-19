@@ -77,7 +77,7 @@ export default defineEventHandler(async (e: H3Event) => {
       newData.image = filename;
     }
     await db(e).update(user).set(newData).where(eq(user.id, id));
-    return auth(e).api.getSession({
+    return _auth(e).api.getSession({
       headers: e.headers,
     });
   } catch (e) {

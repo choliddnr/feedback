@@ -1,4 +1,4 @@
-import { betterAuth } from "better-auth";
+import { betterAuth, BetterAuthOptions } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import type { H3Event } from "h3";
 import { createAuthMiddleware, APIError } from "better-auth/api";
@@ -13,69 +13,7 @@ const toKebabCase = (str: string) => {
     .toLowerCase(); // Convert to lowercase
 };
 
-export const auth = (e: H3Event) => {
-  const _auth = betterAuth({
-    database: drizzleAdapter(db(e), {
-      provider: "sqlite",
-      schema,
-    }),
-
-    // plugins: [userAuth()],
-    user: {
-      additionalFields: {
-        username: {
-          type: "string",
-          required: true,
-          unique: true,
-          input: true,
-        },
-        defaultMerchant: {
-          type: "number",
-          required: false,
-          references: {
-            model: "merchants",
-            field: "id",
-            onDelete: "set null",
-          },
-          input: false, // don't allow user to set role
-        },
-      },
-    },
-    advanced: {
-      database: {
-        generateId: false,
-      },
-    },
-    emailAndPassword: {
-      enabled: true,
-    },
-    socialProviders: {
-      google: {
-        clientId: useRuntimeConfig().GOOGLE_CLIENT_ID as string,
-        clientSecret: useRuntimeConfig().GOOGLE_CLIENT_SECRET as string,
-        mapProfileToUser: (profile) => {
-          return {
-            username: toKebabCase(
-              profile.given_name + " " + profile.family_name
-            ),
-            image: profile.picture,
-          };
-        },
-      },
-    },
-    secret: useRuntimeConfig().BETTER_AUTH_SECRET as string,
-    url: useRuntimeConfig().BETTER_AUTH_URL as string,
-  });
-
-  return _auth;
-};
-
-export const _auth = betterAuth({
-  database: drizzleAdapter({} as any, {
-    provider: "sqlite",
-    schema,
-  }),
-
+const betterAuthOptions = {
   // plugins: [userAuth()],
   user: {
     additionalFields: {
@@ -99,7 +37,7 @@ export const _auth = betterAuth({
   },
   advanced: {
     database: {
-      generateId: false,
+      generateId: false, // Using SQLite's autoincrement instead
     },
   },
   emailAndPassword: {
@@ -107,16 +45,35 @@ export const _auth = betterAuth({
   },
   socialProviders: {
     google: {
-      clientId: useRuntimeConfig().GOOGLE_CLIENT_ID as string,
-      clientSecret: useRuntimeConfig().GOOGLE_CLIENT_SECRET as string,
+      clientId: process.env.NUXT_GOOGLE_CLIENT_ID,
+      clientSecret: process.env.NUXT_GOOGLE_CLIENT_SECRET,
       mapProfileToUser: (profile) => {
         return {
           username: toKebabCase(profile.given_name + " " + profile.family_name),
-          image: undefined, // profile.picture is not used in this case
+          image: profile.picture,
         };
       },
     },
   },
-  secret: useRuntimeConfig().BETTER_AUTH_SECRET as string,
-  url: useRuntimeConfig().BETTER_AUTH_URL as string,
+  secret: process.env.NUXT_BETTER_AUTH_SECRET,
+  url: process.env.NUXT_BASE_URL,
+} as BetterAuthOptions;
+
+export const _auth = (e: H3Event) => {
+  return betterAuth({
+    database: drizzleAdapter(db(e), {
+      provider: "sqlite",
+      schema,
+    }),
+    ...betterAuthOptions,
+  });
+};
+export const auth = betterAuth({
+  database: drizzleAdapter(db, {
+    provider: "sqlite",
+    schema,
+  }),
+  ...betterAuthOptions,
 });
+
+// Use per-request authentication instance

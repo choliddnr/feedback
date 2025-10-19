@@ -1,8 +1,8 @@
-import { merchants, eq, and } from '~~/server/utils/db/schema';
+import { merchants, eq, and } from "~~/server/utils/db/schema";
 
 export default defineEventHandler(async (e) => {
-  const id = Number(getRouterParam(e, 'id'));
-  const session = await auth(e).api.getSession({
+  const id = Number(getRouterParam(e, "id"));
+  const session = await _auth(e).api.getSession({
     headers: e.headers,
   });
 
@@ -10,7 +10,7 @@ export default defineEventHandler(async (e) => {
     .select()
     .from(merchants)
     .where(
-      and(eq(merchants.owner, Number(session?.user.id)), eq(merchants.id, id)),
+      and(eq(merchants.owner, Number(session?.user.id)), eq(merchants.id, id))
     )
     .limit(1);
 });

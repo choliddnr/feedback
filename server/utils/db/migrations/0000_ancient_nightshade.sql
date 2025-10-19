@@ -1,8 +1,8 @@
 CREATE TABLE `account` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
-	`account_id` integer NOT NULL,
-	`provider_id` integer NOT NULL,
-	`user_id` integer NOT NULL,
+	`account_id` text NOT NULL,
+	`provider_id` text NOT NULL,
+	`user_id` text NOT NULL,
 	`access_token` text,
 	`refresh_token` text,
 	`id_token` text,
@@ -10,7 +10,7 @@ CREATE TABLE `account` (
 	`refresh_token_expires_at` integer,
 	`scope` text,
 	`password` text,
-	`created_at` integer NOT NULL,
+	`created_at` integer DEFAULT (cast(unixepoch('subsecond') * 1000 as integer)) NOT NULL,
 	`updated_at` integer NOT NULL,
 	FOREIGN KEY (`user_id`) REFERENCES `user`(`id`) ON UPDATE no action ON DELETE cascade
 );
@@ -19,11 +19,11 @@ CREATE TABLE `session` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
 	`expires_at` integer NOT NULL,
 	`token` text NOT NULL,
-	`created_at` integer NOT NULL,
+	`created_at` integer DEFAULT (cast(unixepoch('subsecond') * 1000 as integer)) NOT NULL,
 	`updated_at` integer NOT NULL,
 	`ip_address` text,
 	`user_agent` text,
-	`user_id` integer NOT NULL,
+	`user_id` text NOT NULL,
 	FOREIGN KEY (`user_id`) REFERENCES `user`(`id`) ON UPDATE no action ON DELETE cascade
 );
 --> statement-breakpoint
@@ -32,12 +32,12 @@ CREATE TABLE `user` (
 	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
 	`name` text NOT NULL,
 	`email` text NOT NULL,
-	`email_verified` integer NOT NULL,
+	`email_verified` integer DEFAULT false NOT NULL,
 	`image` text,
-	`created_at` integer NOT NULL,
-	`updated_at` integer NOT NULL,
+	`created_at` integer DEFAULT (cast(unixepoch('subsecond') * 1000 as integer)) NOT NULL,
+	`updated_at` integer DEFAULT (cast(unixepoch('subsecond') * 1000 as integer)) NOT NULL,
 	`username` text NOT NULL,
-	`default_merchant` integer,
+	`default_merchant` text,
 	FOREIGN KEY (`default_merchant`) REFERENCES `merchants`(`id`) ON UPDATE no action ON DELETE set null
 );
 --> statement-breakpoint
@@ -48,8 +48,8 @@ CREATE TABLE `verification` (
 	`identifier` text NOT NULL,
 	`value` text NOT NULL,
 	`expires_at` integer NOT NULL,
-	`created_at` integer,
-	`updated_at` integer
+	`created_at` integer DEFAULT (cast(unixepoch('subsecond') * 1000 as integer)) NOT NULL,
+	`updated_at` integer DEFAULT (cast(unixepoch('subsecond') * 1000 as integer)) NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE `analysis` (
@@ -100,8 +100,11 @@ CREATE TABLE `products` (
 CREATE TABLE `products_to_responses` (
 	`product_id` integer NOT NULL,
 	`response_id` integer NOT NULL,
-	FOREIGN KEY (`product_id`) REFERENCES `products`(`id`) ON UPDATE no action ON DELETE no action,
-	FOREIGN KEY (`response_id`) REFERENCES `respondents`(`id`) ON UPDATE no action ON DELETE no action
+	`id` integer PRIMARY KEY AUTOINCREMENT NOT NULL,
+	`created_at` integer DEFAULT (strftime('%s','now')),
+	`updated_at` integer DEFAULT (strftime('%s','now') ),
+	FOREIGN KEY (`product_id`) REFERENCES `products`(`id`) ON UPDATE no action ON DELETE cascade,
+	FOREIGN KEY (`response_id`) REFERENCES `respondents`(`id`) ON UPDATE no action ON DELETE cascade
 );
 --> statement-breakpoint
 CREATE TABLE `question_types` (

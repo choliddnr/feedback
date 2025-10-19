@@ -1,24 +1,24 @@
-import { merchants, eq, UpdateMerchantSchema } from '~~/server/utils/db/schema';
-import { Merchant } from '~~/shared/types';
-import { generateNewFilename } from '~~/server/utils';
-import { saveImg } from '~~/server/utils/image';
-import { isValidURL } from '~/utils';
+import { merchants, eq, UpdateMerchantSchema } from "~~/server/utils/db/schema";
+import { Merchant } from "~~/shared/types";
+import { generateNewFilename } from "~~/server/utils";
+import { saveImg } from "~~/server/utils/image";
+import { isValidURL } from "~/utils";
 
 export default defineEventHandler(async (e) => {
-  const session = await auth(e).api.getSession({
+  const session = await _auth(e).api.getSession({
     headers: e.headers,
   });
-  const id = Number(getRouterParam(e, 'id'));
+  const id = Number(getRouterParam(e, "id"));
   const body = parseMultipartData(await readMultipartFormData(e));
 
-  const newData = {} as Partial<Omit<Merchant, 'id'>>;
+  const newData = {} as Partial<Omit<Merchant, "id">>;
 
   if (body.title) newData.title = body.title;
   if (body.slug) newData.slug = body.slug;
   if (body.description) newData.description = body.description;
   if (body.category) newData.category = Number(body.category);
   if (body.logo) {
-    newData.logo = 'merchant/' + generateNewFilename('_.webp'); // modify the filename to avoid conflicts and load cache - all uploaded images are saved as webp format
+    newData.logo = "merchant/" + generateNewFilename("_.webp"); // modify the filename to avoid conflicts and load cache - all uploaded images are saved as webp format
   }
 
   /**
@@ -31,7 +31,7 @@ export default defineEventHandler(async (e) => {
       createError({
         statusCode: 422,
         statusMessage: JSON.stringify(validate.error),
-      }),
+      })
     );
   }
 
@@ -49,8 +49,8 @@ export default defineEventHandler(async (e) => {
           e,
           createError({
             statusCode: 422,
-            statusMessage: 'slug is already taken',
-          }),
+            statusMessage: "slug is already taken",
+          })
         );
       }
     }
@@ -65,8 +65,8 @@ export default defineEventHandler(async (e) => {
         e,
         createError({
           statusCode: 404,
-          statusMessage: 'Missing data to update',
-        }),
+          statusMessage: "Missing data to update",
+        })
       );
     }
 
@@ -85,17 +85,14 @@ export default defineEventHandler(async (e) => {
       .update(merchants)
       .set(newData)
       .where(
-        and(
-          eq(merchants.owner, Number(session!.user.id)),
-          eq(merchants.id, id),
-        ),
+        and(eq(merchants.owner, Number(session!.user.id)), eq(merchants.id, id))
       );
   } catch (err) {
     return sendError(
       e,
       createError(
-        err instanceof Error ? err.message : 'Unknown usr/id/patch error',
-      ),
+        err instanceof Error ? err.message : "Unknown usr/id/patch error"
+      )
     );
   }
 });
