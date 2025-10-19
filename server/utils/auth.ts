@@ -60,6 +60,8 @@ const betterAuthOptions = {
 } as BetterAuthOptions;
 
 export const _auth = (e: H3Event) => {
+  console.log("better-auth secret: ", process.env.NUXT_BETTER_AUTH_SECRET);
+
   return betterAuth({
     database: drizzleAdapter(db(e), {
       provider: "sqlite",
