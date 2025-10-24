@@ -3,7 +3,7 @@ import { sqliteTable, text, integer } from "drizzle-orm/sqlite-core";
 import { merchants } from "./db";
 
 export const user = sqliteTable("user", {
-  id: integer().primaryKey({ autoIncrement: true }),
+  id: integer("id").primaryKey({ autoIncrement: true }),
   name: text("name").notNull(),
   email: text("email").notNull().unique(),
   emailVerified: integer("email_verified", { mode: "boolean" })
@@ -18,13 +18,13 @@ export const user = sqliteTable("user", {
     .$onUpdate(() => /* @__PURE__ */ new Date())
     .notNull(),
   username: text("username").notNull().unique(),
-  defaultMerchant: text("default_merchant").references(() => merchants.id, {
+  defaultMerchant: integer("default_merchant").references(() => merchants.id, {
     onDelete: "set null",
   }),
 });
 
 export const session = sqliteTable("session", {
-  id: integer().primaryKey({ autoIncrement: true }),
+  id: integer("id").primaryKey({ autoIncrement: true }),
   expiresAt: integer("expires_at", { mode: "timestamp_ms" }).notNull(),
   token: text("token").notNull().unique(),
   createdAt: integer("created_at", { mode: "timestamp_ms" })
@@ -35,16 +35,16 @@ export const session = sqliteTable("session", {
     .notNull(),
   ipAddress: text("ip_address"),
   userAgent: text("user_agent"),
-  userId: text("user_id")
+  userId: integer("user_id")
     .notNull()
     .references(() => user.id, { onDelete: "cascade" }),
 });
 
 export const account = sqliteTable("account", {
-  id: integer().primaryKey({ autoIncrement: true }),
+  id: integer("id").primaryKey({ autoIncrement: true }),
   accountId: text("account_id").notNull(),
   providerId: text("provider_id").notNull(),
-  userId: text("user_id")
+  userId: integer("user_id")
     .notNull()
     .references(() => user.id, { onDelete: "cascade" }),
   accessToken: text("access_token"),
@@ -67,7 +67,7 @@ export const account = sqliteTable("account", {
 });
 
 export const verification = sqliteTable("verification", {
-  id: integer().primaryKey({ autoIncrement: true }),
+  id: integer("id").primaryKey({ autoIncrement: true }),
   identifier: text("identifier").notNull(),
   value: text("value").notNull(),
   expiresAt: integer("expires_at", { mode: "timestamp_ms" }).notNull(),

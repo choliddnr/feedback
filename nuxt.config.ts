@@ -1,30 +1,22 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
-  compatibilityDate: "2024-11-01",
-  devtools: {
-    enabled: true,
-
-    timeline: {
-      enabled: true,
-    },
+  nitro: {
+    preset: "cloudflare_pages",
   },
-  future: {
-    compatibilityVersion: 4,
-  },
+  compatibilityDate: "2025-07-15",
+  devtools: { enabled: true },
   modules: [
     "@nuxt/ui",
     "@pinia/nuxt",
     "@nuxt/image",
-    "@nuxt/test-utils/module",
-    "@nuxt/eslint",
     "@vueuse/nuxt",
     "nitro-cloudflare-dev",
   ],
-  css: ["~/assets/css/main.css"],
   ui: {
     fonts: true,
     colorMode: true,
   },
+  css: ["~/assets/css/main.css"],
   colorMode: {
     preference: "dark",
   },
@@ -36,32 +28,21 @@ export default defineNuxtConfig({
   },
   routeRules: {
     "/admin/**": {
-      appMiddleware: ["auth"],
+      // appMiddleware: ["auth"],
       ssr: false,
     },
   },
   runtimeConfig: {
-    DB: process.env.NUXT_DB,
-    DB_PATH: process.env.NUXT_DB_PATH,
-    BETTER_AUTH_SECRET: process.env.NUXT_BETTER_AUTH_SECRET,
-    BETTER_AUTH_URL: process.env.NUXT_BETTER_AUTH_URL,
-    GOOGLE_CLIENT_ID: process.env.NUXT_GOOGLE_CLIENT_ID,
-    GOOGLE_CLIENT_SECRET: process.env.NUXT_GOOGLE_CLIENT_SECRET,
+    // Private (server-only) keys
+    BETTER_AUTH_SECRET: "",
+    GOOGLE_CLIENT_ID: "",
+    GOOGLE_CLIENT_SECRET: "",
     WASABI_KEY: process.env.NUXT_WASABI_KEY,
     WASABI_SECRET: process.env.NUXT_WASABI_SECRET,
     WASABI_BUCKET: process.env.NUXT_WASABI_BUCKET,
-    N8N_API: process.env.NUXT_N8N_API,
-    geminiApiKey: import.meta.env.NUXT_GEMINI_API_KEY || "",
+    geminiApiKey: process.env.NUXT_GEMINI_API_KEY || "",
     public: {
       BASE_URL: process.env.NUXT_BASE_URL,
     },
-  },
-  // ssr: true,
-  nitro: {
-    preset: "cloudflare-pages",
-    logLevel: "debug",
-  },
-  image: {
-    format: ["webp"],
   },
 });

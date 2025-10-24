@@ -168,5 +168,5 @@ export type DateRange = {
   end: Date;
 };
 
-export type Session = typeof _auth.$Infer.Session;
-export type User = typeof _auth.$Infer.Session.user;
+export type Session = typeof auth.$Infer.Session;
+export type User = typeof auth.$Infer.Session.user;

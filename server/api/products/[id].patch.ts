@@ -1,10 +1,10 @@
-import { eq, UpdateProductSchema } from '~~/server/utils/db/schema';
-import { Product } from '~~/shared/types';
-import { generateNewFilename } from '~~/server/utils';
-import { isValidURL } from '~/utils';
+import { eq, UpdateProductSchema } from "~~/server/utils/db/schema";
+import { Product } from "~~/shared/types";
+import { generateNewFilename } from "~~/server/utils";
+// import { isValidURL } from '~/utils';
 
 export default defineEventHandler(async (e) => {
-  const id = Number(getRouterParam(e, 'id'));
+  const id = Number(getRouterParam(e, "id"));
   const body = parseMultipartData(await readMultipartFormData(e)) as Record<
     keyof Product,
     any
@@ -25,9 +25,9 @@ export default defineEventHandler(async (e) => {
       e,
       createError({
         statusCode: 422,
-        statusMessage: 'Invalid Request',
+        statusMessage: "Invalid Request",
         data: validate.error,
-      }),
+      })
     );
   }
 
@@ -43,8 +43,8 @@ export default defineEventHandler(async (e) => {
         e,
         createError({
           statusCode: 404,
-          statusMessage: 'Missing data to update',
-        }),
+          statusMessage: "Missing data to update",
+        })
       );
     }
     if (body.image) {
@@ -52,9 +52,9 @@ export default defineEventHandler(async (e) => {
        * Add delete old image logic
        * If the image is updated, we need to delete the old image
        */
-      if (oldData.image && !isValidURL(oldData.image))
-        await deleteImg(e, oldData.image); // user image could be null, delete it if exists
-      const filename = 'product/' + generateNewFilename('_.webp'); // modify the filename to avoid conflicts and load cache
+      // if (oldData.image && !isValidURL(oldData.image))
+      if (oldData.image) await deleteImg(e, oldData.image); // user image could be null, delete it if exists
+      const filename = "product/" + generateNewFilename("_.webp"); // modify the filename to avoid conflicts and load cache
       await saveImg(e, body.image.data, filename); // all uploaded images are saved as webp format
       newData.image = filename;
     }
@@ -63,7 +63,7 @@ export default defineEventHandler(async (e) => {
   } catch (err) {
     return sendError(
       e,
-      createError(err instanceof Error ? err.message : 'Unknown error'),
+      createError(err instanceof Error ? err.message : "Unknown error")
     );
   }
 });

@@ -2,7 +2,7 @@ import { merchants, eq, UpdateMerchantSchema } from "~~/server/utils/db/schema";
 import { Merchant } from "~~/shared/types";
 import { generateNewFilename } from "~~/server/utils";
 import { saveImg } from "~~/server/utils/image";
-import { isValidURL } from "~/utils";
+// import { isValidURL } from "~/utils";
 
 export default defineEventHandler(async (e) => {
   const session = await _auth(e).api.getSession({
@@ -76,8 +76,8 @@ export default defineEventHandler(async (e) => {
      */
 
     if (body.logo) {
-      if (oldData.logo && !isValidURL(oldData.logo))
-        await deleteImg(e, oldData.logo); // user image could be null, delete it if exists
+      // if (oldData.logo && !isValidURL(oldData.logo))
+      if (oldData.logo) await deleteImg(e, oldData.logo); // user image could be null, delete it if exists
       if (newData.logo) await saveImg(e, body.logo.data, newData.logo);
     }
 

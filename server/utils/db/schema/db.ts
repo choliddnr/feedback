@@ -1,9 +1,8 @@
-import { sql } from "drizzle-orm";
 import { int, sqliteTable, text } from "drizzle-orm/sqlite-core";
 import type { AnySQLiteColumn } from "drizzle-orm/sqlite-core";
 
 import { createInsertSchema, createUpdateSchema } from "drizzle-zod";
-import { ZodString } from "better-auth";
+import { z } from "zod";
 import dafaultField from "./default_field";
 import { user } from "./better-auth";
 import { Merchant } from "~~/shared/types";
@@ -35,25 +34,25 @@ export const merchants = sqliteTable("merchants", {
   ...dafaultField,
 });
 
-export const InsertMerchantSchema = createInsertSchema(merchants, {
-  title: (field) => field.min(4),
-  slug: (field) =>
-    field.min(4).refine((value) => /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(value), {
+export const InsertMerchantSchema = z.object({
+  title: z.string().min(4),
+  slug: z
+    .string()
+    .min(4)
+    .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, {
       message:
         "Slug must be lowercase and can only contain letters, numbers, and dashes.",
     }),
-  description: (field) => field.optional(),
-  category: (field) => field.gt(0),
-  owner: (field) => field.gt(0),
-  greeting: (field) => field.optional(),
-  primery_color: (field) => field.min(4).max(20).optional(),
-  image_background: (field) => field.min(4).max(200).optional(),
-  logo: (field) => field.min(4).max(200),
-}).omit({
-  id: true,
-  createdAt: true,
-  updatedAt: true,
+  description: z.string().optional(),
+  category: z.number().int().gt(0),
+  owner: z.number().int().gt(0),
+  greeting: z.string().optional(),
+  primery_color: z.string().min(4).max(20).optional(),
+  image_background: z.string().min(4).max(200).optional(),
+  logo: z.string().min(4).max(200),
 });
+
+export type InsertMerchant = z.infer<typeof InsertMerchantSchema>;
 
 export const UpdateMerchantSchema = createUpdateSchema(merchants, {
   title: (field) => field.min(4),

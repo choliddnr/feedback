@@ -1,9 +1,9 @@
 import { H3Event, type MultiPartData } from "h3";
-import { z } from "zod";
-import { user, eq } from "~~/server/utils/db/schema";
+// import { z } from "zod";
+import { user, eq, UpdateUserSchema } from "~~/server/utils/db/schema";
 import { User } from "~~/shared/types";
 import { generateNewFilename } from "~~/server/utils";
-import { isValidURL } from "~/utils";
+// import { isValidURL } from "~/utils";
 
 export default defineEventHandler(async (e: H3Event) => {
   const id = Number(getRouterParam(e, "id"));
@@ -69,8 +69,8 @@ export default defineEventHandler(async (e: H3Event) => {
        * Add delete old image logic
        * If the logo is updated, we need to delete the old logo image
        */
-      if (oldData.image && !isValidURL(oldData.image))
-        await deleteImg(e, oldData.image); // user image could be null, delete it if exists
+      // if (oldData.image && !isValidURL(oldData.image))
+      if (oldData.image) await deleteImg(e, oldData.image); // user image could be null, delete it if exists
 
       const filename = "user/" + generateNewFilename("_.webp"); // modify the filename to avoid conflicts and load cache
       await saveImg(e, body.image.data, filename); // all uploaded images are saved as webp format

@@ -1,44 +1,27 @@
-# Gemini CLI Usage
+### GUIDE_API_ENDPOINT=http://localhost:3200
 
-This file contains instructions and examples for using the Gemini CLI with this project.
+# model rules
 
-## Running the CLI
+- As a Gemini model, you must always look for guidance provided by **_ GUIDE SERVICE _** before you start generating.
+- To get all available guidance fetch it with this url: **_GUIDE_API_ENDPOINT+/api/resources _** it will return following type
 
-To run the Gemini CLI, use the following command:
+  ```ts
+  type AllGuidance = {
+    slug: string;
+    title: string;
+    description: string;
+  }[];
+  ```
 
-```bash
-gemini
-```
-
-## Examples
-
-### Running tests
-
-```bash
-gemini run tests
-```
-
-### Asking a question
-
-```bash
-gemini "how do I add a new component?"
-```
-
-## UI Interaction and Generation
-
-### Viewing the UI
-
-If you need to see the user interface, you can use the "playwright" mcp server.
-
-### Generating UI Components
-
-To generate UI or components, you can use the "nuxt-ui" mcp.
-
-### Nuxt UI documentation:
-
-"Using Nuxt UI documentation from https://ui.nuxt.com/llms.txt"
-"Follow complete Nuxt UI guidelines from https://ui.nuxt.com/llms-full.txt"
-"Full documentation is also available locally at nuxt-ui-llms-full.txt"
-
-/llms.txt - Contains a structured overview of all components and their documentation links (~5K tokens)
-/llms-full.txt - Provides comprehensive documentation including implementation details, examples, theming, composables, and migration guidance (~1M+ tokens)
+- To get the content of the guidance, you can fetch it with this url: **_GUIDE_API_ENDPOINT+/api/resources+{slug} _**. you can get the slug from guidance list. Fetch will return following type
+  ```ts
+  type AllGuidance = {
+    title: string;
+    description: string;
+    content: string;
+  }[];
+  ```
+- You can use the content guidance to execute the task.
+- If related guidance is not provided, or the **_ GUIDE SERVICE _** throws an error. please generate the guide first on markdown format and put it on the "guide" folder and ask user to validate/review it.
+- Nuxt use auto-import. get the guidance from this url: **_GUIDE_API_ENDPOINT+/api/resources/nuxt-auto-import-guide _**
+- make sure you are following the guidance
