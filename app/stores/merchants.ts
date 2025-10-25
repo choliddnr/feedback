@@ -7,7 +7,11 @@ export const useMerchantsStore = defineStore("merchants", () => {
     "/api/merchants",
     {
       onResponse: ({ response }) => {
-        if (response.ok && !active_merchant.value) {
+        if (
+          response.ok &&
+          active_merchant.value === 0 &&
+          response._data!.length > 0
+        ) {
           active_merchant.value = response._data![0]!.id;
         }
       },

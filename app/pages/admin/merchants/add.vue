@@ -138,13 +138,10 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {
             method: "patch",
             body: formData,
           });
+          user.value!.defaultMerchant = response._data[0].id;
         }
         await fetch();
-        if (Number(user.value?.defaultMerchant) === 0) {
-          console.log("user.1", user.value?.defaultMerchant, merchants.value);
-          await fetchUser();
-          console.log("user.2", user.value?.defaultMerchant, merchants.value);
-        }
+
         on_submit.value = false;
         navigateTo("/admin/merchants");
         toast.add({

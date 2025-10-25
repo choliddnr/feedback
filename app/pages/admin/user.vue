@@ -34,6 +34,8 @@ const state = reactive({
   defaultMerchant: Number(user.value?.defaultMerchant),
 });
 
+console.log("user state : ", state);
+
 const schema = z.object({
   name: z.string().min(4),
   email: z.string().email(),
