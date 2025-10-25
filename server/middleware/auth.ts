@@ -10,11 +10,11 @@ export default defineEventHandler(async (e) => {
     const session = await _auth(e).api.getSession({
       headers: e.headers,
     });
-    // if (!session) {
-    //   return sendError(
-    //     e,
-    //     createError({ statusCode: 401, statusMessage: 'Unauthorized' }),
-    //   );
-    // }
+    if (!session) {
+      return sendError(
+        e,
+        createError({ statusCode: 401, statusMessage: "Unauthorized" })
+      );
+    }
   }
 });
