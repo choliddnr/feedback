@@ -9,7 +9,7 @@ export default defineEventHandler(async (e: H3Event) => {
   const id = Number(getRouterParam(e, "id"));
   const body = parseMultipartData(await readMultipartFormData(e));
 
-  const newData = {} as Partial<User>;
+  const newData = {} as Partial<Omit<User, "id">>;
   if (body.username) newData.username = body.username;
   if (body.name) newData.name = body.name;
   if (body.defaultMerchant)
@@ -76,6 +76,7 @@ export default defineEventHandler(async (e: H3Event) => {
       await saveImg(e, body.image.data, filename); // all uploaded images are saved as webp format
       newData.image = filename;
     }
+
     await db(e).update(user).set(newData).where(eq(user.id, id));
     return _auth(e).api.getSession({
       headers: e.headers,

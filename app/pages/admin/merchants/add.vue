@@ -105,6 +105,7 @@ const onLogoChange = (e: Event) => {
 
 const on_submit = ref<boolean>(false);
 const onSubmit = async (event: FormSubmitEvent<Schema>) => {
+  const no_merchants = !merchants.value || merchants.value?.length === 0;
   on_submit.value = true;
   const formData = new FormData();
   formData.append("title", state.title);
@@ -129,6 +130,15 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {
     body: formData,
     onResponse: async ({ response }) => {
       if (response.status === 200) {
+        // Set User's default merchant if it's the first merchant
+        if (no_merchants) {
+          const formData = new FormData();
+          formData.append("defaultMerchant", response._data[0].id);
+          await $fetch("/api/user/" + user.value?.id, {
+            method: "patch",
+            body: formData,
+          });
+        }
         await fetch();
         if (Number(user.value?.defaultMerchant) === 0) {
           console.log("user.1", user.value?.defaultMerchant, merchants.value);
