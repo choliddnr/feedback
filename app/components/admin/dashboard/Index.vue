@@ -28,6 +28,12 @@ const { data: _analysisResult } = await useFetch<
   },
 });
 
+if (_analysisResult.value === null || _analysisResult.value!.length === 0) {
+  isEmpty.value = true;
+} else {
+  isEmpty.value = false;
+}
+
 for (const item of _analysisResult.value || []) {
   if (!item.analysis) {
     analysis.value.push({
