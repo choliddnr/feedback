@@ -27,7 +27,7 @@ const emits = defineEmits<{
 const state = reactive<NewQuestion>({
   question: "",
   answer_options: [],
-  type: 0,
+  type: 1,
   product: active_product.value || 0,
 });
 const answer_option = ref<string>();
