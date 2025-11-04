@@ -21,7 +21,7 @@ const state = reactive({
   question_index: 0,
 });
 
-const answer_invalid = ref<string>("Invalid messages here");
+const answer_invalid = ref<string>();
 const product = computed<Product | undefined>(
   () => products.value![state.product_index!]
 );
@@ -48,7 +48,7 @@ const keyid = computed<string>(() => {
 });
 const answer = ref<string>("");
 const saveState = () => {
-  if (!answer.value || answer.value === "") return;
+  // if (!answer.value || answer.value === "") return;
   answers.value.set(keyid.value, answer.value);
   localStorage.setItem(keyid.value, answer.value);
 };
