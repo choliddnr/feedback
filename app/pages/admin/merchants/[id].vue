@@ -156,6 +156,7 @@ const processDelete = async () => {
         }
         on_delete.value = false;
         navigateTo("/admin/merchants");
+        await refreshNuxtData();
       }
     },
   });
