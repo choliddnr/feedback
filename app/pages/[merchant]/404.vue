@@ -1,4 +1,4 @@
 <script lang="ts" setup></script>
 <template>
-  <div>Merchant not found</div>
+  <div>Merchant tidak ditemukan!</div>
 </template>

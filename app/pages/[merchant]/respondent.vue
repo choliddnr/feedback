@@ -92,56 +92,61 @@ onMounted(() => {
   <UCard class="max-w-lg">
     <div class="justify-center text-center">
       <span class="font-bold text-2xl mb-4"
-        >Before continuing, please fill out the form below.</span
+        >Sebelum melanjutkan, tolong lengkapi data diri anda.</span
       >
     </div>
 
     <UForm :state="state" :schema="schema" @submit="onsubmit">
       <UFormField
-        label="Name:"
+        label="Nama:"
         size="xl"
-        description="A fullname or nickname is allowed, so choose which you feel comfortable."
+        description="Nama lengkap atau nama panggilan anda. Pilih yang membuat anda nyaman."
         :ui="{ wrapper: 'my-4' }"
         name="name"
       >
         <UInput
           v-model="state.name"
-          placeholder="Fill out your name here"
+          placeholder="Isikan nama anda disini"
           class="w-full"
         />
       </UFormField>
 
       <UFormField
-        label="Gender:"
+        label="Jenis Kalamin:"
         size="xl"
         :ui="{ wrapper: 'my-4' }"
         name="gender"
       >
         <USelect
           v-model="state.gender"
-          :items="['female', 'male']"
+          :items="[
+            { key: 'female', label: 'wanita' },
+            { key: 'male', label: 'pria' },
+          ]"
           default-value="female"
+          value-key="key"
+          label-key="label"
           class="w-full"
         />
       </UFormField>
 
-      <UFormField label="Age:" size="xl" :ui="{ wrapper: 'my-4' }" name="age">
+      <UFormField label="Umur:" size="xl" :ui="{ wrapper: 'my-4' }" name="age">
         <UInput
           v-model="state.age"
           type="number"
-          placeholder="Fill out your age here"
+          placeholder="Isikan umur anda disini"
           :ui="{ base: 'pr-24' }"
           class="w-full"
         >
           <template #trailing>
-            <UBadge>Years old</UBadge>
+            <UBadge>Tahun</UBadge>
           </template>
         </UInput>
       </UFormField>
 
       <UFormField
         label="Whatsapp:"
-        description="We wll contact you through thid whatsapp number."
+        description="Kami akan menghubungi anda melalui Whatsapp ini."
         size="xl"
         :ui="{ wrapper: 'my-4' }"
         name="whatsapp"
@@ -158,7 +163,7 @@ onMounted(() => {
           </template>
         </UInput>
       </UFormField>
-      <UButton class="mt-5" type="submit" label="Next" size="xl" block />
+      <UButton class="mt-5" type="submit" label="Selanjutnya" size="xl" block />
     </UForm>
   </UCard>
 </template>

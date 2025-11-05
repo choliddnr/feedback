@@ -118,7 +118,7 @@ const isAllValid = () => {
 
       const a = answers.value.get(`${p?.id}_${q?.id}`);
       if (!a || a === "") {
-        answer_invalid.value = "Please, answer this question!";
+        answer_invalid.value = "Tolong jawab pertanyaan ini!";
         return false;
       }
     }

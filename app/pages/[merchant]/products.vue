@@ -33,7 +33,7 @@ const onSubmit = () => {
     class="w-full sm:w-sm"
   >
     <p class="font-bold mb-3 text-xl mx-auto text-center w-[250px]">
-      Please, choose some product to be reviewed.
+      Silahkan pilih satu atau beberapa produk kami yang ingin anda review.
     </p>
     <!-- <pre>{{ _products }}</pre> -->
     <div class="flex flex-col gap-4">

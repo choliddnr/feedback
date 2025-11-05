@@ -6,10 +6,11 @@
   >
     <div class="text-center">
       <h2 class="font-bold text-2xl">
-        Thank you for being part of our growth and sharing your thoughts about
-        our product.
+        Termikasih atas waktu dan feedback yang anda berikan! Feedback dari anda
+        menjadi bagian penting dalam upaya kami untuk terus meningkatkan
+        kualitas produk dan layanan kami.
       </h2>
-      <h1 class="font-bold text-3xl text-primary mt-4">See you later</h1>
+      <h1 class="font-bold text-3xl text-primary mt-4">Sampai Jumpa</h1>
     </div>
   </UCard>
 </template>

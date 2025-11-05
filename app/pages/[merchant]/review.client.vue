@@ -49,7 +49,7 @@ const submitFeedback = async () => {
     >
       <div class="text-center">
         <h1 class="font-bold text-xl">Review</h1>
-        <p>Please, review your answer before submitting</p>
+        <p>Tolong tinjau kembali jawaban anda sebelum di submit!</p>
       </div>
       <uSeparator class="my-4" />
       <UPageCard v-for="p in products">
