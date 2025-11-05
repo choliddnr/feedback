@@ -1,35 +1,42 @@
 <script setup lang="ts">
-import type { Period, Range, Stat } from '~~/shared/types';
+import type { Period, Range, Stat } from "~~/shared/types";
 
 const props = defineProps<{
   period: Period;
   range: Range;
 }>();
 const { active_merchant } = storeToRefs(useMerchantsStore());
+const { products } = storeToRefs(useProductsStore());
 const { data } = await useFetch<{
   respondent: number;
   response: number;
   avg_rating: number;
-}>(() => '/api/statistics/' + active_merchant.value, {
+}>(() => "/api/statistics/" + active_merchant.value, {
   watch: [active_merchant],
 });
 
 const stats = computed<Stat[]>(() => [
   {
-    title: 'Respondents',
-    icon: 'i-lucide-users',
+    title: "Products",
+    icon: "i-heroicons-cube-20-solid",
+    value: products.value.length || 0,
+    variation: 10,
+  },
+  {
+    title: "Respondents",
+    icon: "i-lucide-users",
     value: data.value!.respondent === undefined ? 0 : data.value!.respondent,
     variation: 10,
   },
   {
-    title: 'Response',
-    icon: 'i-lucide-clipboard-pen-line',
+    title: "Response",
+    icon: "i-lucide-clipboard-pen-line",
     value: data.value!.response,
     variation: 10,
   },
   {
-    title: 'Rating',
-    icon: 'i-lucide-star',
+    title: "Rating",
+    icon: "i-lucide-star",
     value:
       data.value!.avg_rating === null ? 0.0 : data.value!.avg_rating.toFixed(1),
     variation: 10,
@@ -38,7 +45,7 @@ const stats = computed<Stat[]>(() => [
 </script>
 
 <template>
-  <UPageGrid class="lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-px">
+  <UPageGrid class="lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-px">
     <UPageCard
       v-for="(stat, index) in stats"
       :key="index"

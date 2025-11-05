@@ -8,7 +8,15 @@ import type { Product, ProductAnalysis } from "~~/shared/types";
 const loading = ref<boolean>(false);
 const isEmpty = ref<boolean>(false);
 const analysis = ref<ProductAnalysis[]>([]);
-const { active_merchant } = storeToRefs(useMerchantsStore());
+
+const toast = useToast();
+const base_url = useRuntimeConfig().public.BASE_URL;
+const { active_merchant, merchants } = storeToRefs(useMerchantsStore());
+const { products } = storeToRefs(useProductsStore());
+
+const merchant = computed(() =>
+  merchants.value!.find((m) => m.id === active_merchant.value)
+);
 
 const { data: _analysisResult } = await useFetch<
   {
@@ -73,6 +81,16 @@ for (const item of _analysisResult.value || []) {
     });
   }
 }
+
+const copyLink = async () => {
+  await navigator.clipboard.writeText(
+    String(base_url + "/" + merchant.value!.slug)
+  );
+  toast.add({
+    title: "Form link copied!",
+    icon: "i-heroicons-check-circle",
+  });
+};
 
 const feedbackChart = useTemplateRef<HTMLCanvasElement>("feedbackChart");
 const completionChart = useTemplateRef<HTMLCanvasElement>("completionChart");
@@ -150,17 +168,36 @@ onMounted(() => {
     highlight-color="warning"
   >
     <template #body>
-      <h1>
-        You don't have any metrics to display here. Start to create the product
-        and its respective questions. Then try to collect responses.
-      </h1>
-      <UButton
-        label="Create a product"
-        target="/admin/products"
-        variant="outline"
-        color="primary"
-        class="mt-3"
-      />
+      <div v-if="products.length === 0">
+        <h1>
+          You don't have any metrics to display here. Start to create the
+          product and its respective questions. Then try to collect responses.
+        </h1>
+        <UButton
+          label="Create a product"
+          variant="outline"
+          color="primary"
+          class="mt-3"
+          @click="navigateTo('/admin/products')"
+        />
+      </div>
+      <div v-else>
+        <h1>
+          Make sure each product has questions assigned to it. Try to collect
+          responses/feedback from your customers by sharing this link to your
+          target respondents:
+        </h1>
+        <span class="text-neutral-400"
+          >{{ base_url }}/{{ merchant ? merchant!.slug : "" }}
+
+          <UButton
+            v-if="merchant"
+            icon="i-heroicons-square-2-stack-solid"
+            variant="ghost"
+            @click="copyLink"
+          />
+        </span>
+      </div>
     </template>
   </UPageCard>
   <!-- KPI Cards -->
