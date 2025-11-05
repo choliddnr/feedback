@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { watchDebounced } from "@vueuse/core";
 import type { Product, Question } from "~~/shared/types";
 
 const { selected_product, products, answers, all_questions, merchant } =
