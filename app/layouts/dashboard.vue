@@ -82,18 +82,34 @@ const links = computed(() => [
     },
   ],
 ]);
+onMounted(async () => {
+  console.log(merchants.value);
+  if (merchants.value === undefined) {
+    // if (route.path !== "/admin/merchants/add") navigateTo("/admin/merchants/add");
+    
+    const unwatch = watch(merchants, () => {
+      console.log(merchants.value);
+      
+      if (merchants.value) {
+        unwatch();
+        if (merchants.value.length === 0 && route.path !== "/admin/merchants/add")
+          navigateTo("/admin/merchants/add");
+      }
+    });
+     const unwatchRoute = watch(route, () => {
+      console.log("watch route");
+      
+      if (merchants.value) {
+        if (merchants.value.length === 0 && route.path !== "/admin/merchants/add")
+          navigateTo("/admin/merchants/add");
+        if (merchants.value.length > 0) {
+          unwatchRoute();
+        }
+      }
+    });
+  }
 
-if (!merchants.value) {
-  if (route.path !== "/admin/merchants/add") navigateTo("/admin/merchants/add");
-  const unwatch = watch(route, () => {
-    if (merchants.value && merchants.value.length > 0) {
-      unwatch();
-      return;
-    }
-    if (route.path !== "/admin/merchants/add")
-      navigateTo("/admin/merchants/add");
-  });
-}
+});
 </script>
 
 <template>
@@ -104,7 +120,7 @@ if (!merchants.value) {
       v-model:open="open"
       collapsible
       resizable
-      class="bg-elevated/25"
+      class="bg-elevated/25 display-none"
       :ui="{ footer: 'lg:border-t lg:border-default' }"
     >
       <template #header="{ collapsed }">

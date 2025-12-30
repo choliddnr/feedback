@@ -10,8 +10,8 @@ const _useDashboard = () => {
   let loadingAnimationSrc: string;
 
   if (import.meta.dev) {
-    loadingAnimationSrc = getImg("public/loading.gif");
-    emptyImage = getImg("public/empty.png");
+    loadingAnimationSrc = getImg("loading.gif");
+    emptyImage = getImg("empty.png");
   } else {
     loadingAnimationSrc = "/loading.gif";
     emptyImage = "/empty.png";

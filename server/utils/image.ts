@@ -1,72 +1,79 @@
-// server/utils/image.ts
-import { AwsClient } from 'aws4fetch';
 import type { H3Event } from 'h3';
 
-const endpoint = (e: H3Event, key: string) => {
-  const config = useRuntimeConfig(e);
-  return `https://s3.ap-southeast-1.wasabisys.com/${config.WASABI_BUCKET}/${key}`;
-};
-const aws = (e: H3Event) => {
-  const config = useRuntimeConfig(e);
-  return new AwsClient({
-    accessKeyId: config.WASABI_KEY!,
-    secretAccessKey: config.WASABI_SECRET!,
-    service: 's3',
-    region: 'ap-southeast-1', // Wasabi ignores this, so it can be anything
-  });
-};
+// This is the binding name for the R2 bucket in wrangler.toml
+// Make sure it matches your configuration.
+const R2_BINDING = 'R2_BUCKET';
 
-export const saveImg = async (e: H3Event, file: Blob, key: string) => {
-  const res = await aws(e).fetch(endpoint(e, key), {
-    method: 'PUT',
-    body: file,
-    headers: {
-      'Content-Type': 'application/octet-stream',
-    },
-  });
+// Helper to get the R2 bucket binding from the event context.
+// For type support, ensure `@cloudflare/workers-types` is added to your tsconfig.json
+function getBucket(e: H3Event) {
+  // The 'cloudflare' property is added to the context by nitro.
+  // @ts-ignore
+  if (!e.context.cloudflare.env.R2_BUCKET) {
+    throw new Error(`R2 binding '${R2_BINDING}' not found.`);
+  }
+  // @ts-ignore
+  return e.context.cloudflare.env.R2_BUCKET;
+}
 
-  if (!res.ok) {
+export const saveImg = async (e: H3Event, file: Blob | ArrayBuffer | Uint8Array | string, key: string) => {
+  const bucket = getBucket(e);
+
+  try {
+    let body = file;
+
+    
+    // Convert Node Buffer (or other ArrayBufferView) to Uint8Array for R2 compatibility
+    // @ts-ignore
+     if (file && typeof file === 'object' && 'buffer' in file) {
+      // @ts-ignore
+      body = new Uint8Array(file);
+    }
+    
+    await bucket.put(key, body as any);
+    return { success: true };
+  } catch (error: any) {
+    console.error('Error uploading to R2:', error.message);
     throw createError({
-      statusCode: res.status,
-      statusMessage: await res.text(),
+      statusCode: 500,
+      statusMessage: `Failed to upload image: ${error.message}`,
     });
   }
-
-  return { success: true };
 };
 
 export const getImg = async (e: H3Event, key: string) => {
-  const res = await aws(e).fetch(endpoint(e, key));
-  if (!res.ok) {
+  const bucket = getBucket(e);
+  
+  const object = await bucket.get(key);
+
+  if (object === null) {
     throw createError({
-      statusCode: res.status,
-      statusMessage: await res.text(),
+      statusCode: 404,
+      statusMessage: 'Image not found',
     });
   }
+  return object
 
-  return new Response(res.body, {
-    status: res.status,
-    headers: {
-      'Content-Type':
-        res.headers.get('content-type') || 'application/octet-stream',
-      'Cache-Control': 'public, max-age=3600', // optional caching
-    },
-  });
+  // const headers = new Headers();
+  // object.writeHttpMetadata(headers);
+  // headers.set('etag', object.httpEtag);
+  // headers.set('Cache-Control', 'public, max-age=3600'); // optional caching
+
+  // return new Response(object.body, {
+  //   headers,
+  // });
 };
 
 export const deleteImg = async (e: H3Event, key: string) => {
-  const res = await aws(e).fetch(endpoint(e, key), {
-    method: 'DELETE',
-  });
-
-  if (!res.ok) {
+  const bucket = getBucket(e);
+  try {
+    await bucket.delete(key);
+    return { success: true };
+  } catch (error: any) {
+    console.error('Error deleting from R2:', error);
     return {
       success: false,
-      error: await res.text(),
+      error: `Failed to delete image: ${error.message}`,
     };
   }
-
-  return {
-    success: true,
-  };
 };

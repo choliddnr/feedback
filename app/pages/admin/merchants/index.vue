@@ -1,5 +1,6 @@
 <script setup lang="ts">
 const { merchants } = storeToRefs(useMerchantsStore());
+const { emptyImage } = useDashboard();
 definePageMeta({
   layout: 'dashboard',
 });
@@ -48,7 +49,7 @@ definePageMeta({
         </UPageCard>
       </div>
       <div v-else class="w-auto mx-auto max-w-xs flex flex-col gap-5">
-        <NuxtImg src="/empty.png" />
+        <NuxtImg :src="emptyImage" />
         <span class="mx-auto font-bold text-xl">No Merchant </span>
         <UButton
           label="Create Merchant"

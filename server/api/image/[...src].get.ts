@@ -10,6 +10,7 @@ export default defineEventHandler(async (e) => {
   }
 
   try {
+    
     return await getImg(e, src);
   } catch (error) {
     console.error('get image error:', error);
