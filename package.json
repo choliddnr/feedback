@@ -41,6 +41,7 @@
     "@iconify-json/simple-icons": "^1.2.55",
     "@types/node": "^24.8.1",
     "@vitest/ui": "^4.0.16",
+    "baseline-browser-mapping": "^2.9.11",
     "drizzle-kit": "^0.31.5",
     "happy-dom": "^20.0.11",
     "tsx": "^4.20.6",

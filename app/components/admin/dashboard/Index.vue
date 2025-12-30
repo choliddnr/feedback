@@ -237,9 +237,9 @@ onMounted(() => {
   </div>
   <div v-else class="grid grid-cols-1 gap-6">
     <AdminDashboardAnalysis
-      v-for="(analysis, index) in analysis"
+      v-for="(_analysis, index) in analysis"
       :key="index"
-      :analysis="analysis"
+      :analysis="_analysis"
     />
   </div>
 </template>
