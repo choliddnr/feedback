@@ -25,7 +25,7 @@ export const useProductsStore = defineStore('products', () => {
       onRequest: () => {},
       onResponse: ({ response }) => {
         if (response.ok) {
-          products.value = response._data;
+           products.value = response._data ? response._data : [];
           if (!active_product.value) {
             active_product.value = products.value[0]?.id;
           }
