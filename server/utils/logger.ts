@@ -1,16 +1,11 @@
-export const logger = {
-  info: (message: string, context?: Record<string, any>) => {
-    console.log(`[INFO] ${message}`, context || '');
+import { createConsola } from 'consola';
+
+export const logger = createConsola({
+  // Use a tag to identify logs from the server application
+  defaults: {
+    tag: 'app',
   },
-  warn: (message: string, context?: Record<string, any>) => {
-    console.warn(`[WARN] ${message}`, context || '');
-  },
-  error: (message: string, error?: Error, context?: Record<string, any>) => {
-    console.error(`[ERROR] ${message}`, error, context || '');
-  },
-  debug: (message: string, context?: Record<string, any>) => {
-    if (process.env.NODE_ENV === 'development') {
-      console.debug(`[DEBUG] ${message}`, context || '');
-    }
-  },
-};
+  // Adjust log level based on environment if needed, or rely on defaults
+  // level: process.env.NODE_ENV === 'production' ? 3 : 4,
+});
+

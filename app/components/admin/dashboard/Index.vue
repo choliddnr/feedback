@@ -22,7 +22,7 @@ const { data: _analysisResult } = await useFetch<
   {
     products: Product;
     analysis: { product: number; analysis: string } | null;
-    products_to_responses: { product_id: number; response_id: number }[] | null;
+    products_to_responses: { product_id: number; response_id: number }[] | [];
   }[]
 >(() => "/api/analysis/merchant/" + active_merchant.value, {
   onResponse: ({ response }) => {
@@ -56,7 +56,7 @@ for (const item of _analysisResult.value || []) {
       recomendations: [],
       trends: [],
       un_analyzed_responses:
-        item.products_to_responses !== null
+        item.products_to_responses.length > 0
           ? item.products_to_responses.length
           : -1,
     });
@@ -75,7 +75,7 @@ for (const item of _analysisResult.value || []) {
       recomendations: _analysis.recomendations,
       trends: _analysis.trends,
       un_analyzed_responses:
-        item.products_to_responses !== null
+        item.products_to_responses.length > 0
           ? item.products_to_responses.length
           : 0,
     });
