@@ -6,7 +6,7 @@ import type { Product, ProductAnalysis } from "~~/shared/types";
 // const { kpis } = useDashboard();
 
 const loading = ref<boolean>(false);
-const isEmpty = ref<boolean>(false);
+const isEmpty = ref<boolean>(true);
 const analysis = ref<ProductAnalysis[]>([]);
 
 const toast = useToast();
@@ -100,7 +100,7 @@ const copyLink = async () => {
 
 const feedbackChart = useTemplateRef<HTMLCanvasElement>("feedbackChart");
 const completionChart = useTemplateRef<HTMLCanvasElement>("completionChart");
-  
+
 onMounted(() => {
   // Feedback Volume Over Time
   //   new Chart(feedbackChart.value!.getContext("2d")!, {

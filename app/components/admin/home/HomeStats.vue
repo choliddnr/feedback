@@ -25,7 +25,7 @@ const stats = computed<Stat[]>(() => [
   {
     title: "Respondents",
     icon: "i-lucide-users",
-    value: data.value!.respondent === undefined ? 0 : data.value!.respondent,
+    value: 0,//!data.value!.respondent ? 0 : data.value!.respondent,
     variation: 10,
   },
   {
