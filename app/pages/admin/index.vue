@@ -68,9 +68,10 @@ const period = ref<Period>("daily");
     </template>
 
     <template #body>
-      <AdminDashboard />
+      <!-- <AdminDashboard /> -->
 
-      <AdminHomeStats :period="period" :range="range" />
+      <!-- <AdminHomeStats :period="period" :range="range" /> -->
+       
       <!-- <HomeChart :period="period" :range="range" /> -->
       <!-- <AdminHomeResponseAnalysis /> -->
     </template>
