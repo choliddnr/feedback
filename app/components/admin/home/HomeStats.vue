@@ -7,11 +7,25 @@ const props = defineProps<{
 }>();
 const { active_merchant } = storeToRefs(useMerchantsStore());
 const { products } = storeToRefs(useProductsStore());
-const { data } = await useFetch<{
+const data = ref<{
+  respondent: number;
+  response: number;
+  avg_rating: number;
+}>({
+  respondent: 0,
+  response: 0,
+  avg_rating: 0.0,
+});
+await useFetch<{
   respondent: number;
   response: number;
   avg_rating: number;
 }>(() => "/api/statistics/" + active_merchant.value, {
+  onResponse: ({ response }) => {
+    data.value.respondent = response._data?.respondent || 0;
+    data.value.response = response._data?.response || 0;
+    data.value.avg_rating = response._data?.avg_rating || 0.0;
+  },
   watch: [active_merchant],
 });
 
