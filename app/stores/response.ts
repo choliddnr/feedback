@@ -10,7 +10,7 @@ import type {
 
 export const useResponseStore = defineStore("response", () => {
   const merchant = ref<Merchant>();
-  const respondent = ref<RespondentForm>();
+  const respondent = ref<RespondentForm>({} as RespondentForm);
   const selected_product = ref<number[]>([]);
   const products = ref<Product[]>([]);
   const answers = ref(new Map());

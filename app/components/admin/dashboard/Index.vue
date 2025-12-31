@@ -18,72 +18,76 @@ const merchant = computed(() =>
   merchants.value!.find((m) => m.id === active_merchant.value)
 );
 
-const { data: _analysisResult } = await useFetch<
-  {
-    products: Product;
-    analysis: { product: number; analysis: string } | null;
-    products_to_responses: { product_id: number; response_id: number }[] | [];
-  }[]
->(() => "/api/analysis/merchant/" + active_merchant.value, {
-  onResponse: ({ response }) => {
-    loading.value = false;
-    if (response.status === 404) {
-      isEmpty.value = true;
-    }
-  },
-  onRequest: ({}) => {
-    loading.value = true;
-  },
-});
+if(products.value.length !== 0){
+ 
 
-if (!_analysisResult.value){ 
-  isEmpty.value = true
-} else if( _analysisResult.value.length === 0) {
-  isEmpty.value = true;
-} else {
-  isEmpty.value = false;
-}
+  const { data: _analysisResult } = await useFetch<
+    {
+      products: Product;
+      analysis: { product: number; analysis: string } | null;
+      products_to_responses: { product_id: number; response_id: number }[] | [];
+    }[]
+  >(() => "/api/analysis/merchant/" + active_merchant.value, {
+    onResponse: ({ response }) => {
+      loading.value = false;
+      if (response.status === 404) {
+        isEmpty.value = true;
+      }
+    },
+    onRequest: ({}) => {
+      loading.value = true;
+    },
+  });
 
-for (const item of _analysisResult.value || []) {
-  if (!item.analysis) {
-    analysis.value.push({
-      product: item.products.id,
-      name: `🔥 ${item.products.title}`,
-      average_rating: 0,
-      sentiment: { positive: 0, neutral: 0, negative: 0 },
-      net_promoter_score: 0,
-      summary: "No analysis available.",
-      themes: [],
-      highlight: "",
-      recomendations: [],
-      trends: [],
-      un_analyzed_responses:
-        item.products_to_responses.length > 0
-          ? item.products_to_responses.length
-          : -1,
-    });
+  if (!_analysisResult.value){ 
+    isEmpty.value = true
+  } else if( _analysisResult.value.length === 0) {
+    isEmpty.value = true;
   } else {
-    const _analysis = JSON.parse(item.analysis.analysis) as ProductAnalysis;
-
-    analysis.value.push({
-      product: item.products.id,
-      name: `🔥 ${item.products.title}`,
-      average_rating: _analysis.average_rating,
-      sentiment: _analysis.sentiment,
-      net_promoter_score: _analysis.net_promoter_score,
-      summary: _analysis.summary,
-      themes: _analysis.themes,
-      highlight: _analysis.highlight,
-      recomendations: _analysis.recomendations,
-      trends: _analysis.trends,
-      un_analyzed_responses:
-        item.products_to_responses.length > 0
-          ? item.products_to_responses.length
-          : 0,
-    });
+    isEmpty.value = false;
   }
-}
 
+  for (const item of _analysisResult.value || []) {
+    if (!item.analysis) {
+      analysis.value.push({
+        product: item.products.id,
+        name: `🔥 ${item.products.title}`,
+        average_rating: 0,
+        sentiment: { positive: 0, neutral: 0, negative: 0 },
+        net_promoter_score: 0,
+        summary: "No analysis available.",
+        themes: [],
+        highlight: "",
+        recomendations: [],
+        trends: [],
+        un_analyzed_responses:
+          item.products_to_responses.length > 0
+            ? item.products_to_responses.length
+            : -1,
+      });
+    } else {
+      const _analysis = JSON.parse(item.analysis.analysis) as ProductAnalysis;
+
+      analysis.value.push({
+        product: item.products.id,
+        name: `🔥 ${item.products.title}`,
+        average_rating: _analysis.average_rating,
+        sentiment: _analysis.sentiment,
+        net_promoter_score: _analysis.net_promoter_score,
+        summary: _analysis.summary,
+        themes: _analysis.themes,
+        highlight: _analysis.highlight,
+        recomendations: _analysis.recomendations,
+        trends: _analysis.trends,
+        un_analyzed_responses:
+          item.products_to_responses.length > 0
+            ? item.products_to_responses.length
+            : 0,
+      });
+    }
+  }
+
+}
 const copyLink = async () => {
   await navigator.clipboard.writeText(
     String(base_url + "/" + merchant.value!.slug)
@@ -96,7 +100,7 @@ const copyLink = async () => {
 
 const feedbackChart = useTemplateRef<HTMLCanvasElement>("feedbackChart");
 const completionChart = useTemplateRef<HTMLCanvasElement>("completionChart");
-
+  
 onMounted(() => {
   // Feedback Volume Over Time
   //   new Chart(feedbackChart.value!.getContext("2d")!, {
