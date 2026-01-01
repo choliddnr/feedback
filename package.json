@@ -27,7 +27,7 @@
     "drizzle-orm": "^0.44.6",
     "drizzle-zod": "^0.8.3",
     "nitro-cloudflare-dev": "^0.2.2",
-    "nuxt": "4.1.2",
+    "nuxt": "4.2.2",
     "pinia": "^3.0.3",
     "tailwindcss": "^4.1.15",
     "vue": "^3.5.22",

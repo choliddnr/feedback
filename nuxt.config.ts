@@ -47,4 +47,7 @@ export default defineNuxtConfig({
       BASE_URL: process.env.NUXT_BASE_URL,
     },
   },
+   experimental: {
+    viteEnvironmentApi: true
+  }
 });
