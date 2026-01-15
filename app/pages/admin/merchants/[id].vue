@@ -234,18 +234,17 @@ const copyLink = async () => {
               <div v-if="isEdit" class="flex gap-1">
                 <UButton
                   type="submit"
-                  label="Save Changes"
                   color="neutral"
                   leading-icon="i-heroicons-document-check-16-solid"
                   :loading="on_submit"
                   @click="form?.submit()"
-                />
+                ><span class="hidden sm:block">Save Changes</span></UButton>
                 <UButton
                   label="Cancel"
                   color="error"
                   leading-icon="i-heroicons-x-mark-16-solid"
                   @click="isEdit = false"
-                />
+               ><span class="hidden sm:block">Cancel</span></UButton>
               </div>
               <UButton
                 v-else

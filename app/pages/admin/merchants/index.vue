@@ -35,10 +35,10 @@ definePageMeta({
           orientation="horizontal"
           spotlight
           spotlight-color="primary"
-          class="w-full xl:w-[50%] max-h-96"
+          class="w-full md:w-1/2 sm:w-1/3 xl:w-1/4 h-full"
+          :ui="{container:'sm:grid-cols-3' }"
           reverse
         >
-          <!-- class="md:w-[25%] lg:w-[20%]" -->
           <template #default>
             <NuxtImg
               :src="merchant.logo ? getImg(merchant.logo) : ''"

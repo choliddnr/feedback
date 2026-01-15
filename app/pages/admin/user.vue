@@ -169,21 +169,21 @@ const deleteAccount = () => {
                   leading-icon="i-heroicons-document-check-16-solid"
                   :loading="onSubmitting"
                   @click="formRef!.submit"
-                />
+                ><span class="hidden sm:block">Save Changes</span></UButton>
                 <UButton
                   label="Cancel"
                   color="error"
                   leading-icon="i-heroicons-x-mark-16-solid"
                   @click="isEdit = false"
-                />
+                ><span class="hidden sm:block">Cancel</span></UButton>
               </div>
               <UButton
                 v-else
-                label="Edit Profile"
+                label=""
                 color="neutral"
                 leading-icon="i-heroicons-pencil-square-16-solid"
                 @click="isEdit = true"
-              />
+              ><p class="hidden sm:block">Edit Profile</p></UButton>
             </div>
           </Transition>
         </template>

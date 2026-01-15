@@ -177,18 +177,16 @@ const onSubmit = async (event: FormSubmitEvent<Schema>) => {
           <Transition mode="out-in" name="slide-right">
             <div class="flex gap-1">
               <UButton
-                label="Save Changes"
                 color="neutral"
                 leading-icon="i-heroicons-document-check-16-solid"
                 :loading="on_submit"
                 @click="form?.submit()"
-              />
+              ><span class="hidden sm:block">Create</span></UButton>
               <UButton
-                label="Cancel"
                 color="error"
                 leading-icon="i-heroicons-x-mark-16-solid"
                 @click="navigateTo('/admin/merchants')"
-              />
+              ><span class="hidden sm:block">Cancel</span></UButton>
             </div>
           </Transition>
         </template>
