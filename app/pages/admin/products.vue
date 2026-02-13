@@ -100,7 +100,10 @@ onMounted(() => {
     </template>
 
     <template #body>
-      <div v-if="products && products.length > 0" class="flex flex-col md:flex-row gap-3">
+      <div
+        v-if="products && products.length > 0"
+        class="flex flex-col md:flex-row gap-3"
+      >
         <!-- class="md:w-[25%] lg:w-[20%]" -->
         <UPageCard
           v-for="product in products"
@@ -109,7 +112,7 @@ onMounted(() => {
           orientation="vertical"
           spotlight
           spotlight-color="primary"
-          class="md:w-1/4 lg:w-1/5"
+          class="md:w-1/4 lg:w-1/5 sm:w-1/35?6h"
           :ui="{ footer: 'w-full' }"
           reverse
         >

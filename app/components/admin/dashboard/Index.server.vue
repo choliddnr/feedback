@@ -15,12 +15,10 @@ const { active_merchant, merchants } = storeToRefs(useMerchantsStore());
 const { products } = storeToRefs(useProductsStore());
 
 const merchant = computed(() =>
-  merchants.value!.find((m) => m.id === active_merchant.value)
+  merchants.value!.find((m) => m.id === active_merchant.value),
 );
 
-if(products.value.length !== 0){
- 
-
+if (products.value.length !== 0) {
   const { data: _analysisResult } = await useFetch<
     {
       products: Product;
@@ -39,9 +37,9 @@ if(products.value.length !== 0){
     },
   });
 
-  if (!_analysisResult.value){ 
-    isEmpty.value = true
-  } else if( _analysisResult.value.length === 0) {
+  if (!_analysisResult.value) {
+    isEmpty.value = true;
+  } else if (_analysisResult.value.length === 0) {
     isEmpty.value = true;
   } else {
     isEmpty.value = false;
@@ -86,11 +84,10 @@ if(products.value.length !== 0){
       });
     }
   }
-
 }
 const copyLink = async () => {
   await navigator.clipboard.writeText(
-    String(base_url + "/" + merchant.value!.slug)
+    String(base_url + "/" + merchant.value!.slug),
   );
   toast.add({
     title: "Form link copied!",

@@ -2,9 +2,9 @@
 export default defineNuxtConfig({
   nitro: {
     preset: "cloudflare_pages",
-    logLevel: 3, // very important
+    // logLevel: 3, // very important
   },
-  debug: true,
+  // debug: true,
   compatibilityDate: "2025-07-15",
   devtools: { enabled: true },
   modules: [
@@ -47,7 +47,7 @@ export default defineNuxtConfig({
       BASE_URL: process.env.NUXT_BASE_URL,
     },
   },
-   experimental: {
-    viteEnvironmentApi: true
-  }
+  experimental: {
+    viteEnvironmentApi: true,
+  },
 });
