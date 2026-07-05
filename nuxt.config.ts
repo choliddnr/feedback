@@ -26,7 +26,7 @@ export default defineNuxtConfig({
     provider: "google",
   },
   pinia: {
-    storesDirs: ["./app/stores"],
+    storesDirs: ["./stores/**"],
   },
   routeRules: {
     "/admin/**": {
@@ -36,12 +36,9 @@ export default defineNuxtConfig({
   },
   runtimeConfig: {
     // Private (server-only) keys
-    BETTER_AUTH_SECRET: "",
-    GOOGLE_CLIENT_ID: "",
-    GOOGLE_CLIENT_SECRET: "",
-    WASABI_KEY: process.env.NUXT_WASABI_KEY,
-    WASABI_SECRET: process.env.NUXT_WASABI_SECRET,
-    WASABI_BUCKET: process.env.NUXT_WASABI_BUCKET,
+    BETTER_AUTH_SECRET: process.env.NUXT_BETTER_AUTH_SECRET,
+    GOOGLE_CLIENT_ID: process.env.NUXT_GOOGLE_CLIENT_ID,
+    GOOGLE_CLIENT_SECRET: process.env.NUXT_GOOGLE_CLIENT_SECRET,
     geminiApiKey: process.env.NUXT_GEMINI_API_KEY || "",
     public: {
       BASE_URL: process.env.NUXT_BASE_URL,
@@ -50,4 +47,15 @@ export default defineNuxtConfig({
   experimental: {
     viteEnvironmentApi: true,
   },
+  vite: {
+    optimizeDeps: {
+      include: [
+        'better-auth/client/plugins',
+        'better-auth/vue',
+        'chart.js/auto',
+        'date-fns',
+        'zod',
+      ]
+    }
+  }
 });

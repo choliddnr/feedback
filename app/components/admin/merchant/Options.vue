@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { DropdownMenuItem } from "@nuxt/ui";
+import { useMerchantsStore } from "~/stores/merchants";
 import type { Merchant } from "~~/shared/types";
 defineProps<{
   collapsed?: boolean;

@@ -1,1 +1,3 @@
 bc/*
+server/utils/db/schema/db.ts
+server/utils/db/schema/better-auth.ts

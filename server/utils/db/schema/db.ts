@@ -1,232 +1,232 @@
-import { int, sqliteTable, text } from "drizzle-orm/sqlite-core";
-import type { AnySQLiteColumn } from "drizzle-orm/sqlite-core";
+// import { int, sqliteTable, text } from "drizzle-orm/sqlite-core";
+// import type { AnySQLiteColumn } from "drizzle-orm/sqlite-core";
 
-import { createInsertSchema, createUpdateSchema } from "drizzle-zod";
-import { z } from "zod";
-import dafaultField from "./default_field";
-import { user } from "./better-auth";
-import { Merchant } from "~~/shared/types";
-export { sql, eq, and, or, gte, lte } from "drizzle-orm";
+// import { createInsertSchema, createUpdateSchema } from "drizzle-zod";
+// import { z } from "zod";
+// import dafaultField from "./default_field";
+// import { user } from "./better-auth";
+// import { Merchant } from "~~/shared/types";
+// export { sql, eq, and, or, gte, lte } from "drizzle-orm";
 
-// export const users = sqliteTable("users", {
-//   name: text().notNull(),
-//   email: text().notNull().unique(),
-//   username: text().notNull().unique(),
-//   picture: text(),
-//   default_merchant: int().references((): AnySQLiteColumn => merchants.id),
+// // export const users = sqliteTable("users", {
+// //   name: text().notNull(),
+// //   email: text().notNull().unique(),
+// //   username: text().notNull().unique(),
+// //   picture: text(),
+// //   default_merchant: int().references((): AnySQLiteColumn => merchants.id),
+// //   ...dafaultField,
+// // });
+
+// export const merchants = sqliteTable("merchants", {
+//   title: text().notNull(),
+//   slug: text().notNull(),
+//   description: text(),
+//   category: int().references((): AnySQLiteColumn => merchant_categories.id, {
+//     onDelete: "set null",
+//   }),
+//   owner: int().references((): AnySQLiteColumn => user.id, {
+//     onDelete: "cascade",
+//   }),
+//   greeting: text().notNull(),
+//   primery_color: text(),
+//   image_background: text(),
+//   logo: text().notNull(),
 //   ...dafaultField,
 // });
 
-export const merchants = sqliteTable("merchants", {
-  title: text().notNull(),
-  slug: text().notNull(),
-  description: text(),
-  category: int().references((): AnySQLiteColumn => merchant_categories.id, {
-    onDelete: "set null",
-  }),
-  owner: int().references((): AnySQLiteColumn => user.id, {
-    onDelete: "cascade",
-  }),
-  greeting: text().notNull(),
-  primery_color: text(),
-  image_background: text(),
-  logo: text().notNull(),
-  ...dafaultField,
-});
+// export const InsertMerchantSchema = z.object({
+//   title: z.string().min(4),
+//   slug: z
+//     .string()
+//     .min(4)
+//     .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, {
+//       message:
+//         "Slug must be lowercase and can only contain letters, numbers, and dashes.",
+//     }),
+//   description: z.string().optional(),
+//   category: z.number().int().gt(0),
+//   owner: z.number().int().gt(0),
+//   greeting: z.string().optional(),
+//   primery_color: z.string().min(4).max(20).optional(),
+//   image_background: z.string().min(4).max(200).optional(),
+//   logo: z.string().min(4).max(200),
+// });
 
-export const InsertMerchantSchema = z.object({
-  title: z.string().min(4),
-  slug: z
-    .string()
-    .min(4)
-    .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, {
-      message:
-        "Slug must be lowercase and can only contain letters, numbers, and dashes.",
-    }),
-  description: z.string().optional(),
-  category: z.number().int().gt(0),
-  owner: z.number().int().gt(0),
-  greeting: z.string().optional(),
-  primery_color: z.string().min(4).max(20).optional(),
-  image_background: z.string().min(4).max(200).optional(),
-  logo: z.string().min(4).max(200),
-});
+// export type InsertMerchant = z.infer<typeof InsertMerchantSchema>;
 
-export type InsertMerchant = z.infer<typeof InsertMerchantSchema>;
+// export const UpdateMerchantSchema = createUpdateSchema(merchants, {
+//   title: (field) => field.min(4),
+//   slug: (field) =>
+//     field.min(4).refine((value) => /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(value), {
+//       message:
+//         "Slug must be lowercase and can only contain letters, numbers, and dashes.",
+//     }),
+//   description: (field) => field.optional(),
+//   category: (field) => field.gt(0),
+//   owner: (field) => field.gt(0),
+//   greeting: (field) => field.optional(),
+//   primery_color: (field) => field.min(4).max(20).optional(),
+//   image_background: (field) => field.min(4).max(200).optional(),
+//   logo: (field) => field.min(4).max(200),
+// }).omit({
+//   id: true,
+//   createdAt: true,
+//   updatedAt: true,
+// });
 
-export const UpdateMerchantSchema = createUpdateSchema(merchants, {
-  title: (field) => field.min(4),
-  slug: (field) =>
-    field.min(4).refine((value) => /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(value), {
-      message:
-        "Slug must be lowercase and can only contain letters, numbers, and dashes.",
-    }),
-  description: (field) => field.optional(),
-  category: (field) => field.gt(0),
-  owner: (field) => field.gt(0),
-  greeting: (field) => field.optional(),
-  primery_color: (field) => field.min(4).max(20).optional(),
-  image_background: (field) => field.min(4).max(200).optional(),
-  logo: (field) => field.min(4).max(200),
-}).omit({
-  id: true,
-  createdAt: true,
-  updatedAt: true,
-});
+// export const merchant_categories = sqliteTable("merchant_categories", {
+//   title: text().notNull(),
+//   description: text(),
+//   ...dafaultField,
+// });
 
-export const merchant_categories = sqliteTable("merchant_categories", {
-  title: text().notNull(),
-  description: text(),
-  ...dafaultField,
-});
+// export const products = sqliteTable("products", {
+//   title: text().notNull(),
+//   description: text().notNull(),
+//   image: text().notNull(),
+//   merchant: int()
+//     .notNull()
+//     .references((): AnySQLiteColumn => merchants.id, { onDelete: "cascade" }),
+//   ...dafaultField,
+// });
 
-export const products = sqliteTable("products", {
-  title: text().notNull(),
-  description: text().notNull(),
-  image: text().notNull(),
-  merchant: int()
-    .notNull()
-    .references((): AnySQLiteColumn => merchants.id, { onDelete: "cascade" }),
-  ...dafaultField,
-});
+// export const InsertProductSchema = createInsertSchema(products, {
+//   title: (field) => field.min(5).max(25),
+//   merchant: (field) => field.gt(0),
+// }).omit({
+//   id: true,
+//   description: true,
+//   image: true,
+//   createdAt: true,
+//   updatedAt: true,
+// });
 
-export const InsertProductSchema = createInsertSchema(products, {
-  title: (field) => field.min(5).max(25),
-  merchant: (field) => field.gt(0),
-}).omit({
-  id: true,
-  description: true,
-  image: true,
-  createdAt: true,
-  updatedAt: true,
-});
+// export const UpdateProductSchema = createUpdateSchema(products, {
+//   title: (field) => field.min(5).max(25),
+//   merchant: (field) => field.gt(0),
+// }).omit({
+//   id: true,
+//   description: true,
+//   image: true,
+//   createdAt: true,
+//   updatedAt: true,
+// });
 
-export const UpdateProductSchema = createUpdateSchema(products, {
-  title: (field) => field.min(5).max(25),
-  merchant: (field) => field.gt(0),
-}).omit({
-  id: true,
-  description: true,
-  image: true,
-  createdAt: true,
-  updatedAt: true,
-});
+// export const questions = sqliteTable("questions", {
+//   question: text().notNull(),
+//   type: int()
+//     .notNull()
+//     .references((): AnySQLiteColumn => question_types.id, {
+//       onDelete: "set null",
+//     }),
+//   product: int()
+//     .notNull()
+//     .references((): AnySQLiteColumn => products.id, { onDelete: "cascade" }),
+//   answer_options: text({ mode: "json" })
+//     .notNull()
+//     .$type<string[]>()
+//     .default([]),
+//   ...dafaultField,
+// });
 
-export const questions = sqliteTable("questions", {
-  question: text().notNull(),
-  type: int()
-    .notNull()
-    .references((): AnySQLiteColumn => question_types.id, {
-      onDelete: "set null",
-    }),
-  product: int()
-    .notNull()
-    .references((): AnySQLiteColumn => products.id, { onDelete: "cascade" }),
-  answer_options: text({ mode: "json" })
-    .notNull()
-    .$type<string[]>()
-    .default([]),
-  ...dafaultField,
-});
+// export const InsertQuestionSchema = createInsertSchema(questions, {
+//   question: (field) => field.min(10),
+//   product: (field) => field.gt(0),
+//   type: (field) => field.gt(0),
+// }).omit({
+//   id: true,
+//   createdAt: true,
+//   updatedAt: true,
+// });
 
-export const InsertQuestionSchema = createInsertSchema(questions, {
-  question: (field) => field.min(10),
-  product: (field) => field.gt(0),
-  type: (field) => field.gt(0),
-}).omit({
-  id: true,
-  createdAt: true,
-  updatedAt: true,
-});
+// export const UpdateQuestionSchema = createUpdateSchema(questions, {
+//   question: (field) => field.min(10),
+//   product: (field) => field.gt(0),
+//   type: (field) => field.gt(0),
+// }).omit({
+//   id: true,
+//   createdAt: true,
+//   updatedAt: true,
+// });
 
-export const UpdateQuestionSchema = createUpdateSchema(questions, {
-  question: (field) => field.min(10),
-  product: (field) => field.gt(0),
-  type: (field) => field.gt(0),
-}).omit({
-  id: true,
-  createdAt: true,
-  updatedAt: true,
-});
+// export const question_types = sqliteTable("question_types", {
+//   title: text().notNull(),
+//   description: text(),
+//   ...dafaultField,
+// });
 
-export const question_types = sqliteTable("question_types", {
-  title: text().notNull(),
-  description: text(),
-  ...dafaultField,
-});
+// export const respondents = sqliteTable("respondents", {
+//   name: text().notNull(),
+//   gender: int({ mode: "boolean" }).notNull(),
+//   age: int().notNull(),
+//   whatsapp: int(),
+//   location: text({ mode: "json" }).$type<[number, number]>(),
+//   ...dafaultField,
+// });
 
-export const respondents = sqliteTable("respondents", {
-  name: text().notNull(),
-  gender: int({ mode: "boolean" }).notNull(),
-  age: int().notNull(),
-  whatsapp: int(),
-  location: text({ mode: "json" }).$type<[number, number]>(),
-  ...dafaultField,
-});
+// export const InsertRespondentsSchema = createInsertSchema(respondents, {
+//   name: (field) => field.min(3),
+//   age: (field) => field.gte(20).lte(90),
+//   gender: (field) => field,
+//   whatsapp: (field) => field.gt(100000000).lt(10000000000000).nullable(),
+// }).omit({
+//   id: true,
+//   createdAt: true,
+//   updatedAt: true,
+//   location: true,
+// });
 
-export const InsertRespondentsSchema = createInsertSchema(respondents, {
-  name: (field) => field.min(3),
-  age: (field) => field.gte(20).lte(90),
-  gender: (field) => field,
-  whatsapp: (field) => field.gt(100000000).lt(10000000000000).nullable(),
-}).omit({
-  id: true,
-  createdAt: true,
-  updatedAt: true,
-  location: true,
-});
+// export const responses = sqliteTable("responses", {
+//   merchant: int()
+//     .notNull()
+//     .references((): AnySQLiteColumn => merchants.id, { onDelete: "cascade" }),
+//   respondent: int()
+//     .references((): AnySQLiteColumn => respondents.id, {
+//       onDelete: "set default",
+//     })
+//     .$default(() => 0),
+//   ...dafaultField,
+// });
 
-export const responses = sqliteTable("responses", {
-  merchant: int()
-    .notNull()
-    .references((): AnySQLiteColumn => merchants.id, { onDelete: "cascade" }),
-  respondent: int()
-    .references((): AnySQLiteColumn => respondents.id, {
-      onDelete: "set default",
-    })
-    .$default(() => 0),
-  ...dafaultField,
-});
+// export const products_to_responses = sqliteTable("products_to_responses", {
+//   product_id: int()
+//     .notNull()
+//     .references(() => products.id, {
+//       onDelete: "cascade",
+//     }),
+//   response_id: int()
+//     .notNull()
+//     .references(() => respondents.id, {
+//       onDelete: "cascade",
+//     }),
+//   ...dafaultField,
+// });
 
-export const products_to_responses = sqliteTable("products_to_responses", {
-  product_id: int()
-    .notNull()
-    .references(() => products.id, {
-      onDelete: "cascade",
-    }),
-  response_id: int()
-    .notNull()
-    .references(() => respondents.id, {
-      onDelete: "cascade",
-    }),
-  ...dafaultField,
-});
+// export const response_answers = sqliteTable("response_answers", {
+//   response: int().references((): AnySQLiteColumn => responses.id, {
+//     onDelete: "cascade",
+//   }),
+//   question: int().references((): AnySQLiteColumn => questions.id, {
+//     onDelete: "cascade",
+//   }),
+//   answer: text().notNull(),
+//   ...dafaultField,
+// });
 
-export const response_answers = sqliteTable("response_answers", {
-  response: int().references((): AnySQLiteColumn => responses.id, {
-    onDelete: "cascade",
-  }),
-  question: int().references((): AnySQLiteColumn => questions.id, {
-    onDelete: "cascade",
-  }),
-  answer: text().notNull(),
-  ...dafaultField,
-});
+// export const InsertResponseAnswerSchema = createInsertSchema(response_answers, {
+//   answer: (field) => field.nonempty(),
+// }).omit({
+//   id: true,
+//   createdAt: true,
+//   updatedAt: true,
+//   response: true,
+//   question: true,
+// });
 
-export const InsertResponseAnswerSchema = createInsertSchema(response_answers, {
-  answer: (field) => field.nonempty(),
-}).omit({
-  id: true,
-  createdAt: true,
-  updatedAt: true,
-  response: true,
-  question: true,
-});
-
-export const analysis = sqliteTable("analysis", {
-  product: int().references((): AnySQLiteColumn => products.id, {
-    onDelete: "cascade",
-  }),
-  analysis: text().notNull(),
-  ...dafaultField,
-});
+// export const analysis = sqliteTable("analysis", {
+//   product: int().references((): AnySQLiteColumn => products.id, {
+//     onDelete: "cascade",
+//   }),
+//   analysis: text().notNull(),
+//   ...dafaultField,
+// });

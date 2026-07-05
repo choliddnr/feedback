@@ -58,6 +58,7 @@ const onSave = async () => {
             movable
             :width="500"
             :height="500"
+            :aspect-ratio="1"
           >
             <CropperGrid role="grid" covered />
             <CropperCrosshair centered />

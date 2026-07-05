@@ -24,6 +24,7 @@ onMounted(() => {
 
 <template>
   <div>
+    <NuxtAnnouncer />
     <NuxtRouteAnnouncer />
     <NuxtLoadingIndicator />
     <UApp>

@@ -4,6 +4,9 @@ import { z } from "zod";
 import type { NavigationMenuItem } from "@nuxt/ui";
 import type { ImageError, Merchant } from "~~/shared/types";
 import { LazyAdminMerchantEditLogo } from "#components";
+import { useMerchantCategoriesStore } from "../../../stores/merchant_categories";
+import { useUserStore } from "../../../stores/user";
+import { useMerchantsStore } from "../../../stores/merchants"; 
 
 definePageMeta({
   layout: "dashboard",
