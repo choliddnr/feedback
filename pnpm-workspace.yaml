@@ -9,3 +9,5 @@ allowBuilds:
   workerd: true
 minimumReleaseAgeExclude:
   - vue-cropperjs2@0.0.4 || 0.0.5
+overrides:
+  vite: 8.1.2
